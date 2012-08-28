@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: centos | devops-ar]]></title>
-  <link href="http://www.devops.com.ar/blog/categories/centos/atom.xml" rel="self"/>
-  <link href="http://www.devops.com.ar/"/>
-  <updated>2012-08-27T23:02:40-03:00</updated>
-  <id>http://www.devops.com.ar/</id>
+  <link href="http://devops-ar.github.com/blog/categories/centos/atom.xml" rel="self"/>
+  <link href="http://devops-ar.github.com/"/>
+  <updated>2012-08-27T23:24:25-03:00</updated>
+  <id>http://devops-ar.github.com/</id>
   <author>
     <name><![CDATA[osvaldo]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[creating an rpm package from on tgz file]]></title>
-    <link href="http://www.devops.com.ar/blog/2011/12/17/creating-an-rpm-package-from-on-a-tgz-file/"/>
+    <link href="http://devops-ar.github.com/blog/2011/12/17/creating-an-rpm-package-from-on-a-tgz-file/"/>
     <updated>2011-12-17T15:26:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2011/12/17/creating-an-rpm-package-from-on-a-tgz-file</id>
+    <id>http://devops-ar.github.com/blog/2011/12/17/creating-an-rpm-package-from-on-a-tgz-file</id>
     <content type="html"><![CDATA[<p><em>disclaimer: this is only for creating an rpm for installing a set of files, no compiling, just a bunch of file being copied into a server.</em></p>
 
 <p>Starting from a tgz file, an rpm package will be created. Sometimes, a tgz file is quicker/easier to use. However, in the long run, sticking to a package management system for handling the installation of applications on a system will pay off for sure.</p>

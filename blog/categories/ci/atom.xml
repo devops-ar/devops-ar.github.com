@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: ci | devops-ar]]></title>
-  <link href="http://www.devops.com.ar/blog/categories/ci/atom.xml" rel="self"/>
-  <link href="http://www.devops.com.ar/"/>
-  <updated>2012-08-27T23:02:40-03:00</updated>
-  <id>http://www.devops.com.ar/</id>
+  <link href="http://devops-ar.github.com/blog/categories/ci/atom.xml" rel="self"/>
+  <link href="http://devops-ar.github.com/"/>
+  <updated>2012-08-27T23:24:25-03:00</updated>
+  <id>http://devops-ar.github.com/</id>
   <author>
     <name><![CDATA[osvaldo]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[instalacion de un server de ci]]></title>
-    <link href="http://www.devops.com.ar/blog/2011/11/30/instalacion-de-un-server-de-ci/"/>
+    <link href="http://devops-ar.github.com/blog/2011/11/30/instalacion-de-un-server-de-ci/"/>
     <updated>2011-11-30T14:26:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2011/11/30/instalacion-de-un-server-de-ci</id>
+    <id>http://devops-ar.github.com/blog/2011/11/30/instalacion-de-un-server-de-ci</id>
     <content type="html"><![CDATA[<p>CI - Continuous Integration.</p>
 
 <p>Este post describe la instalación de un servidor de integración continua. El mismo estará integrado por jenkins, maven y sonar.</p>
@@ -106,9 +106,9 @@ $CATALINA_HOME/webapps/ROOT/index.html</p>
 server<p /></p>
 
 <ul>
-<li><a href="http://www.devops.com.ar/jenkins">jenkins</a></li>
-<li><a href="http://www.devops.com.ar/sonar">sonar</a></li>
-<li><a href="http://www.devops.com.ar/nexus">nexus</a></li>
+<li><a href="http://devops-ar.github.com/jenkins">jenkins</a></li>
+<li><a href="http://devops-ar.github.com/sonar">sonar</a></li>
+<li><a href="http://devops-ar.github.com/nexus">nexus</a></li>
 </ul>
 
 

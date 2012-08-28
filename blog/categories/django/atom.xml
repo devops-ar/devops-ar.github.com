@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: django | devops-ar]]></title>
-  <link href="http://www.devops.com.ar/blog/categories/django/atom.xml" rel="self"/>
-  <link href="http://www.devops.com.ar/"/>
-  <updated>2012-08-27T23:02:40-03:00</updated>
-  <id>http://www.devops.com.ar/</id>
+  <link href="http://devops-ar.github.com/blog/categories/django/atom.xml" rel="self"/>
+  <link href="http://devops-ar.github.com/"/>
+  <updated>2012-08-27T23:24:25-03:00</updated>
+  <id>http://devops-ar.github.com/</id>
   <author>
     <name><![CDATA[osvaldo]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Usando python con virtualenv ]]></title>
-    <link href="http://www.devops.com.ar/blog/2011/11/26/usando-python-con-virtualenv/"/>
+    <link href="http://devops-ar.github.com/blog/2011/11/26/usando-python-con-virtualenv/"/>
     <updated>2011-11-26T00:08:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2011/11/26/usando-python-con-virtualenv</id>
+    <id>http://devops-ar.github.com/blog/2011/11/26/usando-python-con-virtualenv</id>
     <content type="html"><![CDATA[<p>Una buena introducción se puede encontrar aca en los siguientes posts, uno en <a href="http://www.saltycrane.com/blog/2009/05/notes-using-pip-and-virtualenv-django/">inglés</a> y otro en <a href="http://elweb.co/uncategorized/django-deployment-3-virtualenv-virtualenvwrapper-pip/">castellano</a>.</p>
 
 <p>Sistemas Operativos como CentOS o Gentoo hacen uso de python para sus herramientas de gestión de paquetes, no es recomendable modificar manualmente la versión de python o jugar con las versiones de los módulos. Pero puede suceder que nos haga falta utilizar una versión superior de python o cierto módulo para un proyecto en el que estemos trabajando. En este caso, virtualenv es una solución.</p>

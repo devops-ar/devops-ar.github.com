@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: knife | devops-ar]]></title>
-  <link href="http://www.devops.com.ar/blog/categories/knife/atom.xml" rel="self"/>
-  <link href="http://www.devops.com.ar/"/>
-  <updated>2012-08-27T23:02:40-03:00</updated>
-  <id>http://www.devops.com.ar/</id>
+  <link href="http://devops-ar.github.com/blog/categories/knife/atom.xml" rel="self"/>
+  <link href="http://devops-ar.github.com/"/>
+  <updated>2012-08-27T23:24:25-03:00</updated>
+  <id>http://devops-ar.github.com/</id>
   <author>
     <name><![CDATA[osvaldo]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[empezando con chef]]></title>
-    <link href="http://www.devops.com.ar/blog/2012/02/03/empezando-con-chef/"/>
+    <link href="http://devops-ar.github.com/blog/2012/02/03/empezando-con-chef/"/>
     <updated>2012-02-03T02:20:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2012/02/03/empezando-con-chef</id>
+    <id>http://devops-ar.github.com/blog/2012/02/03/empezando-con-chef</id>
     <content type="html"><![CDATA[<h1>Componentes de una instalación de Chef</h1>
 
 <p>Una instalación de Chef va a contar típicamente con tres componentes.</p>

@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[devops-ar]]></title>
-  <link href="http://www.devops.com.ar/atom.xml" rel="self"/>
-  <link href="http://www.devops.com.ar/"/>
-  <updated>2012-08-27T23:02:40-03:00</updated>
-  <id>http://www.devops.com.ar/</id>
+  <link href="http://devops-ar.github.com/atom.xml" rel="self"/>
+  <link href="http://devops-ar.github.com/"/>
+  <updated>2012-08-27T23:24:25-03:00</updated>
+  <id>http://devops-ar.github.com/</id>
   <author>
     <name><![CDATA[osvaldo]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[definiendo un smarthost en mac os x]]></title>
-    <link href="http://www.devops.com.ar/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/"/>
+    <link href="http://devops-ar.github.com/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/"/>
     <updated>2012-08-27T11:36:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x</id>
+    <id>http://devops-ar.github.com/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x</id>
     <content type="html"><![CDATA[<p>Es común tener un smarthost o relay de correo en las intranet. Si tenemos un equipo con Mac OS X  y necesitamos configurarle que todos los correos que envia salgan a través de un servidor en particular, estos serian los pasos. La pasarela de mensajeria seria para este caso: mailgateway.example.com. El puerto 25 en el smarthost deberia estar accesible desde el host que estamos configurando.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -48,9 +48,9 @@
   
   <entry>
     <title type="html"><![CDATA[usando https detras de un proxy reverso]]></title>
-    <link href="http://www.devops.com.ar/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/"/>
+    <link href="http://devops-ar.github.com/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/"/>
     <updated>2012-08-08T11:17:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy</id>
+    <id>http://devops-ar.github.com/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy</id>
     <content type="html"><![CDATA[<h2>tl;dr</h2>
 
 <p>Agregar en el archivo .conf del apache para el sitio sin ssl:</p>
@@ -211,9 +211,9 @@ http://en.wikipedia.org/wiki/List_of_HTTP_header_fields</p>
   
   <entry>
     <title type="html"><![CDATA[borrando viejos builds en jenkins]]></title>
-    <link href="http://www.devops.com.ar/blog/2012/08/08/borrando-viejos-builds-en-jenkins/"/>
+    <link href="http://devops-ar.github.com/blog/2012/08/08/borrando-viejos-builds-en-jenkins/"/>
     <updated>2012-08-08T11:17:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2012/08/08/borrando-viejos-builds-en-jenkins</id>
+    <id>http://devops-ar.github.com/blog/2012/08/08/borrando-viejos-builds-en-jenkins</id>
     <content type="html"><![CDATA[<p>Algunos jobs crean builds grandes y con el tiempo, empiezan a ocupar espacio hasta llenar el disco duro.</p>
 
 <p>Para solucionar este problema, se pueden borrar periodicamente los builds mas viejos. El siguiente comando va a eliminar los builds de mas de 10 dias:</p>
@@ -345,9 +345,9 @@ http://en.wikipedia.org/wiki/List_of_HTTP_header_fields</p>
   
   <entry>
     <title type="html"><![CDATA[permisos en directorio www]]></title>
-    <link href="http://www.devops.com.ar/blog/2012/08/07/permisos-en-directorio-www/"/>
+    <link href="http://devops-ar.github.com/blog/2012/08/07/permisos-en-directorio-www/"/>
     <updated>2012-08-07T18:18:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2012/08/07/permisos-en-directorio-www</id>
+    <id>http://devops-ar.github.com/blog/2012/08/07/permisos-en-directorio-www</id>
     <content type="html"><![CDATA[<h2>tl;dr</h2>
 
 <p>Suele suceder que un equipo de desarrolladores necesita trabajar de manera conjunta sobre un mismo directorio.</p>
@@ -629,9 +629,9 @@ http://en.wikipedia.org/wiki/List_of_HTTP_header_fields</p>
   
   <entry>
     <title type="html"><![CDATA[configurando jboss 6]]></title>
-    <link href="http://www.devops.com.ar/blog/2012/06/14/configurando-jboss-6/"/>
+    <link href="http://devops-ar.github.com/blog/2012/06/14/configurando-jboss-6/"/>
     <updated>2012-06-14T12:55:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2012/06/14/configurando-jboss-6</id>
+    <id>http://devops-ar.github.com/blog/2012/06/14/configurando-jboss-6</id>
     <content type="html"><![CDATA[<p>Para configurar jboss 6 de manera que funcione con puertos no estandards (porque en el mismo server se esta ejecutando otra aplicacion que ya usa esos puertos, digamos, jenkins) se requieren dos cambios. El primero en el script que inicia el jboss. El segundo, al script que lo detiene, pues de lo contrario, no podria funcionar.</p>
 
 <p>Primero se le adiciona la linea <code>JAVA_OPTS="$JAVA_OPTS -Djboss.service.binding.set=\"ports-01\""</code> al script que inicia el jboss.</p>
@@ -689,9 +689,9 @@ http://en.wikipedia.org/wiki/List_of_HTTP_header_fields</p>
   
   <entry>
     <title type="html"><![CDATA[sendmail cookbook]]></title>
-    <link href="http://www.devops.com.ar/blog/2012/05/19/sendmail-cookbook/"/>
+    <link href="http://devops-ar.github.com/blog/2012/05/19/sendmail-cookbook/"/>
     <updated>2012-05-19T14:02:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2012/05/19/sendmail-cookbook</id>
+    <id>http://devops-ar.github.com/blog/2012/05/19/sendmail-cookbook</id>
     <content type="html"><![CDATA[<p>Postfix se ha convertido en el MTA por excelencia para la mayoría de las distribuciones Linux. Sin embargo, algunas, como CentOS (hasta la 5 al menos) instalan sendmail de manera predeterminada. A menos que estemos instalando un servidor de mensajeria, utilizar sendmail sería la mejor opción. Es sencillo de configurar, ya esta instalado y para el uso que le vamos a dar, cumple su cometido.</p>
 
 <p>Para cubrir la parte de configuración y ahorrarnos ese paso, se armo un cookbook que solo contiene tres archivos.</p>
@@ -772,9 +772,9 @@ http://en.wikipedia.org/wiki/List_of_HTTP_header_fields</p>
   
   <entry>
     <title type="html"><![CDATA[configurando vncserver en centos]]></title>
-    <link href="http://www.devops.com.ar/blog/2012/04/10/configurando-vncserver-en-centos/"/>
+    <link href="http://devops-ar.github.com/blog/2012/04/10/configurando-vncserver-en-centos/"/>
     <updated>2012-04-10T18:09:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2012/04/10/configurando-vncserver-en-centos</id>
+    <id>http://devops-ar.github.com/blog/2012/04/10/configurando-vncserver-en-centos</id>
     <content type="html"><![CDATA[<p>Primero nos aseguramos de que los paquetes estan instalados.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -968,9 +968,9 @@ http://en.wikipedia.org/wiki/List_of_HTTP_header_fields</p>
   
   <entry>
     <title type="html"><![CDATA[instalando el proxy de perforce]]></title>
-    <link href="http://www.devops.com.ar/blog/2012/04/09/instalando-el-proxy-de-perforce/"/>
+    <link href="http://devops-ar.github.com/blog/2012/04/09/instalando-el-proxy-de-perforce/"/>
     <updated>2012-04-09T23:29:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2012/04/09/instalando-el-proxy-de-perforce</id>
+    <id>http://devops-ar.github.com/blog/2012/04/09/instalando-el-proxy-de-perforce</id>
     <content type="html"><![CDATA[<p>El proxy de perforce consta de dos procesos. Un script que se conecta al servidor remoto (se requieren credenciales para el mismo que el usuario debera proporcionar) y descarga los archivos para un directorio local de cache en el servidor. Y un demonio, el p4p, al que los clientes locales se conectan como si fuera el server de perforce y le sirve los fetch de los archivos del directorio de cache local mientras que le pasa al servidor real los commits que se hacen.</p>
 
 <!-- more -->
@@ -1226,9 +1226,9 @@ http://en.wikipedia.org/wiki/List_of_HTTP_header_fields</p>
   
   <entry>
     <title type="html"><![CDATA[usando gitolite]]></title>
-    <link href="http://www.devops.com.ar/blog/2012/03/25/usando-gitolite/"/>
+    <link href="http://devops-ar.github.com/blog/2012/03/25/usando-gitolite/"/>
     <updated>2012-03-25T03:04:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2012/03/25/usando-gitolite</id>
+    <id>http://devops-ar.github.com/blog/2012/03/25/usando-gitolite</id>
     <content type="html"><![CDATA[<p>Una de las ventajas de git es el trabajo en equipos. Como compartir el codigo seria la pregunta. Existen varias alternativas. Hay servicios que ofrecen hospedaje de repositorios para git como el propio github. Entre las opciones si queremos hospedar el repositorio en un servidor propio destacan las siguientes:</p>
 
 <ul>
@@ -1685,9 +1685,9 @@ http://en.wikipedia.org/wiki/List_of_HTTP_header_fields</p>
   
   <entry>
     <title type="html"><![CDATA[instalando blueprint en CentOS 5.5]]></title>
-    <link href="http://www.devops.com.ar/blog/2012/03/05/instalando-blueprint-en-centos-5-dot-5/"/>
+    <link href="http://devops-ar.github.com/blog/2012/03/05/instalando-blueprint-en-centos-5-dot-5/"/>
     <updated>2012-03-05T08:44:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2012/03/05/instalando-blueprint-en-centos-5-dot-5</id>
+    <id>http://devops-ar.github.com/blog/2012/03/05/instalando-blueprint-en-centos-5-dot-5</id>
     <content type="html"><![CDATA[<p>Para instalar <a href="http://devstructure.com/">Blueprint</a> en CentOS 5.5 necesitamos instalar python 2.6 y git previamente. En algunos entornos se bloquean los puertos salientes y solo se permite acceder a los puertos web (80,443). A continuación se muestran los pasos para instalar Blueprint tomando todo esto en consideración.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -1713,9 +1713,9 @@ http://en.wikipedia.org/wiki/List_of_HTTP_header_fields</p>
   
   <entry>
     <title type="html"><![CDATA[transfiriendo zonas con tsig]]></title>
-    <link href="http://www.devops.com.ar/blog/2012/03/01/transfiriendo-zonas-con-tsig/"/>
+    <link href="http://devops-ar.github.com/blog/2012/03/01/transfiriendo-zonas-con-tsig/"/>
     <updated>2012-03-01T16:45:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2012/03/01/transfiriendo-zonas-con-tsig</id>
+    <id>http://devops-ar.github.com/blog/2012/03/01/transfiriendo-zonas-con-tsig</id>
     <content type="html"><![CDATA[<p>Siguiendo los consejos de <a href="http://blog.wains.be/2007/12/13/centos-5-chroot-dns-with-bind/">Sébastien Wains</a>:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -2044,9 +2044,9 @@ secret "GFivxZnevSPcNsgaGCc9RHasIzZFSEiKTtme0UIPnNiOZk6ZQ3kXuwXetS9iE+ynei2p5pkp
   
   <entry>
     <title type="html"><![CDATA[empezando con chef]]></title>
-    <link href="http://www.devops.com.ar/blog/2012/02/03/empezando-con-chef/"/>
+    <link href="http://devops-ar.github.com/blog/2012/02/03/empezando-con-chef/"/>
     <updated>2012-02-03T02:20:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2012/02/03/empezando-con-chef</id>
+    <id>http://devops-ar.github.com/blog/2012/02/03/empezando-con-chef</id>
     <content type="html"><![CDATA[<h1>Componentes de una instalación de Chef</h1>
 
 <p>Una instalación de Chef va a contar típicamente con tres componentes.</p>
@@ -2238,9 +2238,9 @@ secret "GFivxZnevSPcNsgaGCc9RHasIzZFSEiKTtme0UIPnNiOZk6ZQ3kXuwXetS9iE+ynei2p5pkp
   
   <entry>
     <title type="html"><![CDATA[guia rapida de git para equipos]]></title>
-    <link href="http://www.devops.com.ar/blog/2012/02/03/guia-rapida-de-git-para-equipos/"/>
+    <link href="http://devops-ar.github.com/blog/2012/02/03/guia-rapida-de-git-para-equipos/"/>
     <updated>2012-02-03T01:54:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2012/02/03/guia-rapida-de-git-para-equipos</id>
+    <id>http://devops-ar.github.com/blog/2012/02/03/guia-rapida-de-git-para-equipos</id>
     <content type="html"><![CDATA[<h2>¿Quien soy?</h2>
 
 <p>Si se ejecuta <code>git config -l</code> deberia obtenerse algo asi.</p>
@@ -2310,9 +2310,9 @@ secret "GFivxZnevSPcNsgaGCc9RHasIzZFSEiKTtme0UIPnNiOZk6ZQ3kXuwXetS9iE+ynei2p5pkp
   
   <entry>
     <title type="html"><![CDATA[instalando graylog2]]></title>
-    <link href="http://www.devops.com.ar/blog/2012/01/02/manejando-trazas/"/>
+    <link href="http://devops-ar.github.com/blog/2012/01/02/manejando-trazas/"/>
     <updated>2012-01-02T15:43:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2012/01/02/manejando-trazas</id>
+    <id>http://devops-ar.github.com/blog/2012/01/02/manejando-trazas</id>
     <content type="html"><![CDATA[<h2>Elasticsearch</h2>
 
 <p>Primero necesitamos instalar elasticsearch.</p>
@@ -2860,9 +2860,9 @@ Un mensaje GELF es una cadena JSON compactada con GZIP o ZLIB &#8230;
   
   <entry>
     <title type="html"><![CDATA[creating an rpm package from on tgz file]]></title>
-    <link href="http://www.devops.com.ar/blog/2011/12/17/creating-an-rpm-package-from-on-a-tgz-file/"/>
+    <link href="http://devops-ar.github.com/blog/2011/12/17/creating-an-rpm-package-from-on-a-tgz-file/"/>
     <updated>2011-12-17T15:26:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2011/12/17/creating-an-rpm-package-from-on-a-tgz-file</id>
+    <id>http://devops-ar.github.com/blog/2011/12/17/creating-an-rpm-package-from-on-a-tgz-file</id>
     <content type="html"><![CDATA[<p><em>disclaimer: this is only for creating an rpm for installing a set of files, no compiling, just a bunch of file being copied into a server.</em></p>
 
 <p>Starting from a tgz file, an rpm package will be created. Sometimes, a tgz file is quicker/easier to use. However, in the long run, sticking to a package management system for handling the installation of applications on a system will pay off for sure.</p>
@@ -3354,10 +3354,10 @@ to avoid in the first place.</p>
   
   <entry>
     <title type="html"><![CDATA[Herramientas de Chef]]></title>
-    <link href="http://www.devops.com.ar/blog/2011/12/17/chef-tools/"/>
+    <link href="http://devops-ar.github.com/blog/2011/12/17/chef-tools/"/>
     <updated>2011-12-17T14:07:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2011/12/17/chef-tools</id>
-    <content type="html"><![CDATA[<p>Este artículo se puede visualizar en formato de presentación <a href="http://www.devops.com.ar/talks/chef/chef-tools.html">aquí</a>.</p>
+    <id>http://devops-ar.github.com/blog/2011/12/17/chef-tools</id>
+    <content type="html"><![CDATA[<p>Este artículo se puede visualizar en formato de presentación <a href="http://devops-ar.github.com/talks/chef/chef-tools.html">aquí</a>.</p>
 
 <h2><a href="http://wiki.opscode.com/display/chef/Ohai">ohai</a></h2>
 
@@ -3510,10 +3510,10 @@ Es utilizada por los administradores para interactuar con la API del Servidor de
   
   <entry>
     <title type="html"><![CDATA[Introducción rápida a Chef]]></title>
-    <link href="http://www.devops.com.ar/blog/2011/12/17/introduccion-rapida-a-chef/"/>
+    <link href="http://devops-ar.github.com/blog/2011/12/17/introduccion-rapida-a-chef/"/>
     <updated>2011-12-17T13:19:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2011/12/17/introduccion-rapida-a-chef</id>
-    <content type="html"><![CDATA[<p>Este artículo se puede visualizar en formato de presentación <a href="http://www.devops.com.ar/talks/chef/quick-intro.html">aquí</a>.</p>
+    <id>http://devops-ar.github.com/blog/2011/12/17/introduccion-rapida-a-chef</id>
+    <content type="html"><![CDATA[<p>Este artículo se puede visualizar en formato de presentación <a href="http://devops-ar.github.com/talks/chef/quick-intro.html">aquí</a>.</p>
 
 <h3>Definir problema</h3>
 
@@ -3968,9 +3968,9 @@ Es utilizada por los administradores para interactuar con la API del Servidor de
   
   <entry>
     <title type="html"><![CDATA[instalacion de un server de ci]]></title>
-    <link href="http://www.devops.com.ar/blog/2011/11/30/instalacion-de-un-server-de-ci/"/>
+    <link href="http://devops-ar.github.com/blog/2011/11/30/instalacion-de-un-server-de-ci/"/>
     <updated>2011-11-30T14:26:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2011/11/30/instalacion-de-un-server-de-ci</id>
+    <id>http://devops-ar.github.com/blog/2011/11/30/instalacion-de-un-server-de-ci</id>
     <content type="html"><![CDATA[<p>CI - Continuous Integration.</p>
 
 <p>Este post describe la instalación de un servidor de integración continua. El mismo estará integrado por jenkins, maven y sonar.</p>
@@ -4273,9 +4273,9 @@ $CATALINA_HOME/webapps/ROOT/index.html</p>
   
   <entry>
     <title type="html"><![CDATA[Usando python con virtualenv ]]></title>
-    <link href="http://www.devops.com.ar/blog/2011/11/26/usando-python-con-virtualenv/"/>
+    <link href="http://devops-ar.github.com/blog/2011/11/26/usando-python-con-virtualenv/"/>
     <updated>2011-11-26T00:08:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2011/11/26/usando-python-con-virtualenv</id>
+    <id>http://devops-ar.github.com/blog/2011/11/26/usando-python-con-virtualenv</id>
     <content type="html"><![CDATA[<p>Una buena introducción se puede encontrar aca en los siguientes posts, uno en <a href="http://www.saltycrane.com/blog/2009/05/notes-using-pip-and-virtualenv-django/">inglés</a> y otro en <a href="http://elweb.co/uncategorized/django-deployment-3-virtualenv-virtualenvwrapper-pip/">castellano</a>.</p>
 
 <p>Sistemas Operativos como CentOS o Gentoo hacen uso de python para sus herramientas de gestión de paquetes, no es recomendable modificar manualmente la versión de python o jugar con las versiones de los módulos. Pero puede suceder que nos haga falta utilizar una versión superior de python o cierto módulo para un proyecto en el que estemos trabajando. En este caso, virtualenv es una solución.</p>
@@ -4411,9 +4411,9 @@ $CATALINA_HOME/webapps/ROOT/index.html</p>
   
   <entry>
     <title type="html"><![CDATA[ORA-01882: timezone region  not found]]></title>
-    <link href="http://www.devops.com.ar/blog/2011/11/16/ora-01882-timezone-region-not-found/"/>
+    <link href="http://devops-ar.github.com/blog/2011/11/16/ora-01882-timezone-region-not-found/"/>
     <updated>2011-11-16T01:01:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2011/11/16/ora-01882-timezone-region-not-found</id>
+    <id>http://devops-ar.github.com/blog/2011/11/16/ora-01882-timezone-region-not-found</id>
     <content type="html"><![CDATA[<p>Una aplicación corriendo en un tomcat, no se conectaba con la base de datos en Oracle. El siguiente error aparecía en el archivo de trazas (${CATALINA_HOME}/logs/catalina.out)</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>

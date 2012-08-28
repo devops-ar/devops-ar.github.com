@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: oracle | devops-ar]]></title>
-  <link href="http://www.devops.com.ar/blog/categories/oracle/atom.xml" rel="self"/>
-  <link href="http://www.devops.com.ar/"/>
-  <updated>2012-08-27T23:02:40-03:00</updated>
-  <id>http://www.devops.com.ar/</id>
+  <link href="http://devops-ar.github.com/blog/categories/oracle/atom.xml" rel="self"/>
+  <link href="http://devops-ar.github.com/"/>
+  <updated>2012-08-27T23:24:25-03:00</updated>
+  <id>http://devops-ar.github.com/</id>
   <author>
     <name><![CDATA[osvaldo]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[ORA-01882: timezone region  not found]]></title>
-    <link href="http://www.devops.com.ar/blog/2011/11/16/ora-01882-timezone-region-not-found/"/>
+    <link href="http://devops-ar.github.com/blog/2011/11/16/ora-01882-timezone-region-not-found/"/>
     <updated>2011-11-16T01:01:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2011/11/16/ora-01882-timezone-region-not-found</id>
+    <id>http://devops-ar.github.com/blog/2011/11/16/ora-01882-timezone-region-not-found</id>
     <content type="html"><![CDATA[<p>Una aplicación corriendo en un tomcat, no se conectaba con la base de datos en Oracle. El siguiente error aparecía en el archivo de trazas (${CATALINA_HOME}/logs/catalina.out)</p>
 
 <p><code>

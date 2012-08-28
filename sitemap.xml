@@ -1,101 +1,105 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
-        <loc>http://www.devops.com.ar/blog/2011/11/16/ora-01882-timezone-region-not-found/</loc>
-        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
-    </url>
-    <url>
-        <loc>http://www.devops.com.ar/blog/2011/11/26/usando-python-con-virtualenv/</loc>
-        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
-    </url>
-    <url>
-        <loc>http://www.devops.com.ar/blog/2011/11/30/instalacion-de-un-server-de-ci/</loc>
-        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
-    </url>
-    <url>
-        <loc>http://www.devops.com.ar/blog/2011/12/17/introduccion-rapida-a-chef/</loc>
-        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
-    </url>
-    <url>
-        <loc>http://www.devops.com.ar/blog/2011/12/17/chef-tools/</loc>
-        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
-    </url>
-    <url>
         <loc>
-            http://www.devops.com.ar/blog/2011/12/17/creating-an-rpm-package-from-on-a-tgz-file/
+            http://devops-ar.github.com/blog/2011/11/16/ora-01882-timezone-region-not-found/
         </loc>
         <lastmod>2012-08-27T13:03:32-03:00</lastmod>
     </url>
     <url>
-        <loc>http://www.devops.com.ar/blog/2012/01/02/manejando-trazas/</loc>
+        <loc>http://devops-ar.github.com/blog/2011/11/26/usando-python-con-virtualenv/</loc>
         <lastmod>2012-08-27T13:03:32-03:00</lastmod>
     </url>
     <url>
-        <loc>http://www.devops.com.ar/blog/2012/02/03/guia-rapida-de-git-para-equipos/</loc>
+        <loc>http://devops-ar.github.com/blog/2011/11/30/instalacion-de-un-server-de-ci/</loc>
         <lastmod>2012-08-27T13:03:32-03:00</lastmod>
     </url>
     <url>
-        <loc>http://www.devops.com.ar/blog/2012/02/03/empezando-con-chef/</loc>
+        <loc>http://devops-ar.github.com/blog/2011/12/17/introduccion-rapida-a-chef/</loc>
         <lastmod>2012-08-27T13:03:32-03:00</lastmod>
     </url>
     <url>
-        <loc>http://www.devops.com.ar/blog/2012/03/01/transfiriendo-zonas-con-tsig/</loc>
-        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
-    </url>
-    <url>
-        <loc>
-            http://www.devops.com.ar/blog/2012/03/05/instalando-blueprint-en-centos-5-dot-5/
-        </loc>
-        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
-    </url>
-    <url>
-        <loc>http://www.devops.com.ar/blog/2012/03/25/usando-gitolite/</loc>
-        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
-    </url>
-    <url>
-        <loc>http://www.devops.com.ar/blog/2012/04/09/instalando-el-proxy-de-perforce/</loc>
-        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
-    </url>
-    <url>
-        <loc>http://www.devops.com.ar/blog/2012/04/10/configurando-vncserver-en-centos/</loc>
-        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
-    </url>
-    <url>
-        <loc>http://www.devops.com.ar/blog/2012/05/19/sendmail-cookbook/</loc>
-        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
-    </url>
-    <url>
-        <loc>http://www.devops.com.ar/blog/2012/06/14/configurando-jboss-6/</loc>
-        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
-    </url>
-    <url>
-        <loc>http://www.devops.com.ar/blog/2012/08/07/permisos-en-directorio-www/</loc>
-        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
-    </url>
-    <url>
-        <loc>http://www.devops.com.ar/blog/2012/08/08/borrando-viejos-builds-en-jenkins/</loc>
+        <loc>http://devops-ar.github.com/blog/2011/12/17/chef-tools/</loc>
         <lastmod>2012-08-27T13:03:32-03:00</lastmod>
     </url>
     <url>
         <loc>
-            http://www.devops.com.ar/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/
+            http://devops-ar.github.com/blog/2011/12/17/creating-an-rpm-package-from-on-a-tgz-file/
         </loc>
         <lastmod>2012-08-27T13:03:32-03:00</lastmod>
     </url>
     <url>
-        <loc>http://www.devops.com.ar/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/</loc>
+        <loc>http://devops-ar.github.com/blog/2012/01/02/manejando-trazas/</loc>
         <lastmod>2012-08-27T13:03:32-03:00</lastmod>
     </url>
     <url>
-        <loc>http://www.devops.com.ar/blog/archives/</loc>
+        <loc>http://devops-ar.github.com/blog/2012/02/03/guia-rapida-de-git-para-equipos/</loc>
         <lastmod>2012-08-27T13:03:32-03:00</lastmod>
     </url>
     <url>
-        <loc>http://www.devops.com.ar/contacto/</loc>
+        <loc>http://devops-ar.github.com/blog/2012/02/03/empezando-con-chef/</loc>
+        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
+    </url>
+    <url>
+        <loc>http://devops-ar.github.com/blog/2012/03/01/transfiriendo-zonas-con-tsig/</loc>
+        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://devops-ar.github.com/blog/2012/03/05/instalando-blueprint-en-centos-5-dot-5/
+        </loc>
+        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
+    </url>
+    <url>
+        <loc>http://devops-ar.github.com/blog/2012/03/25/usando-gitolite/</loc>
+        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
+    </url>
+    <url>
+        <loc>http://devops-ar.github.com/blog/2012/04/09/instalando-el-proxy-de-perforce/</loc>
+        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
+    </url>
+    <url>
+        <loc>http://devops-ar.github.com/blog/2012/04/10/configurando-vncserver-en-centos/</loc>
+        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
+    </url>
+    <url>
+        <loc>http://devops-ar.github.com/blog/2012/05/19/sendmail-cookbook/</loc>
+        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
+    </url>
+    <url>
+        <loc>http://devops-ar.github.com/blog/2012/06/14/configurando-jboss-6/</loc>
+        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
+    </url>
+    <url>
+        <loc>http://devops-ar.github.com/blog/2012/08/07/permisos-en-directorio-www/</loc>
+        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
+    </url>
+    <url>
+        <loc>http://devops-ar.github.com/blog/2012/08/08/borrando-viejos-builds-en-jenkins/</loc>
+        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://devops-ar.github.com/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/
+        </loc>
+        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://devops-ar.github.com/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/
+        </loc>
+        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
+    </url>
+    <url>
+        <loc>http://devops-ar.github.com/blog/archives/</loc>
+        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
+    </url>
+    <url>
+        <loc>http://devops-ar.github.com/contacto/</loc>
         <lastmod>2012-08-27T13:00:34-03:00</lastmod>
     </url>
     <url>
-        <loc>http://www.devops.com.ar/</loc>
+        <loc>http://devops-ar.github.com/</loc>
         <lastmod>2012-08-27T13:03:32-03:00</lastmod>
     </url>
 </urlset>

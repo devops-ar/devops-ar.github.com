@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: graylog2 | devops-ar]]></title>
-  <link href="http://www.devops.com.ar/blog/categories/graylog2/atom.xml" rel="self"/>
-  <link href="http://www.devops.com.ar/"/>
-  <updated>2012-08-27T23:02:40-03:00</updated>
-  <id>http://www.devops.com.ar/</id>
+  <link href="http://devops-ar.github.com/blog/categories/graylog2/atom.xml" rel="self"/>
+  <link href="http://devops-ar.github.com/"/>
+  <updated>2012-08-27T23:24:25-03:00</updated>
+  <id>http://devops-ar.github.com/</id>
   <author>
     <name><![CDATA[osvaldo]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[instalando graylog2]]></title>
-    <link href="http://www.devops.com.ar/blog/2012/01/02/manejando-trazas/"/>
+    <link href="http://devops-ar.github.com/blog/2012/01/02/manejando-trazas/"/>
     <updated>2012-01-02T15:43:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2012/01/02/manejando-trazas</id>
+    <id>http://devops-ar.github.com/blog/2012/01/02/manejando-trazas</id>
     <content type="html"><![CDATA[<h2>Elasticsearch</h2>
 
 <p>Primero necesitamos instalar elasticsearch.</p>

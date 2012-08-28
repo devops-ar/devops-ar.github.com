@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: chef | devops-ar]]></title>
-  <link href="http://www.devops.com.ar/blog/categories/chef/atom.xml" rel="self"/>
-  <link href="http://www.devops.com.ar/"/>
-  <updated>2012-08-27T23:02:40-03:00</updated>
-  <id>http://www.devops.com.ar/</id>
+  <link href="http://devops-ar.github.com/blog/categories/chef/atom.xml" rel="self"/>
+  <link href="http://devops-ar.github.com/"/>
+  <updated>2012-08-27T23:24:25-03:00</updated>
+  <id>http://devops-ar.github.com/</id>
   <author>
     <name><![CDATA[osvaldo]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[sendmail cookbook]]></title>
-    <link href="http://www.devops.com.ar/blog/2012/05/19/sendmail-cookbook/"/>
+    <link href="http://devops-ar.github.com/blog/2012/05/19/sendmail-cookbook/"/>
     <updated>2012-05-19T14:02:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2012/05/19/sendmail-cookbook</id>
+    <id>http://devops-ar.github.com/blog/2012/05/19/sendmail-cookbook</id>
     <content type="html"><![CDATA[<p>Postfix se ha convertido en el MTA por excelencia para la mayoría de las distribuciones Linux. Sin embargo, algunas, como CentOS (hasta la 5 al menos) instalan sendmail de manera predeterminada. A menos que estemos instalando un servidor de mensajeria, utilizar sendmail sería la mejor opción. Es sencillo de configurar, ya esta instalado y para el uso que le vamos a dar, cumple su cometido.</p>
 
 <p>Para cubrir la parte de configuración y ahorrarnos ese paso, se armo un cookbook que solo contiene tres archivos.</p>
@@ -78,9 +78,9 @@ end
   
   <entry>
     <title type="html"><![CDATA[empezando con chef]]></title>
-    <link href="http://www.devops.com.ar/blog/2012/02/03/empezando-con-chef/"/>
+    <link href="http://devops-ar.github.com/blog/2012/02/03/empezando-con-chef/"/>
     <updated>2012-02-03T02:20:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2012/02/03/empezando-con-chef</id>
+    <id>http://devops-ar.github.com/blog/2012/02/03/empezando-con-chef</id>
     <content type="html"><![CDATA[<h1>Componentes de una instalación de Chef</h1>
 
 <p>Una instalación de Chef va a contar típicamente con tres componentes.</p>
@@ -207,9 +207,9 @@ EOP
   
   <entry>
     <title type="html"><![CDATA[Herramientas de Chef]]></title>
-    <link href="http://www.devops.com.ar/blog/2011/12/17/chef-tools/"/>
+    <link href="http://devops-ar.github.com/blog/2011/12/17/chef-tools/"/>
     <updated>2011-12-17T14:07:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2011/12/17/chef-tools</id>
+    <id>http://devops-ar.github.com/blog/2011/12/17/chef-tools</id>
     <content type="html"><![CDATA[<p>Este artículo se puede visualizar en formato de presentación <a href="/talks/chef/chef-tools.html">aquí</a>.</p>
 
 <h2><a href="http://wiki.opscode.com/display/chef/Ohai">ohai</a></h2>
@@ -324,9 +324,9 @@ toja-lm java version: 1.6.0_18
   
   <entry>
     <title type="html"><![CDATA[Introducción rápida a Chef]]></title>
-    <link href="http://www.devops.com.ar/blog/2011/12/17/introduccion-rapida-a-chef/"/>
+    <link href="http://devops-ar.github.com/blog/2011/12/17/introduccion-rapida-a-chef/"/>
     <updated>2011-12-17T13:19:00-03:00</updated>
-    <id>http://www.devops.com.ar/blog/2011/12/17/introduccion-rapida-a-chef</id>
+    <id>http://devops-ar.github.com/blog/2011/12/17/introduccion-rapida-a-chef</id>
     <content type="html"><![CDATA[<p>Este artículo se puede visualizar en formato de presentación <a href="/talks/chef/quick-intro.html">aquí</a>.</p>
 
 <h3>Definir problema</h3>
