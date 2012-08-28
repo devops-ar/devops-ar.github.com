@@ -1,0 +1,339 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>guia rapida de git para equipos - devops-ar</title>
+  <meta name="author" content="osvaldo">
+
+  
+  <meta name="description" content="¿Quien soy? Si se ejecuta git config -l deberia obtenerse algo asi. 1
+2
+3
+$ git config -l
+user.name=Osvaldo
+user.email=osvaldo@example.com Si no &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.devops.com.ar/blog/2012/02/03/guia-rapida-de-git-para-equipos/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="devops-ar" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-5155520-9']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">devops-ar</a></h1>
+  
+    <h2>devops en castellano</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.devops.com.ar" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Guia Rapida De Git Para Equipos</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-03T01:54:00-03:00" pubdate data-updated="true">Feb 3<span>rd</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>¿Quien soy?</h2>
+
+<p>Si se ejecuta <code>git config -l</code> deberia obtenerse algo asi.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>git config -l
+</span><span class='line'>user.name<span class="o">=</span>Osvaldo
+</span><span class='line'>user.email<span class="o">=</span>osvaldo@example.com
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Si no hemos configurado aun git, empecemos por ahi.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git config --global user.email <span class="s2">&quot;osvaldo@example.com&quot;</span>
+</span><span class='line'>git config --global user.name <span class="s2">&quot;Osvaldo&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Crear un repo</h2>
+
+<p>Se puede crear un repositorio nuevo</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git init
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>o se puede clonar un ya existente</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git clone ssh://192.168.20.52/home/osvaldo/chef-repo .
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Branches</h2>
+
+<p>Una branch puede ser creado por un próposito definido (arreglar un bug, <a href="http://nvie.com/posts/a-successful-git-branching-model/">introducir una nueva funcionalidad</a>. También puede ser por usuario. De esta manera, cada uno tiene su branch, donde puede realizar las modificaciones sin afectar el trabajo que estén haciendo otros. Una vez el código esta listo para producción, se hace el merge a la branch master (<a href="http://kentnguyen.com/development/visualized-git-practices-for-team/">haciendo primero un <code>git pull -rebase</code></a>).</p>
+
+<h2>Flujo de trabajo</h2>
+
+<p>El flujo de trabajo con las branches seria</p>
+
+<ul>
+<li>configurar git</li>
+<li>clonar el repo <code>git fetch</code></li>
+<li>crear/moverme a la branch personal <code>git checkout -b otsuarez</code></li>
+<li>editar <code>git -m -a ".. cambios .."</code> (nota. en la branch personal: &#8220;otsuarez&#8221;).</li>
+<li>cambiar a la branch principal y copiar los cambios para ahi <code>git checkout master</code> y despues <code>git merge otsuarez</code></li>
+<li>actualizar el repo central. <code>git push origin master</code></li>
+<li>opcionalmente podemos borrar la rama creada <code>git branch -D otsuarez</code></li>
+</ul>
+
+
+<h3>Referencias</h3>
+
+<ul>
+<li><a href="http://www.spheredev.org/wiki/Git_for_the_lazy">http://www.spheredev.org/wiki/Git_for_the_lazy</a></li>
+<li><a href="http://help.github.com/git-cheat-sheets/">http://help.github.com/git-cheat-sheets/</a></li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">osvaldo</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-03T01:54:00-03:00" pubdate data-updated="true">Feb 3<span>rd</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/git/'>git</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.devops.com.ar/blog/2012/02/03/guia-rapida-de-git-para-equipos/" data-via="devops_ar" data-counturl="http://www.devops.com.ar/blog/2012/02/03/guia-rapida-de-git-para-equipos/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/01/02/manejando-trazas/" title="Previous Post: instalando graylog2">&laquo; instalando graylog2</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/02/03/empezando-con-chef/" title="Next Post: empezando con chef">empezando con chef &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">definiendo un smarthost en mac os x</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">usando https detras de un proxy reverso</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">borrando viejos builds en jenkins</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/07/permisos-en-directorio-www/">permisos en directorio www</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/configurando-jboss-6/">configurando jboss 6</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("devops_ar", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/devops_ar" class="twitter-follow-button" data-show-count="false">Follow @devops_ar</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - osvaldo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'devops-ar';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.devops.com.ar/blog/2012/02/03/guia-rapida-de-git-para-equipos/';
+        var disqus_url = 'http://www.devops.com.ar/blog/2012/02/03/guia-rapida-de-git-para-equipos/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

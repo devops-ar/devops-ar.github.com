@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>devops-ar</title>
+  <title>configurando jboss 6 - devops-ar</title>
   <meta name="author" content="osvaldo">
 
   
-  <meta name="description" content="Es común tener un smarthost o relay de correo en las intranet. Si tenemos un equipo con Mac OS X y necesitamos configurarle que todos los correos que &hellip;">
+  <meta name="description" content="Para configurar jboss 6 de manera que funcione con puertos no estandards (porque en el mismo server se esta ejecutando otra aplicacion que ya usa &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.devops.com.ar/">
+  <link rel="canonical" href="http://www.devops.com.ar/blog/2012/06/14/configurando-jboss-6/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -74,247 +74,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">Definiendo Un Smarthost en Mac Os X</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-08-27T11:36:00-03:00" pubdate data-updated="true">Aug 27<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Es común tener un smarthost o relay de correo en las intranet. Si tenemos un equipo con Mac OS X  y necesitamos configurarle que todos los correos que envia salgan a través de un servidor en particular, estos serian los pasos. La pasarela de mensajeria seria para este caso: mailgateway.example.com. El puerto 25 en el smarthost deberia estar accesible desde el host que estamos configurando.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>postconf -e <span class="nv">relayhost</span><span class="o">=</span>mailgateway.example.com
-</span><span class='line'>launchctl stop org.postfix.master
-</span><span class='line'>launchctl unload /System/Library/LaunchDaemons/org.postfix.master.plist
-</span><span class='line'>launchctl load /System/Library/LaunchDaemons/org.postfix.master.plist
-</span><span class='line'>launchctl start org.postfix.master
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Si se quiere comprobar utilizar los siguientes comandos.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">echo</span> <span class="s2">&quot;test&quot;</span> | mail -s <span class="s2">&quot;test&quot;</span> osvaldo@example.com
-</span><span class='line'>tail -f /var/log/mail.log
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Me guie por (este link)[http://thomer.com/howtos/postfix_smarthost_mailavenger.html] donde se explica además como configurar la autenticación si el smarthost lo requiere..</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">Usando Https Detras De Un Proxy Reverso</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-08-08T11:17:00-03:00" pubdate data-updated="true">Aug 8<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>tl;dr</h2>
-
-<p>Agregar en el archivo .conf del apache para el sitio sin ssl:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='apacheconf'><span class='line'><span class="nb">RewriteEngine</span> <span class="k">On</span>
-</span><span class='line'><span class="nb">RewriteCond</span> %{HTTP:X-Forwarded-Proto} !=https
-</span><span class='line'><span class="nb">RewriteRule</span> (.*) https://%{SERVER_NAME}/$1 [redirect=permanent,last]
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Con eso, deberia detectar que es http y hacer el redirect para el https. Ya el nginx le esta asignando esa variable (actuando como proxy reverso)</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">Borrando Viejos Builds en Jenkins</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-08-08T11:17:00-03:00" pubdate data-updated="true">Aug 8<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Algunos jobs crean builds grandes y con el tiempo, empiezan a ocupar espacio hasta llenar el disco duro.</p>
-
-<p>Para solucionar este problema, se pueden borrar periodicamente los builds mas viejos. El siguiente comando va a eliminar los builds de mas de 10 dias:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="k">for </span>i in <span class="sb">`</span>find /var/lib/jenkins/jobs -name builds<span class="sb">`</span> ; <span class="k">do </span>find <span class="nv">$i</span>  -mtime +10 -delete ; <span class="k">done</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/08/07/permisos-en-directorio-www/">Permisos en Directorio Www</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-08-07T18:18:00-03:00" pubdate data-updated="true">Aug 7<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/08/07/permisos-en-directorio-www/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>tl;dr</h2>
-
-<p>Suele suceder que un equipo de desarrolladores necesita trabajar de manera conjunta sobre un mismo directorio.</p>
-
-<p>La solución es sencilla.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>chown -R root /var/www/html/
-</span><span class='line'>chmod 775  /var/www/html/
-</span><span class='line'>chgrp -R dev  /var/www/html/
-</span><span class='line'>chmod g+s   /var/www/html/
-</span><span class='line'>setfacl -d -m g::rwx /var/www/html
-</span><span class='line'>setfacl -d -m o::rx /var/www/html
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/08/07/permisos-en-directorio-www/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/06/14/configurando-jboss-6/">Configurando Jboss 6</a></h1>
+      <h1 class="entry-title">Configurando Jboss 6</h1>
     
     
       <p class="meta">
@@ -332,14 +97,14 @@
 
 <time datetime="2012-06-14T12:55:00-03:00" pubdate data-updated="true">Jun 14<span>th</span>, 2012</time>
         
-         | <a href="/blog/2012/06/14/configurando-jboss-6/#disqus_thread">Comments</a>
+         | <a href="#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>Para configurar jboss 6 de manera que funcione con puertos no estandards (porque en el mismo server se esta ejecutando otra aplicacion que ya usa esos puertos, digamos, jenkins) se requieren dos cambios. El primero en el script que inicia el jboss. El segundo, al script que lo detiene, pues de lo contrario, no podria funcionar.</p>
+<div class="entry-content"><p>Para configurar jboss 6 de manera que funcione con puertos no estandards (porque en el mismo server se esta ejecutando otra aplicacion que ya usa esos puertos, digamos, jenkins) se requieren dos cambios. El primero en el script que inicia el jboss. El segundo, al script que lo detiene, pues de lo contrario, no podria funcionar.</p>
 
 <p>Primero se le adiciona la linea <code>JAVA_OPTS="$JAVA_OPTS -Djboss.service.binding.set=\"ports-01\""</code> al script que inicia el jboss.</p>
 
@@ -392,20 +157,61 @@
 </span></code></pre></td></tr></table></div></figure>
 
 </div>
+
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">osvaldo</span></span>
+
+      
+
+
+
+
+
+
+
+
   
 
 
-    </article>
+<time datetime="2012-06-14T12:55:00-03:00" pubdate data-updated="true">Jun 14<span>th</span>, 2012</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
   
-  <div class="pagination">
-    
-      <a class="prev" href="/blog/page/2/">&larr; Older</a>
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.devops.com.ar/blog/2012/06/14/configurando-jboss-6/" data-via="devops_ar" data-counturl="http://www.devops.com.ar/blog/2012/06/14/configurando-jboss-6/" >Tweet</a>
+  
+  
+  
 </div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/05/19/sendmail-cookbook/" title="Previous Post: sendmail cookbook">&laquo; sendmail cookbook</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/08/07/permisos-en-directorio-www/" title="Next Post: permisos en directorio www">permisos en directorio www &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
 <aside class="sidebar">
   
     <section>
@@ -439,7 +245,7 @@
 <section>
   <h1>Latest Tweets</h1>
   <ul id="tweets">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   <script type="text/javascript">
     $.domReady(function(){
@@ -459,6 +265,7 @@
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -473,7 +280,10 @@
       var disqus_shortname = 'devops-ar';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.devops.com.ar/blog/2012/06/14/configurando-jboss-6/';
+        var disqus_url = 'http://www.devops.com.ar/blog/2012/06/14/configurando-jboss-6/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

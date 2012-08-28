@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: knife | devops-ar]]></title>
+  <link href="http://www.devops.com.ar/blog/categories/knife/atom.xml" rel="self"/>
+  <link href="http://www.devops.com.ar/"/>
+  <updated>2012-08-27T23:02:40-03:00</updated>
+  <id>http://www.devops.com.ar/</id>
+  <author>
+    <name><![CDATA[osvaldo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[empezando con chef]]></title>
+    <link href="http://www.devops.com.ar/blog/2012/02/03/empezando-con-chef/"/>
+    <updated>2012-02-03T02:20:00-03:00</updated>
+    <id>http://www.devops.com.ar/blog/2012/02/03/empezando-con-chef</id>
+    <content type="html"><![CDATA[<h1>Componentes de una instalación de Chef</h1>
+
+<p>Una instalación de Chef va a contar típicamente con tres componentes.</p>
+
+<ul>
+<li><strong>Chef Server</strong> Es el host donde esta la base de datos de los nodes registrados, los certificados de las credenciales de los mismos y los cookbooks.</li>
+<li><strong>Chef Client</strong> Es el node gestionado a través del Chef Server. Una vez hecho el bootstraping, cada vez que se ejecute el cliente de chef (comando chef-client) se conecta al Chef Server, descarga y aplica la configuración establecida por las recetas, roles y environments que tenga asignado.</li>
+<li><strong>Workstation</strong> Puede o no ser un node de chef, pero si va tener las credenciales de un usuario registrado con el Chef Server. Desde este equipo se ejecutan comandos de knife y se trabajan con los cookbooks.</li>
+</ul>
+
+
+<h1>Bootstraping</h1>
+
+<p>La instalación de chef en un host (node) para que pueda ser gestionado por un chef server se llama bootstraping. Se realiza con el comando <a href="http://wiki.opscode.com/display/chef/Knife">knife</a> y el subcomando <a href="http://wiki.opscode.com/display/chef/Knife+Bootstrap">bootstrap</a>.</p>
+
+<p>Por ejemplo:</p>
+
+<p><code>sh
+knife bootstrap 10.24.2.51 -x osvaldo --sudo  -N unixtools.tx.corp.acme.com -r 'role[demo]' -d rhel5-demo
+</code></p>
+
+<p>Con ese comando, se esta ejecutando el comando knife, el subcomando bootstrap, la dirección IP del server que se le va a hacer el bootstrap y los parámetros, que entonces, serán del subcomando.</p>
+
+<pre><code>--sudo:
+    El bootstrap se ejecuta via sudo.
+-x, --ssh-user USERNAME:
+    El username (nombre de usuario) con el que se realiza la conexión ssh.
+-N, --node-name NAME:
+    El nombre con el que el host va a ser registrado (como un node) en el server Chef. Usamos el fqdn (el node name tiene que ser único).
+-r, --run-list RUN_LIST:
+    Un listado separado por comas de los roles o recetas que se van a aplicar en el momento del bootstrapping.
+-d, --distro DISTRO:
+    El template que se va a utilizar para el bootstrap.
+</code></pre>
+
+<p>El bootstraping se debe realizar desde la workstation. Los templates del bootstrap son scripts en ruby pero con codigo en bash y se colocan en alguna de las locaciones predeterminadas.</p>
+
+<p><code>sh  tree ~/chef-repo/.chef
+|-- bootstrap
+|   `-- glb-rhel5.erb
+|-- knife.rb
+|-- osvaldo.pem
+`-- validation.pem
+</code></p>
+
+<p>Una locación común seria ~/chef-repo/.chef. En esta carpeta tenemos:</p>
+
+<ul>
+<li><strong>validation.pem</strong>: Es el certificado que utilizan los nodes para validarse ante el Chef Server</li>
+<li><strong>osvaldo.pem</strong>: Certificado del cliente. Lo utiliza el operador para trabajar desde ese host como workstation.</li>
+<li><strong>knife.rb</strong>: Archivo de configuración del comando knife.</li>
+<li><strong>bootstrap</strong>: Directorio donde se almacenan los templates para el bootstrap.</li>
+<li><strong>glb-rhel5.rb</strong>: Template para la instalación de un servidor RedHat (CentOS) de ACME.</li>
+</ul>
+
+
+<p>```rb bootstrap/glb-rhel5.erb
+bash -c '</p>
+
+<p>echo &lt;%= @config[:chef_node_name] %> > /tmp/chef_node_name</p>
+
+<p>PROPERHOSTNAME=<code>cat /tmp/chef_node_name | cut -d. -f1</code>
+PROPERDNSDOMAINNAME=<code>cat /tmp/chef_node_name | sed s/^$PROPERHOSTNAME.//</code></p>
+
+<p>IPV4ADDR=<code>/sbin/ip addr | grep eth0 | grep "inet " | cut -d " " -f 6 | cut -d \/ -f 1</code></p>
+
+<p>cp /etc/hosts /etc/hosts.chef-bck</p>
+
+<p>NETCONF="/etc/sysconfig/network"
+grep "<sup>HOSTNAME=${PROPERHOSTNAME}$"</sup> ${NETCONF} || ( sed -i s/<sup>HOSTNAME.*$//</sup> ${NETCONF} &amp;&amp; echo "HOSTNAME=${PROPERHOSTNAME}" >> ${NETCONF})</p>
+
+<p>(
+cat &lt;<EOF
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+${IPV4ADDR} ${PROPERHOSTNAME}.${PROPERDNSDOMAINNAME} ${PROPERHOSTNAME}
+EOF
+) > /etc/hosts</p>
+
+<p>hostname $PROPERHOSTNAME</p>
+
+<p>if [ ! -d /usr/local/rvm ]; then</p>
+
+<pre><code>wget http://192.168.20.50/rvm-chef-0.10.4-r0.noarch.rpm -P /tmp
+rpm -ivh /tmp/rvm-chef-0.10.4-r0.noarch.rpm
+</code></pre>
+
+<p>fi</p>
+
+<p>(
+cat &lt;&lt;'EOP'
+[[ -s "/usr/local/rvm/scripts/rvm" ]] &amp;&amp; . "/usr/local/rvm/scripts/rvm"
+EOP
+) >> .bashrc
+[[ -s "/usr/local/rvm/scripts/rvm" ]] &amp;&amp; . "/usr/local/rvm/scripts/rvm"
+rvm use --default ruby-1.9.2</p>
+
+<p>mkdir -p /etc/chef</p>
+
+<p>(
+cat &lt;&lt;'EOP'
+&lt;%= validation_key %>
+EOP
+) > /tmp/validation.pem
+awk NF /tmp/validation.pem > /etc/chef/validation.pem
+rm /tmp/validation.pem</p>
+
+<p>(
+cat &lt;&lt;'EOP'
+&lt;%= config_content %>
+EOP
+) > /etc/chef/client.rb</p>
+
+<p>(
+cat &lt;&lt;'EOP'
+&lt;%= { "run_list" => @run_list }.to_json %>
+EOP
+) > /etc/chef/first-boot.json</p>
+
+<p>chef-client -j /etc/chef/first-boot.json'
+```</p>
+]]></content>
+  </entry>
+  
+</feed>

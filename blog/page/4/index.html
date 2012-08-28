@@ -1,0 +1,1413 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>devops-ar</title>
+  <meta name="author" content="osvaldo">
+
+  
+  <meta name="description" content="Este artículo se puede visualizar en formato de presentación aquí. ohai Ohai detecta información acerca del sistema operativo. Puede ser utilizado &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.devops.com.ar/blog/page/4/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="devops-ar" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-5155520-9']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">devops-ar</a></h1>
+  
+    <h2>devops en castellano</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.devops.com.ar" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/17/chef-tools/">Herramientas De Chef</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-17T14:07:00-03:00" pubdate data-updated="true">Dec 17<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/17/chef-tools/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Este artículo se puede visualizar en formato de presentación <a href="/talks/chef/chef-tools.html">aquí</a>.</p>
+
+<h2><a href="http://wiki.opscode.com/display/chef/Ohai">ohai</a></h2>
+
+<p>Ohai detecta información acerca del sistema operativo. Puede ser utilizado como un comando independiente pero su función primaria consiste en proveer información sobre el Nodo a Chef.
+Cuando se ejecuta, recolecta información detallada y extensible acerca del equipo sobre el esta corriendo, como por ejemplo, configuración de Chef, el hostname, el FQDN, la configuración de red, así como datos sobre la memoria, la CPU, la plataforma y el kernel.</p>
+
+<p>Cuando se ejecuta independiente, Ohai imprime un bloque de datos en formato JSON con toda la información que puede obtener del sistema. Cuando se utiliza a través de Chef, ese bloque de datos JSON es enviado al servidor de Chef como atributos &#8220;automáticos&#8221; del Nodo para actualizar la información del mismo que pudiera existir previamente.</p>
+
+<h2><a href="http://wiki.opscode.com/display/chef/Knife">knife</a></h2>
+
+<p>Knife es una poderosa herramienta de linea de comandos (CLI) que forma parte de Chef.
+Es utilizada por los administradores para interactuar con la API del Servidor de Chef y con el Repositorio local de Chef. Permite manipular los Nodos, Cookbooks, Roles, Databags, Ambientes, etc. Además, puede ser utilizada para la propia instalación de Chef en nuevos sistemas.</p>
+
+<h2>Ohai</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>osvaldo@vostro:~<span class="nv">$ </span>ohai
+</span><span class='line'><span class="o">{</span>
+</span><span class='line'>  <span class="s2">&quot;languages&quot;</span>: <span class="o">{</span>
+</span><span class='line'>    <span class="s2">&quot;perl&quot;</span>: <span class="o">{</span>
+</span><span class='line'>      <span class="s2">&quot;version&quot;</span>: <span class="s2">&quot;5.10.1&quot;</span>,
+</span><span class='line'>      <span class="s2">&quot;archname&quot;</span>: <span class="s2">&quot;i486-linux-gnu-thread-multi&quot;</span>
+</span><span class='line'>    <span class="o">}</span>,
+</span><span class='line'>    <span class="s2">&quot;python&quot;</span>: <span class="o">{</span>
+</span><span class='line'>      <span class="s2">&quot;version&quot;</span>: <span class="s2">&quot;2.6.6&quot;</span>,
+</span><span class='line'>      <span class="s2">&quot;builddate&quot;</span>: <span class="s2">&quot;Dec 27 2010, 00:02:40&quot;</span>
+</span><span class='line'>    <span class="o">}</span>,
+</span><span class='line'>...
+</span><span class='line'>  <span class="s2">&quot;kernel&quot;</span>: <span class="o">{</span>
+</span><span class='line'>    <span class="s2">&quot;name&quot;</span>: <span class="s2">&quot;Linux&quot;</span>,
+</span><span class='line'>    <span class="s2">&quot;release&quot;</span>: <span class="s2">&quot;2.6.32-5-686&quot;</span>,
+</span><span class='line'>    <span class="s2">&quot;version&quot;</span>: <span class="s2">&quot;#1 SMP Thu Nov 3 04:23:54 UTC 2011&quot;</span>,
+</span><span class='line'>    <span class="s2">&quot;machine&quot;</span>: <span class="s2">&quot;i686&quot;</span>,
+</span><span class='line'>...
+</span><span class='line'>  <span class="s2">&quot;lsb&quot;</span>: <span class="o">{</span>
+</span><span class='line'>    <span class="s2">&quot;id&quot;</span>: <span class="s2">&quot;Debian&quot;</span>,
+</span><span class='line'>    <span class="s2">&quot;description&quot;</span>: <span class="s2">&quot;Debian GNU/Linux 6.0.3 (squeeze)&quot;</span>,
+</span><span class='line'>    <span class="s2">&quot;release&quot;</span>: <span class="s2">&quot;6.0.3&quot;</span>,
+</span><span class='line'>    <span class="s2">&quot;codename&quot;</span>: <span class="s2">&quot;squeeze&quot;</span>
+</span><span class='line'>  <span class="o">}</span>,
+</span><span class='line'>  <span class="s2">&quot;platform&quot;</span>: <span class="s2">&quot;debian&quot;</span>,
+</span><span class='line'>  <span class="s2">&quot;platform_version&quot;</span>: <span class="s2">&quot;6.0.3&quot;</span>,
+</span><span class='line'>...
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Knife :: the killer app</h2>
+
+<p>Que pasa si queremos obtener una mirada del estado de los servidores que pertenecen a un rol en particular?</p>
+
+<p><strong>Sort by 5min load average</strong></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>osvaldo@coldplay ~<span class="o">]</span><span class="nv">$ </span>knife ssh -x otoja <span class="s1">&#39;roles:demo&#39;</span>  <span class="s1">&#39;cat /proc/loadavg | awk &quot;{print $2}&quot;&#39;</span> | sort -n -k 2
+</span><span class='line'>nirvana.example.com 0.00 0.00 0.00 1/149 16941
+</span><span class='line'>stp.example.com 0.00 0.00 0.00 4/182 25165
+</span><span class='line'>soundgarden.example.com  0.40 0.10 0.03 1/179 485
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>Sort by uptime</strong></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>osvaldo@coldplay ~<span class="o">]</span><span class="nv">$ </span>knife ssh -x otoja <span class="s1">&#39;roles:demo&#39;</span> <span class="s1">&#39;uptime&#39;</span> | sort -n -k 4
+</span><span class='line'>nirvana.example.com  21:25:39 up 8 days,  6:30,  2 users,  load average: 0.00, 0.00, 0.00
+</span><span class='line'>soundgarden.example.com   21:24:04 up 8 days,  9:00,  1 user,  load average: 0.20, 0.08, 0.02
+</span><span class='line'>stp.example.com  21:25:39 up 33 days, 10:47,  2 users,  load average: 0.00, 0.00, 0.00
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>puedo hacer un tail a un archivo al mismo tiempo en todos los servidores con solo un comando?</strong></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>knife ssh -x otoja <span class="s1">&#39;roles:demo&#39;</span> <span class="s1">&#39;sudo tail -f /var/log/messages&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>y ahora a mirar la pantalla &#8230;</p>
+
+<p><strong>que servidores estan utilizando python 2.*?</strong></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>osvaldo@coldplay ~<span class="o">]</span><span class="nv">$ </span>knife <span class="nb">exec</span> -E <span class="s2">&quot;search(:node, &#39;languages_python_version:2.*&#39;  ).each {|host|  puts host[:fqdn] + &#39; python version: &#39; + host[:languages][:python][:version] }&quot;</span>
+</span><span class='line'>soundgarden.example.com python version: 2.4.3
+</span><span class='line'>nirvana.example.com python version: 2.4.3
+</span><span class='line'>stp.example.com python version: 2.4.3
+</span><span class='line'>vostro python version: 2.6.6
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>cual es el estado de un servicio X (ntp en el ejemplo) en un grupo determinado de servidores (con el role demo)?</strong></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>osvaldo@coldplay ~<span class="o">]</span><span class="nv">$ </span>knife ssh -x otoja -m <span class="s2">&quot;`knife exec -E &quot;</span>search<span class="o">(</span>:node, <span class="s1">&#39;roles:demo&#39;</span><span class="o">)</span>.each <span class="o">{</span>|host| puts host<span class="o">[</span>:fqdn<span class="o">]</span> <span class="o">}</span><span class="s2">&quot; | xargs`&quot;</span> <span class="s1">&#39;/etc/init.d/ntpd status&#39;</span>
+</span><span class='line'>stp.example.com ntpd is stopped
+</span><span class='line'>soundgarden.example.com  ntpd is stopped
+</span><span class='line'>nirvana.example.com ntpd is stopped
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>que servidores tienen instalado java version 1.*?</strong></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>osvaldo@coldplay ~<span class="o">]</span><span class="nv">$ </span>knife <span class="nb">exec</span> -E <span class="s2">&quot;search(:node, &#39;languages_java_version:1.*&#39;  ).each {|host|  puts host[:fqdn] + &#39; java version: &#39; + host[:languages][:java][:version] }&quot;</span>
+</span><span class='line'>toja-lm java version: 1.6.0_18
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/17/introduccion-rapida-a-chef/">Introducción Rápida a Chef</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-17T13:19:00-03:00" pubdate data-updated="true">Dec 17<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/17/introduccion-rapida-a-chef/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Este artículo se puede visualizar en formato de presentación <a href="/talks/chef/quick-intro.html">aquí</a>.</p>
+
+<h3>Definir problema</h3>
+
+<ul>
+<li>crecimiento de la granja de servidores</li>
+<li>configuración manual</li>
+<li>a mayor numero de servidores, mayor posibilidad de error cuando se utiliza la configuracion manual</li>
+<li>baja productividad = pérdida de tiempo</li>
+<li>El mantenimiento es reactivo en vez de ser proactivo</li>
+<li>Cambios de emergencia pueden comprometer un sistema</li>
+</ul>
+
+
+<h3>Objetivo a lograr</h3>
+
+<ul>
+<li>permitir crecimiento horizontal</li>
+<li>estar preparados para escalar sin mayores complicaciones</li>
+<li>evitar los puntos únicos de falla</li>
+<li>trabajo manual</li>
+<li>conocimiento compartimentado</li>
+<li>manejo sencillo de configuraciones complicadas</li>
+</ul>
+
+
+<h3>Beneficio de la solución</h3>
+
+<ul>
+<li>organización del trabajo</li>
+<li>obliga a una separación de los entornos de trabajo</li>
+<li>fuerza a evitar las excepciones</li>
+<li>incremento de la productividad</li>
+<li>documentación</li>
+</ul>
+
+
+<h3>Herramientas</h3>
+
+<ul>
+<li>opscode chef</li>
+<li>chef-client/chef-server</li>
+<li>hosted chef (propuesta comercial de opscode)</li>
+<li>chef-solo</li>
+<li>puppet</li>
+<li>cfengine</li>
+<li>otros &#8230;.</li>
+</ul>
+
+
+<h3>¿Cual es mejor?</h3>
+
+<ul>
+<li>puppet o chef</li>
+<li>vi o emacs</li>
+<li>ruby o python</li>
+<li>linux o windows</li>
+</ul>
+
+
+<p>Con Puppet, un Cron Type sería algo asi:</p>
+
+<figure class='code'><figcaption><span>Puppet Cron Type</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">cron</span> <span class="p">{</span> <span class="n">command</span><span class="p">:</span>
+</span><span class='line'>  <span class="n">command</span> <span class="o">=&gt;</span> <span class="s2">&quot;/usr/local/sbin/command&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="n">hour</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span>
+</span><span class='line'>  <span class="n">minute</span> <span class="o">=&gt;</span> <span class="mi">0</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Con Chef, declarar un Recurso equivalente seria:</p>
+
+<figure class='code'><figcaption><span>chef resource</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">cron</span> <span class="s2">&quot;describe your job&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">hour</span> <span class="s2">&quot;2&quot;</span>
+</span><span class='line'>  <span class="n">minute</span> <span class="s2">&quot;0&quot;</span>
+</span><span class='line'>  <span class="n">command</span> <span class="s2">&quot;/usr/local/sbin/command&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>modos de trabajo</h3>
+
+<ul>
+<li>chef-solo</li>
+<li>chef-server</li>
+<li>hosted chef</li>
+</ul>
+
+
+<h3>instalación rapida en 3 pasos</h3>
+
+<ul>
+<li>instalar ruby</li>
+<li>depende del sistema operativo</li>
+<li>instalar chef: sudo gem install chef</li>
+<li>no hay tercer paso ;)</li>
+</ul>
+
+
+<h3>¿Qué es una receta?</h3>
+
+<ul>
+<li>con solo dos archivos ya armamos una receta</li>
+<li>en realidad con uno basta (se puede excluir la metadata)</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>foo/recipes/default.rb
+</span><span class='line'>foo/metadata.rb
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>ejemplo de una receta para PHP</h3>
+
+<figure class='code'><figcaption><span>default.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="no">Chef</span><span class="o">::</span><span class="no">Log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running php recipe)</span>
+</span><span class='line'>
+</span><span class='line'><span class="s2">package &quot;</span><span class="n">php5</span><span class="o">-</span><span class="n">cgi</span><span class="s2">&quot;</span>
+</span><span class='line'><span class="s2">package &quot;</span><span class="n">php5</span><span class="o">-</span><span class="n">cli</span><span class="s2">&quot;</span>
+</span><span class='line'><span class="s2">package &quot;</span><span class="n">php5</span><span class="o">-</span><span class="n">mysql</span><span class="s2">&quot;</span>
+</span><span class='line'><span class="s2">package &quot;</span><span class="n">php5</span><span class="o">-</span><span class="n">curl</span><span class="s2">&quot;</span>
+</span><span class='line'><span class="s2">package &quot;</span><span class="n">php5</span><span class="o">-</span><span class="n">dev</span><span class="s2">&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s2">include_recipe &quot;</span><span class="n">php</span><span class="o">::</span><span class="n">pear</span><span class="s2">&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>ejemplo de una receta para PHP</h3>
+
+<figure class='code'><figcaption><span>pear.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="no">Chef</span><span class="o">::</span><span class="no">Log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running pear recipe&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">package</span> <span class="s2">&quot;php-pear&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">execute</span> <span class="s2">&quot;Update PEAR and all packages&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">command</span> <span class="s2">&quot;pear upgrade-all&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">execute</span> <span class="s2">&quot;Install HTTP_Session2 &amp; Net_CheckIP2&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">command</span> <span class="s2">&quot;pear install HTTP_Session2-beta Net_CheckIP-1.0.0RC3&quot;</span>
+</span><span class='line'>  <span class="n">not_if</span> <span class="s2">&quot;test -f /usr/share/php/pear/HTTP/Session2.php&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>ejemplo de una receta para PHP</h3>
+
+<figure class='code'><figcaption><span>metadata.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">maintainer</span>        <span class="s2">&quot;Till Klampeckel&quot;</span>
+</span><span class='line'><span class="n">maintainer_email</span>  <span class="s2">&quot;till@php.net&quot;</span>
+</span><span class='line'><span class="n">license</span>           <span class="s2">&quot;BSD License&quot;</span>
+</span><span class='line'><span class="n">description</span>       <span class="s2">&quot;Install PHP &amp; required dependencies.&quot;</span>
+</span><span class='line'><span class="n">version</span>           <span class="s2">&quot;0.1&quot;</span>
+</span><span class='line'><span class="n">recipe</span>            <span class="s2">&quot;php::default&quot;</span><span class="p">,</span> <span class="s2">&quot;Install and configure PHP&quot;</span>
+</span><span class='line'><span class="n">recipe</span>            <span class="s2">&quot;php::pear&quot;</span><span class="p">,</span> <span class="s2">&quot;Install PEAR and packages&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">supports</span> <span class="s1">&#39;ubuntu&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>ejemplo de una receta para PHP</h3>
+
+<p>Estructura del directorio</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>/tmp/chef/cookbooks/php/
+</span><span class='line'>/tmp/chef/cookbooks/php/metadata.rb
+</span><span class='line'>/tmp/chef/cookbooks/php/recipes/default.rb
+</span><span class='line'>/tmp/chef/cookbooks/php/recipes/pear.rb
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>ejemplo de una receta para PHP</h3>
+
+<p>Utilizando el modo de trabajo Chef-solo</p>
+
+<ul>
+<li>Necesitamos dos archivo de configuración</li>
+<li>/etc/chef/solo.rb</li>
+<li>node.json</li>
+<li>Un repositorio de cookbooks</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>/etc/chef/solo.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">file_cache_path</span> <span class="s2">&quot;/tmp/chef&quot;</span>
+</span><span class='line'><span class="n">cookbook_path</span> <span class="s2">&quot;/tmp/chef/cookbooks&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>ejemplo de una receta para PHP</h3>
+
+<p>node.json</p>
+
+<ul>
+<li>JSON qué? la mujer de quién?</li>
+<li>La lista de ejecución (run_list) define las recetas que van a ser utilizadas y el orden que son ejecutadas.</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>node.json</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;run_list&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;recipe[php]&quot;</span> <span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Ser flexibles</h3>
+
+<ul>
+<li>Mantener las recetas genéricas</li>
+<li>Configuración individual</li>
+<li>Utilizar variables en node.json</li>
+</ul>
+
+
+<h3>ejemplo de node.json</h3>
+
+<figure class='code'><figcaption><span>node.json</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;php&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;memory&quot;</span><span class="o">:</span><span class="s2">&quot;18G&quot;</span><span class="p">,</span> <span class="s2">&quot;tmp&quot;</span><span class="o">:</span><span class="s2">&quot;/tmp/php/data&quot;</span> <span class="p">},</span>
+</span><span class='line'>  <span class="s2">&quot;run_list&quot;</span><span class="o">:</span> <span class="p">...</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>uso de variables en foo.rb:</p>
+
+<figure class='code'><figcaption><span>foo.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">memory</span> <span class="o">=</span> <span class="n">node</span><span class="o">[</span><span class="ss">:php</span><span class="o">][</span><span class="ss">:memory</span><span class="o">]</span>
+</span><span class='line'><span class="n">tempdir</span> <span class="o">=</span> <span class="n">node</span><span class="o">[</span><span class="ss">:php</span><span class="o">][</span><span class="ss">:tmp</span><span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">directory</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">tempdir</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">owner</span> <span class="s2">&quot;www-data&quot;</span>
+</span><span class='line'>  <span class="n">group</span> <span class="s2">&quot;www-data&quot;</span>
+</span><span class='line'>  <span class="n">recursive</span> <span class="ss">:true</span>
+</span><span class='line'>  <span class="n">action</span> <span class="ss">:delete</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Ejecución</h3>
+
+<p>Con el archivo node.json local en el servidor:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>chef-solo -j /tmp/node.json <span class="o">[</span>-c /etc/chef/solo.rb<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>El archivo node.json y las recetas se pueden descargar de un servidor remoto [master, Amazon S3,..]:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>chef-solo -j http://example.org/node.json -r http://example.org/recipes.tar.gz
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Uso avanzado</h2>
+
+<h3>Archivos</h3>
+
+<ul>
+<li>distribución de archivos de configuración</li>
+<li>archivos estáticos - solo necesitan ser copiados tal cual</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>openssh/files/default/banner</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="no">Ud</span><span class="o">.</span> <span class="n">est</span><span class="err">á</span> <span class="n">ingresando</span> <span class="n">a</span> <span class="n">una</span> <span class="n">red</span> <span class="n">inform</span><span class="err">á</span><span class="n">tica</span> <span class="n">de</span> <span class="no">Acceso</span> <span class="no">Restringido</span> <span class="n">y</span> <span class="n">que</span> <span class="n">contiene</span> <span class="n">informaci</span><span class="err">ó</span><span class="n">n</span>
+</span><span class='line'><span class="n">legalmente</span> <span class="n">protegida</span><span class="p">,</span> <span class="n">confidencial</span> <span class="n">y</span><span class="o">/</span><span class="n">o</span> <span class="n">de</span> <span class="n">secreto</span> <span class="n">profesional</span><span class="p">,</span> <span class="n">cuyo</span> <span class="n">uso</span> <span class="n">indebido</span>
+</span><span class='line'><span class="n">puede</span> <span class="n">generar</span> <span class="n">al</span> <span class="n">usuario</span> <span class="n">responsabilidad</span> <span class="n">civil</span> <span class="n">o</span> <span class="n">configurar</span> <span class="n">los</span>
+</span><span class='line'><span class="n">delitos</span> <span class="n">previstos</span> <span class="n">en</span> <span class="n">los</span> <span class="n">arts</span><span class="o">.</span> <span class="mi">153</span> <span class="n">a</span> <span class="mi">157</span> <span class="n">del</span> <span class="n">C</span><span class="err">ó</span><span class="n">digo</span> <span class="no">Penal</span><span class="o">.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>openssh/recipes/default.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="c1"># asume openssh/files/default/banner</span>
+</span><span class='line'><span class="n">template</span> <span class="s2">&quot;banner&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">source</span>  <span class="s2">&quot;banner&quot;</span>
+</span><span class='line'>  <span class="n">owner</span>   <span class="s2">&quot;root&quot;</span>
+</span><span class='line'>  <span class="n">group</span>   <span class="s2">&quot;root&quot;</span>
+</span><span class='line'>  <span class="n">mode</span>    <span class="s2">&quot;0644&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Atributos</h3>
+
+<ul>
+<li>los atributos de un node son generados por ohai</li>
+<li>pueden ser modificados ó adicionados en las recetas de los cookbooks, en los roles o los ambientes</li>
+<li>ejemplo de atributos en una receta (openssh/attributes/default.rb):</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>openssh/attributes/default.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">default</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:port</span><span class="o">]</span>                <span class="o">=</span> <span class="o">[</span> <span class="s2">&quot;22&quot;</span> <span class="o">]</span>
+</span><span class='line'><span class="n">default</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:listen_address</span><span class="o">]</span>      <span class="o">=</span> <span class="o">[</span> <span class="s2">&quot;0.0.0.0&quot;</span> <span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">default</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:permit_root_login</span><span class="o">]</span>   <span class="o">=</span> <span class="s2">&quot;no&quot;</span>
+</span><span class='line'><span class="n">default</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:x11_forwarding</span><span class="o">]</span>      <span class="o">=</span> <span class="s2">&quot;no&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">default</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:ignore_rhosts</span><span class="o">]</span>      <span class="o">=</span> <span class="s2">&quot;yes&quot;</span>
+</span><span class='line'><span class="n">default</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:use_dns</span><span class="o">]</span>      <span class="o">=</span> <span class="s2">&quot;no&quot;</span>
+</span><span class='line'><span class="n">default</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:banner</span><span class="o">]</span>      <span class="o">=</span> <span class="s2">&quot;/etc/ssh/banner&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>ejemplo de atributos en un ambiente</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>roles/local.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="nb">name</span> <span class="s2">&quot;local&quot;</span>
+</span><span class='line'><span class="n">description</span> <span class="s2">&quot;local testing environment&quot;</span>
+</span><span class='line'><span class="n">override_attributes</span> <span class="p">({</span>
+</span><span class='line'>    <span class="s2">&quot;ntp&quot;</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>        <span class="s2">&quot;ntp_server&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;time.apple.com&quot;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Plantillas</h3>
+
+<ul>
+<li>Archivos de configuración</li>
+<li>Scripts de inicio</li>
+<li>uso de atributos en una plantilla (openssh/templates/centos/sshd_config.erb):</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>openssh/templates/centos/sshd_config.erb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="no">PermitRootLogin</span> <span class="o">&lt;</span><span class="sx">%= node[:openssh][:permit_root_login] %&gt;</span>
+</span><span class='line'><span class="sx">IgnoreRhosts &lt;%=</span> <span class="n">node</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:ignore_rhosts</span><span class="o">]</span> <span class="sx">%&gt;</span>
+</span><span class='line'><span class="sx">X11Forwarding &lt;%= node[:openssh][:x11_forwarding] %&gt;</span>
+</span><span class='line'><span class="no">Banner</span>  <span class="o">&lt;%=</span> <span class="n">node</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:banner</span><span class="o">]</span> <span class="o">%&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>uso de una plantilla en una receta (openssh/recipes/default.rb):</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>openssh/recipes/default.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">template</span> <span class="s2">&quot;/etc/ssh/sshd_config&quot;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">source</span>  <span class="s2">&quot;sshd_config.erb&quot;</span>
+</span><span class='line'>    <span class="n">owner</span>   <span class="s2">&quot;root&quot;</span>
+</span><span class='line'>    <span class="n">group</span>   <span class="s2">&quot;root&quot;</span>
+</span><span class='line'>    <span class="n">mode</span>    <span class="s2">&quot;0600&quot;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">notifies</span> <span class="ss">:restart</span><span class="p">,</span> <span class="s2">&quot;service[sshd]&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/11/30/instalacion-de-un-server-de-ci/">Instalacion De Un Server De Ci</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-11-30T14:26:00-03:00" pubdate data-updated="true">Nov 30<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/11/30/instalacion-de-un-server-de-ci/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>CI - Continuous Integration.</p>
+
+<p>Este post describe la instalación de un servidor de integración continua. El mismo estará integrado por jenkins, maven y sonar.</p>
+
+<h1>jenkins</h1>
+
+<h2>Instalacion de jenkins</h2>
+
+<p>Esta instalacion describe la instalacion de jenkins en un container tomcat ya existente y utilizando al apache (via mod_proxy_ajp) como frontend.</p>
+
+<p>jenkins es un fork de hudson.</p>
+
+<p>La instalacion se realiza sobre un server estandar con tomcat instalado.</p>
+
+<p>Los pasos a realizar serian los siguientes:
+* Descargar la ultima version del war de jenkins (el ejemplo es para el caso de server).
+* Configurar el apache.
+* Reiniciar el apache y el tomcat.</p>
+
+<h2>Descargar el jenkins.</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>wget -P /opt/thirdparty/tomcat/webapps/ http://updates.jenkins-ci.org/download/war/1.438/jenkins.war
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Configurar el apache</h2>
+
+<p>Primero revisar que el modulo este activado. En el archivo /etc/httpd/conf.d/proxy_ajp.conf la siguiente linea este descomentareada.</p>
+
+<p>LoadModule proxy_ajp_module modules/mod_proxy_ajp.so</p>
+
+<p>Nota: Asegurarse de que el modulo mod_jk no este habilitado (usualmente el archivo mod_jk.conf en el mismo directorio).</p>
+
+<p>Luego se crea un archivo de virtualhost para el server.</p>
+
+<figure class='code'><figcaption><span>/etc/httpd/vhost.d/server.conf </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='apache'><span class='line'><span class="nb">ProxyRequests</span> <span class="k">Off</span>
+</span><span class='line'><span class="nb">ProxyPreserveHost</span> <span class="k">On</span>
+</span><span class='line'><span class="nt">&lt;VirtualHost</span> <span class="s">*:80</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nb">ServerAdmin</span> unixadmin@example.com
+</span><span class='line'>    <span class="nb">ServerName</span> server.example.com
+</span><span class='line'>    <span class="nb">ProxyPass</span> <span class="sx">/sonar</span> ajp://localhost:9009/sonar
+</span><span class='line'>    <span class="c">#ProxyPass /nexus http://localhost:8081/nexus</span>
+</span><span class='line'>    <span class="c">#ProxyPassReverse /nexus http://localhost:8081/nexus</span>
+</span><span class='line'>    <span class="nb">ProxyPass</span> /   ajp://localhost:8009/
+</span><span class='line'>    <span class="nb">ErrorLog</span> logs/server.dev.corp-error_log
+</span><span class='line'>    <span class="nb">CustomLog</span> logs/server.dev.corp-access_log common
+</span><span class='line'><span class="nt">&lt;/VirtualHost&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Nota, las lineas para el sonar y el nexus solo se requieren si estos servicios van a ser instalados, si no, se dejan comentadas.</p>
+
+<p>Se habilita el puerto 8009 para el protocolo AJP en el tomcat (por defecto solo habilita el 8080: protocolo HTTP).</p>
+
+<figure class='code'><figcaption><span>/opt/thirdparty/tomcat/conf/server.xml </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="c">&lt;!-- Define an AJP 1.3 Connector on port 8009 --&gt;</span>
+</span><span class='line'><span class="nt">&lt;Connector</span> <span class="na">port=</span><span class="s">&quot;8009&quot;</span> <span class="na">protocol=</span><span class="s">&quot;AJP/1.3&quot;</span> <span class="na">redirectPort=</span><span class="s">&quot;8443&quot;</span> <span class="na">URIEncoding=</span><span class="s">&quot;UTF-8&quot;</span> <span class="nt">/&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Y se reinician el apache y el tomcat</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>/etc/init.d/httpd restart
+</span><span class='line'>/etc/init.d/tomcat stop
+</span><span class='line'>/etc/init.d/tomcat start
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>El jenkins deberia estar accesible en: http://server.example.com/jenkins</p>
+
+<p>Se sugiere crear una pagina de inicio por si alguien teclea la url http://server.example.com/ directamente.
+Esta pagina se crea en
+$CATALINA_HOME/webapps/ROOT/index.html</p>
+
+<p>Por ejemplo:</p>
+
+<figure class='code'><figcaption><span>/opt/thirdparty/tomcat/webapps/ROOT/index.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;html&gt;</span>
+</span><span class='line'><span class="nt">&lt;head&gt;&lt;title&gt;</span>server <span class="nt">&lt;/title&gt;</span> <span class="nt">&lt;/head&gt;</span>
+</span><span class='line'><span class="nt">&lt;body&gt;</span>
+</span><span class='line'>server<span class="nt">&lt;p</span> <span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;ul&gt;</span>
+</span><span class='line'><span class="nt">&lt;li&gt;&lt;a</span> <span class="na">href=</span><span class="s">&quot;/jenkins&quot;</span><span class="nt">&gt;</span>jenkins<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>
+</span><span class='line'><span class="nt">&lt;li&gt;&lt;a</span> <span class="na">href=</span><span class="s">&quot;/sonar&quot;</span><span class="nt">&gt;</span>sonar<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>
+</span><span class='line'><span class="nt">&lt;li&gt;&lt;a</span> <span class="na">href=</span><span class="s">&quot;/nexus&quot;</span><span class="nt">&gt;</span>nexus<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>
+</span><span class='line'><span class="nt">&lt;/ul&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Maven</h1>
+
+<p>Descargar y descompactar el maven.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>wget -P /opt/thirdparty http://apache.dattatec.com//maven/binaries/apache-maven-3.0.3-bin.tar.gz
+</span><span class='line'><span class="nb">cd</span> /opt/thirdparty
+</span><span class='line'>tar zxf apache-maven-3.0.3-bin.tar.gz
+</span><span class='line'>rm apache-maven-3.0.3-bin.tar.gz
+</span><span class='line'>ln -s apache-maven-3.0.3 maven
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Adicionar al final del archivo /etc/bashrc las siguientes lineas</p>
+
+<figure class='code'><figcaption><span>/etc/bashrc</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">export </span><span class="nv">JAVA_HOME</span><span class="o">=</span>/opt/thirdparty/java
+</span><span class='line'><span class="nb">export </span><span class="nv">M2_HOME</span><span class="o">=</span>/opt/thirdparty/maven
+</span><span class='line'><span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="k">${</span><span class="nv">M2_HOME</span><span class="k">}</span>/bin:<span class="k">${</span><span class="nv">PATH</span><span class="k">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Si nuestro server utiliza un proxy para conectarse a la web, deberemos configurar el maven para hacer uso de este proxy.  Esto se hace en el archivo de configuracion del maven: /opt/thirdparty/maven/conf/settings.xml donde la seccion de proxies deberá quedar de la siguiente manera:</p>
+
+<figure class='code'><figcaption><span>/opt/thirdparty/maven/conf/settings.xml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>  <span class="nt">&lt;proxies&gt;</span>
+</span><span class='line'>   <span class="nt">&lt;proxy&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;active&gt;</span>true<span class="nt">&lt;/active&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;protocol&gt;</span>http<span class="nt">&lt;/protocol&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;host&gt;</span>proxy.example.com<span class="nt">&lt;/host&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;port&gt;</span>3128<span class="nt">&lt;/port&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/proxy&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/proxies&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Sonar</h1>
+
+<p>Descargamos el sonar y lo descompactamos en un directorio.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">COMPANY</span><span class="o">=</span>globant
+</span><span class='line'><span class="nb">cd</span> /opt/<span class="nv">$COMPANY</span>
+</span><span class='line'>wget http://dist.sonar.codehaus.org/sonar-2.11.zip
+</span><span class='line'>unzip sonar-2.11.zip
+</span><span class='line'>ln -s sonar-2.11 sonar
+</span><span class='line'>rm -f sonar-2.11.zip
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Creamos la base de datos</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">CREATE</span> <span class="k">DATABASE</span> <span class="n">sonar</span> <span class="nb">CHARACTER</span> <span class="k">SET</span> <span class="n">utf8</span> <span class="k">COLLATE</span> <span class="n">utf8</span><span class="err">\</span><span class="n">_general_ci</span><span class="p">;</span>
+</span><span class='line'><span class="k">grant</span> <span class="k">all</span> <span class="k">privileges</span> <span class="k">on</span> <span class="n">sonar</span><span class="p">.</span><span class="o">*</span> <span class="k">to</span> <span class="s1">&#39;sonar&#39;</span><span class="o">@</span><span class="s1">&#39;localhost&#39;</span> <span class="n">identified</span> <span class="k">by</span> <span class="s1">&#39;Ht4uS1cNwbxeI&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="n">flush</span> <span class="k">privileges</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Se declara la base de datos en el archivo de propiedades del sonar: /opt/thirdparty/sonar/conf/sonar.properties</p>
+
+<figure class='code'><figcaption><span>/opt/thirdparty/sonar/conf/sonar.properties</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='properties'><span class='line'><span class="na">sonar.web.host</span><span class="o">:</span>                           <span class="s">0.0.0.0</span>
+</span><span class='line'><span class="na">sonar.web.port</span><span class="o">:</span>                           <span class="s">9000</span>
+</span><span class='line'><span class="na">sonar.web.context</span><span class="o">:</span>                        <span class="s">/sonar</span>
+</span><span class='line'><span class="c">#sonar.web.context:                        /</span>
+</span><span class='line'><span class="na">sonar.ajp13.port</span><span class="o">:</span> <span class="s">9009</span>
+</span><span class='line'>
+</span><span class='line'><span class="na">sonar.jdbc.username</span><span class="o">:</span>                       <span class="s">sonar</span>
+</span><span class='line'><span class="na">sonar.jdbc.password</span><span class="o">:</span>                       <span class="s">*********</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Comment the following lines to deactivate the default embedded database.</span>
+</span><span class='line'><span class="c">#sonar.jdbc.url:                            jdbc:derby://localhost:1527/sonar;create=true</span>
+</span><span class='line'><span class="c">#sonar.jdbc.driverClassName:                org.apache.derby.jdbc.ClientDriver</span>
+</span><span class='line'><span class="c">#sonar.jdbc.validationQuery:                values(1)</span>
+</span><span class='line'>
+</span><span class='line'><span class="na">sonar.jdbc.url</span><span class="o">:</span> <span class="s">jdbc:mysql://localhost:3306/sonar?useUnicode=true&amp;characterEncoding=utf8</span>
+</span><span class='line'><span class="na">sonar.jdbc.driverClassName</span><span class="o">:</span> <span class="s">com.mysql.jdbc.Driver</span>
+</span><span class='line'><span class="na">sonar.jdbc.validationQuery</span><span class="o">:</span> <span class="s">select 1</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Podemos iniciar el sonar manualmente.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$SONAR_HOME</span>/bin/linux-x86-32/sonar.sh start
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Y comprobar que funciona accediendo al puerto 9000 del server: <a href="http://server.example.com:9000/">http://server.example.com:9000/</a></p>
+
+<p>Adicionamos una instalacion de sonar al jenkins</p>
+
+<p>Si el server soporta la instalación de plugins via web.
+<a href="http://server.example.com/jenkins/pluginManager/available">http://server.example.com/jenkins/pluginManager/available</a></p>
+
+<p>Instalando el plugin de sonar manualmente.
+<a href="http://updates.jenkins-ci.org/download/plugins/">http://updates.jenkins-ci.org/download/plugins/</a></p>
+
+<p>Descargamos el archivo *.hpi para el directorio $JENKINS_HOME/plugins directory. Algunos contenedores podrian requerir reiniciar Jenkins para que muestre el nuevo plugin.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">cd</span> <span class="nv">$TOMCAT_HOME</span>/webapps/jenkins/WEB-INF/plugins
+</span><span class='line'>wget http://updates.jenkins-ci.org/latest/sonar.hpi
+</span><span class='line'>chown tomcat:tomcat sonar.hpi
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Configuramos jenkins para que utilice el sonar: <a href="http://server.example.com:8080/jenkins/configure">http://server.example.com:8080/jenkins/configure</a></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='properties'><span class='line'><span class="err">Name</span>  <span class="err">sonar</span>
+</span><span class='line'><span class="na">Server URL   http</span><span class="o">:</span><span class="s">//server.example.com/sonar</span>
+</span><span class='line'><span class="na">Database URL     jdbc</span><span class="o">:</span><span class="s">mysql://localhost:3306/sonar?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=utf8</span>
+</span><span class='line'><span class="err">Database</span> <span class="err">login</span>  <span class="err">sonar</span>
+</span><span class='line'><span class="err">Database</span> <span class="err">password</span>   <span class="err">&lt;el</span> <span class="err">mismo</span> <span class="err">que</span> <span class="err">utilizamos</span> <span class="err">para</span> <span class="err">la</span> <span class="err">creacion</span> <span class="err">del</span> <span class="err">usuario</span> <span class="err">mysql&gt;</span>
+</span><span class='line'><span class="err">Database</span> <span class="err">driver</span> <span class="err">com.mysql.jdbc.Driver</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Referencias</h1>
+
+<h2>Jenkins</h2>
+
+<ul>
+<li><a href="https://wiki.jenkins-ci.org/display/JENKINS/Plugins">https://wiki.jenkins-ci.org/display/JENKINS/Plugins</a></li>
+</ul>
+
+
+<h2>Sonar</h2>
+
+<ul>
+<li><a href="http://docs.codehaus.org/display/SONAR/Configure+Sonar+plugin">http://docs.codehaus.org/display/SONAR/Configure+Sonar+plugin</a></li>
+<li><a href="http://www.wakaleo.com/component/content/article/187">http://www.wakaleo.com/component/content/article/187</a></li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/11/26/usando-python-con-virtualenv/">Usando Python Con Virtualenv</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-11-26T00:08:00-03:00" pubdate data-updated="true">Nov 26<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/11/26/usando-python-con-virtualenv/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Una buena introducción se puede encontrar aca en los siguientes posts, uno en <a href="http://www.saltycrane.com/blog/2009/05/notes-using-pip-and-virtualenv-django/">inglés</a> y otro en <a href="http://elweb.co/uncategorized/django-deployment-3-virtualenv-virtualenvwrapper-pip/">castellano</a>.</p>
+
+<p>Sistemas Operativos como CentOS o Gentoo hacen uso de python para sus herramientas de gestión de paquetes, no es recomendable modificar manualmente la versión de python o jugar con las versiones de los módulos. Pero puede suceder que nos haga falta utilizar una versión superior de python o cierto módulo para un proyecto en el que estemos trabajando. En este caso, virtualenv es una solución.</p>
+
+<p>Virtualenv nos permite tener una instalacion de python aislada de la versión del sistema. Junto con esta versión de python, se pueden instalar los módulos que se necesiten sin que esto influya en absoluto en la instalación de python del sistema.</p>
+
+<p>El primer paso seria instalar algunos paquetes que vamos a necesitar. Como estamos trabajando sobre Debian 6 Squeeze, apt-get es nuestro amigo. Utilizamos sudo porque nunca trabajamos como root, correcto? :P</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get install python-setuptools python-dev build-essential
+</span><span class='line'># export http_proxy="http://proxy.example.com:3128/"
+</span><span class='line'>sudo easy_install -U pip
+</span><span class='line'>sudo pip install -U virtualenv
+</span><span class='line'>sudo easy_install -U virtualenvwrapper</span></code></pre></td></tr></table></div></figure>
+
+
+<p>El siguiente paso sería crear la carpeta donde vamos a guardar nuestro proyecto. Tambien nos aseguramos de que cada vez que creemos una sesion de trabajo, las variables de entorno requeridas sean creadas. Con el comando mkvirtualenv creamos el entorno que vamos a utilizar.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mkdir -p ~/Sites/.virtualenvs/status.devops.com.ar
+</span><span class='line'>cat >> ~/.bashrc &lt;&lt;EOF
+</span><span class='line'>export WORKON_HOME=$HOME/Sites/.virtualenvs
+</span><span class='line'>source /usr/local/bin/virtualenvwrapper.sh
+</span><span class='line'>EOF
+</span><span class='line'>mkvirtualenv --no-site-packages --distribute  status.devops.com.ar</span></code></pre></td></tr></table></div></figure>
+
+
+<p>En la consola se obtendría algo similar a lo siguiente.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>osvaldo@vostro:~$ mkvirtualenv --no-site-packages  --distribute  status.devops.com.ar 
+</span><span class='line'>New python executable in status.devops.com.ar/bin/python
+</span><span class='line'>Installing distribute....................................................................................................................................................................................done.
+</span><span class='line'>Installing pip...............done.
+</span><span class='line'>virtualenvwrapper.user_scripts creating /home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/predeactivate
+</span><span class='line'>virtualenvwrapper.user_scripts creating /home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/postdeactivate
+</span><span class='line'>virtualenvwrapper.user_scripts creating /home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/preactivate
+</span><span class='line'>virtualenvwrapper.user_scripts creating /home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/postactivate
+</span><span class='line'>virtualenvwrapper.user_scripts creating /home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/get_env_details</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Para probar, utilizamos un interesante dashboard creado por la gente de discus.com utilizando Django: <a href="http://code.disqus.com/code/projects/overseer.html">overseer</a></p>
+
+<p>Se puede descargar overseer desde github o simplemente instalarlo utilizando pip.</p>
+
+<p>El comando (workon) nos permite acceder al entorno aislado recién creado. Una vez dentro del mismo, podemos trabajar sin relación con el python o los módulos del sistema, solo lo que haya dentro de ese entorno.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>workon status.devops.com.ar
+</span><span class='line'>mkdir -p ~/Sites/status_devops/requirements/
+</span><span class='line'>cat &gt; ~/Sites/status_devops/requirements/requirements.txt <span class="s">&lt;&lt;EOF</span>
+</span><span class='line'><span class="s">django</span>
+</span><span class='line'><span class="s">EOF</span>
+</span><span class='line'>pip install -r ~/Sites/status_devops/requirements/requirements.txt
+</span><span class='line'>pip install overseer
+</span><span class='line'>python manage.py syncdb
+</span><span class='line'>./manage.py migrate overseer
+</span><span class='line'>python manage.py runserver
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Una vez dentro del entorno podemos comprobar que el binario de python que se esta utilizando es él que instalamos dentro de dicho entorno y no él del sistem.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>osvaldo@vostro:~$ workon status.devops.com.ar
+</span><span class='line'>(status.devops.com.ar)osvaldo@vostro:~$ 
+</span><span class='line'>(status.devops.com.ar)osvaldo@vostro:~$ which python
+</span><span class='line'>/home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/python
+</span><span class='line'>(status.devops.com.ar)osvaldo@vostro:~$ cd ~/Sites/status_devops/example_project
+</span><span class='line'>(status.devops.com.ar)osvaldo@vostro:~/Sites/status_devops/example_project$ python manage.py runserver
+</span><span class='line'>Validating models...
+</span><span class='line'>0 errors found
+</span><span class='line'>
+</span><span class='line'>Django version 1.2.4, using settings 'example_project.settings'
+</span><span class='line'>Running django-devserver 0.3.1
+</span><span class='line'>Threaded django server is running at http://127.0.0.1:8000/
+</span><span class='line'>Quit the server with CONTROL-C.</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Y el sitio se encuentra disponible para recibir consultas a traves de la url que recién se habilito.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>http://127.0.0.1:8000/</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Una vez terminado el trabajo en el entorno, lo desactivamos para regresar a nuestro entorno habitual con el siguiente comando.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>deactivate</span></code></pre></td></tr></table></div></figure>
+
+
+<p>et voila!</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/11/16/ora-01882-timezone-region-not-found/">ORA-01882: Timezone Region Not Found</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-11-16T01:01:00-03:00" pubdate data-updated="true">Nov 16<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/11/16/ora-01882-timezone-region-not-found/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Una aplicación corriendo en un tomcat, no se conectaba con la base de datos en Oracle. El siguiente error aparecía en el archivo de trazas (${CATALINA_HOME}/logs/catalina.out)</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>(2011-10-05 15:57:45,511) DEBUG com.apache.example.async.ThreadPoolAsynchronousRunner$PoolThread-#0 com.apache.example.resourcepool.BasicResourcePool - An exception occurred while acquiring a poolable resource. Will retry.
+</span><span class='line'>java.sql.SQLException: ORA-00604: error occurred at recursive SQL level 1
+</span><span class='line'>ORA-01882: timezone region  not found</span></code></pre></td></tr></table></div></figure>
+
+
+<p>La solución era sencilla (kudos to A.A.), al archivo de inicio del tomcat (${CATALINA_HOME}/bin/catalina.sh) adicionarle esta línea:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">JAVA_OPTS</span><span class="o">=</span><span class="s2">&quot;$JAVA_OPTS -Duser.timezone=&#39;+03:00&#39; &quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Este valor deberá ser ajustado al timezone que corresponda en cada caso.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/3/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">definiendo un smarthost en mac os x</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">usando https detras de un proxy reverso</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">borrando viejos builds en jenkins</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/07/permisos-en-directorio-www/">permisos en directorio www</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/configurando-jboss-6/">configurando jboss 6</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("devops_ar", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/devops_ar" class="twitter-follow-button" data-show-count="false">Follow @devops_ar</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - osvaldo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'devops-ar';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

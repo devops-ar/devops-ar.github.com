@@ -1,0 +1,456 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+	<link href="CSSS/slideshow.css" rel="stylesheet" type="text/css" /> 
+	<link href="theme-funky-wood.css" rel="stylesheet" type="text/css" /> 
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Introducción rápida a Chef</title>
+</head>
+<body>
+
+<header id="intro" class="slide">
+	<h1>Introducción rápida a Chef</h1>
+	<p class="attribution">por Osvaldo</p>
+</header>
+
+<div class="slide">
+  <h4>hola :)</h4>
+  <pre>shell% whoami
+osvaldo</pre>
+
+  <ul>
+    <li>Sysadmin for over 15+ years</li>
+    <li>Linux, BSD</li>
+    <li>Blog: <a href="http://www.devops.com.ar/">www.devops.com.ar</a></li>
+    <li>Twitter: <a href="http://twitter.com/otsuarez">@otsuarez</a></li>
+  </ul>
+
+</div>
+
+<div class="slide">
+ <hgroup>
+    <h5>Definición del</h5>
+    <h6> problema</h6>
+ </hgroup>
+
+ <ul>
+    <li class="delayed">crecimiento de la granja de servidores</li>
+    <li class="delayed">configuración manual</li>
+    <ul>
+        <li class="delayed">a mayor numero de servidores, mayor posibilidad de error cuando se utiliza la configuracion manual</li>
+    </ul>
+    <li class="delayed">baja productividad = pérdida de tiempo</li>
+    <li class="delayed">La administración es reactiva en vez de ser proactiva</li>
+    <li class="delayed">Cambios de emergencia pueden comprometer un sistema</li>
+ </ul>
+</div>
+
+<div class="slide">
+ <hgroup>
+  <h5>Objetivos a</h5>
+  <h6>lograr</h6>
+ </hgroup>
+
+ <ul>
+    <li class="delayed">permitir crecimiento horizontal</li>
+    <ul>
+        <li class="delayed">estar preparados para escalar sin mayores complicaciones</li>
+    </ul>
+	<li class="delayed">evitar los puntos únicos de falla</li>
+    <li class="delayed">reducir el trabajo manual</li>
+    <ul>
+        <li class="delayed">compartir el conocimiento</li>
+    </ul>
+   	<li class="delayed">manejo sencillo de configuraciones complicadas</li>
+ </ul>
+</div>
+
+<div class="slide">
+ <hgroup>
+  <h5>Beneficio de la</h5>
+  <h6>solución</h6>
+ </hgroup>
+
+ <ul>
+    <li class="delayed">organización del trabajo</li>
+    <ul>
+        <li class="delayed">obliga a una separación de los ambientes de trabajo de los servidores</li>
+        <li class="delayed">fuerza a evitar las excepciones</li>
+    </ul>
+    <li class="delayed">incremento de la productividad</li>
+    <li class="delayed">documentación</li>
+ </ul>
+</div>
+
+<div class="slide">
+ <h5>Herramientas</h5>
+
+ <ul>
+	<li class="delayed">
+        opscode chef
+		<ul>
+			<li class="delayed">chef-client/chef-server</li>
+			<li class="delayed">hosted chef (propuesta comercial de opscode)</li>
+   			<li class="delayed">chef-solo</li>
+		</ul>
+	</li>
+	<li class="delayed">puppet</li>
+    <li class="delayed">cfengine</li>
+ 	<li class="delayed">otros ...</li>
+ </ul>
+</div>
+
+<div class="slide">
+ <h5>¿Cual es mejor?</h5>
+
+ <ul>
+   	<li class="delayed">vi o emacs</li>
+    <li class="delayed">ruby o python</li>
+   	<li class="delayed">linux o windows</li>
+   	<li class="delayed">puppet o chef</li>
+   	<li class="delayed">....</li>
+ </ul>
+
+</div>
+
+<div class="slide">
+ <h5>Puppet vs Chef</h5>
+Definiendo un trabajo de cron con Puppet:
+
+<pre>
+cron { command:
+  command => "/usr/local/sbin/command",
+  hour => 2,
+  minute => 0
+}
+</pre>
+
+Definiendo un trabajo de cron con Chef:
+
+<pre>
+cron "describe your job" do
+  hour "2"
+  minute "0"
+  command "/usr/local/sbin/command"
+end
+</pre>
+
+</div>
+
+
+<div class="slide">
+
+ <h5>modos de trabajo de Chef</h5>
+
+ <ul>
+ 	<li class="delayed">chef-solo</li>
+   	<li class="delayed">chef-server</li>
+	<li class="delayed">hosted chef</li>
+ </ul>
+</div>
+
+<div class="slide">
+  <h5>instalación rapida en 3 pasos</h5>
+
+  <ul>
+    <li class="delayed">instalar <a href="http://www.ruby-lang.org/es/downloads/">Ruby</a>
+        <ul>
+            <li>paquete binario</li>
+            <li><code>sudo dpkg -i ...</code></li>
+        </ul>
+    </li>
+    <li class="delayed">instalar chef: <code>sudo gem install chef</code></li>
+    <li class="delayed">no hay tercer paso ;)</li>
+  </ul>  
+</div>
+
+<div class="slide">
+
+ <h5>¿Qué es una receta?</h5>
+
+ <ul>
+ 	<li class="delayed">con solo dos archivos ya armamos una receta</li>
+   	<li class="delayed">en realidad con uno basta (se puede excluir la metadata)</li>
+ </ul>
+ <pre>foo/recipes/default.rb
+foo/metadata.rb</pre>
+</div>
+
+<div class="slide" title="PHP5 installation">
+
+ <hgroup>
+ <h5>Ejemplo con PHP</h5>
+ <h6>default.rb</h6>
+ </hgroup>
+
+ <pre>Chef::Log.debug("Running php recipe)
+
+package "php5-cgi"
+package "php5-cli"
+package "php5-mysql"
+package "php5-curl"
+package "php5-dev"
+
+include_recipe "php::pear"</pre>
+</div>
+
+<div class="slide" title="PEAR installation">
+  <hgroup>
+   <h5>Ejemplo con PHP</h5>
+   <h6>pear.rb</h6>
+  </hgroup>
+
+  <pre>Chef::Log.debug("Running pear recipe")
+
+package "php-pear"
+
+execute "Update PEAR and all packages" do
+  command "pear upgrade-all"
+end
+
+execute "Install HTTP_Session2 & Net_CheckIP2" do
+  command "pear install HTTP_Session2-beta Net_CheckIP-1.0.0RC3"
+  not_if "test -f /usr/share/php/pear/HTTP/Session2.php"
+end</pre>
+
+</div>
+
+<div class="slide">
+
+ <hgroup>
+  <h5>Ejemplo con PHP</h5>
+  <h6>metadata.rb</h6>
+ </hgroup>
+
+ <pre>maintainer        "Till Robbins"
+maintainer_email  "trobbins@php.net"
+license           "BSD License"
+description       "Install PHP & required dependencies."
+version           "0.1"
+recipe            "php::default", "Install and configure PHP"
+recipe            "php::pear", "Install PEAR and packages"
+
+supports 'ubuntu'</pre>
+
+</div>
+
+<div class="slide"> 
+ <hgroup>
+  <h5>Ejemplo con PHP</h5>
+  <h6>Estructura</h6>
+ </hgroup>
+
+ <pre>/tmp/chef/cookbooks/php/
+/tmp/chef/cookbooks/php/metadata.rb
+/tmp/chef/cookbooks/php/recipes/default.rb
+/tmp/chef/cookbooks/php/recipes/pear.rb</pre>
+</div>
+
+<div class="slide">
+ <hgroup>
+  <h5>Ejemplo con PHP</h5>
+  <h6>solo.rb</h6>
+ </hgroup>
+
+ <ul>
+	<li class="delayed">archivo de configuración</li>
+	<li class="delayed">más código Ruby</li>
+ 	<li class="delayed"><code>/etc/chef/solo.rb</code></li>
+ </ul>
+ <pre>file_cache_path "/tmp/chef"
+cookbook_path "/tmp/chef/cookbooks"</pre>
+</div>
+
+<div class="slide" title="node.json">
+
+ <hgroup>
+  <h5>Ejemplo con PHP</h5>
+  <h6>node.json</h6>
+ </hgroup>
+
+ <ul>
+	<li class="delayed">JSON qué? la mujer de quién?</li>
+	<li class="delayed">la lista de ejecución <code>run_list</code> define las recetas que son ejecutadas</li>
+ </ul>
+ <pre>{
+  "run_list": [ "recipe[php]" ]
+}</pre>
+</div>
+
+<div class="slide" title="variable">
+
+ <h5>Mantener la flexibilidad!</h5>
+
+ <ul>
+    <li class="delayed">hacer las recetas genéricas</li>
+    <li class="delayed">configuración individual</li>
+    <li class="delayed">utilizar variables en <code>node.json</code></li>
+ </ul>
+</div>
+
+<div class="slide">
+ <h5>ejemplo</h5>
+ <ul>
+    <li class="delayed">un ejemplo de <code>node.json</code>:
+ <pre>
+{
+  "php": { "memory":"18G", "tmp":"/tmp/php/data" },
+  "run_list": ...
+}</pre>
+    </li>
+    <li class="delayed">uso de variables en  <code>foo.rb</code>:
+ <pre>memory = node[:php][:memory]
+tempdir = node[:php][:tmp]
+
+directory "#{tempdir}" do
+  owner "www-data"
+  group "www-data"
+  recursive :true
+  action :delete
+end</pre>
+    </li>
+ </ul>
+</div>
+
+<div class="slide">
+ <h5>Ejecución</h5>
+
+ <ul>
+    <li class="delayed">Con el archivo <code>node.json</code> en el servidor:
+ <pre>chef-solo -j /tmp/node.json [-c /etc/chef/solo.rb]</pre>
+    </li>
+    <li class="delayed">El archivo <code>node.json</code> y las recetas se pueden descargar de un <i> servidor remoto</i> [master, Amazon S3, ...]:
+<pre>chef-solo -j http://example.org/node.json -r http://example.org/recipes.tar.gz</pre>
+    </li>
+ </ul>
+</div>
+
+<div class="slide">
+ <hgroup>
+    <h5>Uso avanzado</h5>
+    <h6>archivos</h6>
+ </hgroup>
+
+ <ul>
+    <li class="delayed">distribución de archivos de configuración</li>
+    <li class="delayed">archivos estáticos - solo necesitan ser copiados tal cual</li>
+    <li class="delayed"><code>openssh/files/default/banner</code>
+ <pre>Ud. está ingresando a una red informática de Acceso Restringido y que contiene información 
+legalmente protegida, confidencial y/o de secreto profesional, cuyo uso indebido puede 
+generar al usuario responsabilidad civil o configurar los delitos previstos 
+en los arts. 153 a 157 del Código Penal.</pre></li>
+    <li class="delayed"><code>openssh/recipes/default.rb</code>
+ <pre># asume openssh/files/default/banner
+template "banner" do
+  source  "banner"
+  owner   "root"
+  group   "root"
+  mode    "0644"
+end</pre></li>
+ </ul>
+
+</div>
+
+<div class="slide">
+ <hgroup>
+    <h5>Uso avanzado</h5>
+    <h6>atributos</h6>
+ </hgroup>
+
+ <ul>
+    <li class="delayed">los atributos de un node son generados por <code>ohai</code> </li>
+    <li class="delayed">pueden ser modificados ó adicionados en las recetas de los cookbooks, en los roles o los ambientes</li>
+    <li class="delayed">ejemplo de atributos en un ambiente  (<code>roles/local.rb</code>):<br />
+ <pre>name "local"
+description "local testing environment"
+override_attributes ({
+    "ntp" => {
+        "ntp_server" => "time.apple.com"
+    }
+})</pre></li>
+ </ul>
+</div>
+
+<div class="slide">
+ <hgroup>
+    <h5>Uso avanzado</h5>
+    <h6>atributos</h6>
+ </hgroup>
+
+ <ul>
+    <li class="delayed">ejemplo de atributos en una receta (<code>openssh/attributes/default.rb</code>):<br />
+ <pre>default[:openssh][:port]                = [ "22" ]
+default[:openssh][:listen_address]      = [ "0.0.0.0" ]
+
+default[:openssh][:permit_root_login]   = "no"
+default[:openssh][:x11_forwarding]      = "no"
+
+default[:openssh][:ignore_rhosts]      = "yes"
+default[:openssh][:use_dns]      = "no"
+default[:openssh][:banner]      = "/etc/ssh/banner"</pre></li>
+ </ul>
+</div>
+<div class="slide">
+ <hgroup>
+    <h5>Uso avanzado</h5>
+    <h6>plantillas</h6>
+ </hgroup>
+
+ <ul>
+    <li class="delayed">Archivos de configuración</li>
+    <li class="delayed">Scripts de inicio</li>
+    <li class="delayed">uso de atributos en una plantilla (<code>openssh/templates/centos/sshd_config.erb</code>):<br />
+ <pre>...
+PermitRootLogin <%= node[:openssh][:permit_root_login] %>
+IgnoreRhosts <%= node[:openssh][:ignore_rhosts] %>
+X11Forwarding <%= node[:openssh][:x11_forwarding] %>
+Banner  <%= node[:openssh][:banner] %>
+...</pre></li>
+
+ </ul>
+
+</div>
+
+<div class="slide">
+ <hgroup>
+    <h5>Uso avanzado</h5>
+    <h6>plantillas</h6>
+ </hgroup>
+
+ <ul>
+
+    <li class="delayed">uso de una plantilla en una receta (<code>openssh/recipes/default.rb</code>):<br />
+ <pre>template "/etc/ssh/sshd_config" do
+    source  "sshd_config.erb"
+    owner   "root"
+    group   "root"
+    mode    "0600"
+
+    notifies :restart, "service[sshd]"
+end</pre></li>
+ </ul>
+
+</div>
+
+<div class="light slide">
+ <h4>FIN</h4>
+
+ <p>Gracias.</p>
+</div>
+
+<script src="CSSS/classList.js"></script> 
+<script src="CSSS/slideshow.js"></script> 
+<script>
+/* <![CDATA[ */
+	var slideshow = new SlideShow(document.getElementById('presentation'));
+/* ]]> */
+</script> 
+	
+</body> 
+</html>
+
+
+
+
+
+

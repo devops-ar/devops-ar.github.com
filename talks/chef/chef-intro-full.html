@@ -1,0 +1,476 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+	<link href="CSSS/slideshow.css" rel="stylesheet" type="text/css" /> 
+	<link href="theme-funky-wood.css" rel="stylesheet" type="text/css" /> 
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>Introducción a Chef</title>
+</head>
+<body>
+
+<header id="intro" class="slide">
+	<h1>Introducción a Chef</h1>
+	<p class="attribution">por Osvaldo</p>
+</header>
+
+<div class="slide">
+  <h4>hola :)</h4>
+  <pre>shell% whoami
+osvaldo</pre>
+
+  <ul>
+    <li>Sysadmin for over 15+ years</li>
+    <li>Linux, BSD</li>
+    <li>Blog: <a href="http://www.devops.com.ar/">www.devops.com.ar</a></li>
+    <li>Twitter: <a href="http://twitter.com/otsuarez">@otsuarez</a></li>
+  </ul>
+
+</div>
+
+<div class="slide">
+ <hgroup>
+    <h5>tipos de instalacion de chef</h5>
+ </hgroup>
+
+ <ul>
+    <li class="delayed">chef-solo</li>
+    <li class="delayed">chef server/client (opensource)</li>
+    <li class="delayed">chef hosted (opscode provided)</li>
+ </ul>
+</div>
+
+<div class="slide">
+ <hgroup>
+  <h5>chef-solo</h5>
+ </hgroup>
+
+ <ul>
+	<li class="delayed">se ejecuta en un server de manera individual</li>
+   	<li class="delayed">ofrece las ventajas de chef para un server standalone</li>
+    <li class="delayed">util para un número muy reducido de servidores</li>
+ </ul>
+</div>
+
+<div class="slide">
+ <hgroup>
+  <h5>chef client/server</h5>
+ </hgroup>
+
+ <ul>
+    <li class="delayed">util para la administracion de granjas de servidores</li>
+    <li class="delayed">configuracion centralizada de clientes</li>
+    <li class="delayed">se puede elegir la frecuencia de ejecucion del cliente
+     <ul>
+        <li class="delayed">via cron</li>
+        <li class="delayed">lanzando el cliente como un servicio</li>
+        <li class="delayed">manualmente (el equivalente a un chef-solo pero con la ventaja de la configuracion centralizada)</li>
+     </ul>    
+    </li>
+ </ul>
+</div>
+
+<div class="slide">
+ <h5>chef hosted</h5>
+
+ <ul>
+	<li class="delayed">un servicio de la empresa que desarrolla chef</li>
+    <li class="delayed">gratis para hasta 5 servidores</li>
+ 	<li class="delayed">conveniente para demostraciones o un pequeño grupo de servidores</li>
+ 	<li class="delayed">ofrece los beneficios de una infrastructura para las empresas que no cuentan con la capacidad técnica para implementar una propia.</li>
+ </ul>
+</div>
+
+<div class="slide">
+ <h5>componentes de una instalacion chef</h5>
+
+ <ul>
+   	<li class="delayed">server</li>
+    <li class="delayed">nodes</li>
+   	<li class="delayed">workstation</li>
+ </ul>
+
+</div>
+
+<div class="slide">
+ <hgroup>
+  <h5>Elementos básicos de Chef</h5>
+  <h6>atributos (attributes)</h6>
+ </hgroup>
+Los atributos son piezas de información del nodo, tales como su dirección IP, el hostname, los módulos del kernel en uso, los lenguajes de programación disponibles en el sistema así como sus versiones y mucho más. Además, de manera dinámica se pueden agregar nuevos atributos al nodo.
+
+Durante la ejecución de Chef, el Cliente de Chef almacena los atributos del nodo en el Servidor de Chef, donde son indexados para la búsqueda. Cuando el Cliente de Chef es ejecutado nuevamente, recupera estos atributos previamente almacenados y los combina con los atributos adicionados dinámicamente.
+</div>
+
+
+<div class="slide">
+ <hgroup>
+  <h5>Elementos básicos de Chef</h5>
+  <h6>cookboks</h6>
+ </hgroup>
+Los cookbooks (libro de recetas) son la unidad de distribución fundamental en Chef. Ellos encapsulan todos los recursos que se necesitan para automatizar la infrastructura. Una de sus ventajas es que son fáciles de compartir con otros usuarios de Chef.
+</div>
+
+
+<div class="slide">
+ <hgroup>
+  <h5>Elementos básicos de Chef</h5>
+  <h6>definiciones (definitions)</h6>
+ </hgroup>
+Las Definiciones permiten crear nuevos Recursos a partir de la integración de recursos ya existentes.
+
+Las Definiciones deben ser colocadas en un directorio de definiciones en el raiz del cookbook. No se deben declarar dentro de un cookbook.
+</div>
+
+
+<div class="slide">
+ <hgroup>
+  <h5>Elementos básicos de Chef</h5>
+  <h6><a href="http://wiki.opscode.com/display/chef/Libraries">librerias (libraries)</a></h6>
+ </hgroup>
+Las librerias permiten incluir código Ruby, ya sea para extender el lenguaje de Chef o para implementar nuevas clases directamente.
+</div>
+
+
+<div class="slide">
+ <hgroup>
+  <h5>Elementos básicos de Chef</h5>
+  <h6>metadata</h6>
+ </hgroup>
+Los cookbooks requieren una pequeña cantidad de meta-datos. Esta información es utilizada para proveer indicios al Servidor de Chef cuales cookbooks deberian ser utilizados en un nodo determinado.
+
+</div>
+
+
+<div class="slide">
+ <hgroup>
+  <h5>Elementos básicos de Chef</h5>
+  <h6>recetas (recipes)</h6>
+ </hgroup>
+Es la unidad básica de configuración en Chef. Las Recetas encapsulan las colecciones de Recursos que son ejecutados en el orden definido con el objetivo de configurar los Nodos.
+
+Las Recetas se escriben un lenguaje interno de Ruby de dominio especifico (DSL), pero no es necesario en absoluto experiencia con Ruby para poder escribir Recetas.
+
+La mayoría del contenido de una receta consiste en la configuración de Recursos. Las Recetas se utilizan al ser asignadas a un nodo o a la lista de ejecución de un role.
+
+</div>
+
+
+<div class="slide">
+ <hgroup>
+  <h5>Elementos básicos de Chef</h5>
+  <h6><a href="http://wiki.opscode.com/display/chef/Templates">plantillas (templates)</a></h6>
+ </hgroup>
+Las Plantillas son archivos escritos en un lenguaje de markup que permite la generación dinámica de su contenido final basado en variables ó elementos de lógica. Chef utiliza las Plantillas generalmente para administrar los archivos de configuración.
+</div>
+
+
+<div class="slide">
+ <hgroup>
+  <h5>Elementos básicos de Chef</h5>
+  <h6>Repositorio de Chef</h6>
+ </hgroup>
+ Repositorio de Chef (Chef Repository)<br />
+ 
+ 
+Es el lugar donde se ubican los archivos de los cookbooks, de los roles y otros artefactos para la administración de sistemas con Chef.
+</div>
+
+
+<div class="slide">
+ <hgroup>
+  <h5>Elementos básicos de Chef</h5>
+  <h6>Data Bags</h6>
+ </hgroup>
+Proporcionan un almacén de datos disponibles en formato JSON.
+<br />
+Las Data Bags no están asociadas directamente con los atributos de un Nodo ó un Role. Cuando se utilizan las Data Bags con un Servidor de Chef, las mismas son almacenadas en el servidor e indexadas para su búsqueda. Las Recetas pueden leer las Data Bags directamente o buscar un Data Bag por valores específicos similares a los atributos en los índices de un Nodo.
+</div>
+
+
+<div class="slide">
+ <hgroup>
+  <h5>Elementos básicos de Chef</h5>
+  <h6>Ambientes</h6>
+ </hgroup>
+ Ambientes (Environments)<br />
+Proporcionan un mecanismo para la administración de distintos ambientes como por ejemplo: producción, staging, desarrollo, testing, etc teniendo una sola instalación de Chef.
+<br />
+Al utilizar ambientes, se pueden especificar listas de ejecución en los roles por ambiente, versiones de cookbook para cada ambiente, así como atributos válidos por ambiente.
+</div>
+
+
+<div class="slide">
+ <hgroup>
+  <h5>Elementos básicos de Chef</h5>
+  <h6>Manejo de excepciones y reportes</h6>
+ </hgroup>
+ Manejo de excepciones y reportes (Exception and Report Handlers)<br />
+Una funcionalidad de Chef es que permite ejecutar código en dependencia del éxito o fallo de una ejecución del cliente.
+<br />
+El uso más obvio sería enviar una alerta en el caso de que falle la ejecución, pero resulta interesante si deseamos llevar un registro del uso de chef para analizar la tendencia de su uso y análisis similares.
+</div>
+
+
+<div class="slide">
+ <hgroup>
+  <h5>Elementos básicos de Chef</h5>
+  <h6>Lightweight Resources and Providers (LWRP)</h6>
+ </hgroup>
+Los Recursos en Chef representan un fragmento del estado del sistema y los Proveedores son la implementación interna que permite arribar a ese estado.
+<br />
+Por ejemplo, todos los motores de bases de datos soportan la creación de una base de datos, sin embargo, la implementación interna es diferente en cada caso.
+<br />
+La implementación de LWRP es rápida y sencilla, y requiere mucho menos conocimiento de Ruby que la requerida para implementar los Recursos y Proveedores tradicionales.
+
+</div>
+
+
+<div class="slide">
+ <hgroup>
+  <h5>Elementos básicos de Chef</h5>
+  <h6>Nodos (Nodes)</h6>
+ </hgroup>
+Son los Hosts donde se ejecuta el Cliente de Chef.
+<br />
+Un Nodo se construye a partir de dos componentes primarios: una Lista de Ejecución (Run Lis) y los Atributos. Los Nodos son aquello a los que se aplican las Recetas y los Roles. La Lista de Ejecución (Run List) es una lista ordenada de Recetas y/o Roles para ser ejecutados. Las Recetas son el elemento básico de construcción de Chef, ellas definen los recursos que se quieren administrar, en el orden que queremos administrarlos. Los Roles son listas ordenadas de otros Roles y Recetas, ejecutados en tiempo de corrida. Los Atributo son datos acerca del Nodo, elementos como las interfaces de red, el sistema de archivos o cuantos clientes puede permitir el servidor Apache.
+</div>
+
+
+<div class="slide">
+ <hgroup>
+  <h5>Elementos básicos de Chef</h5>
+  <h6>Proveedores (Providers)</h6>
+ </hgroup>
+Los Proveedores le permiten a Chef soportar distintas plataformas a través de un único Recurso.
+<br />
+Su función es tomar un Recurso, comparar dicho Recurso con el estado actual de la parte del sistema a la que aplica el Recurso, y entonces, tomar la Acción especificada en el Recurso.
+<br />
+Si se desea escribir proveedores propios para recursos que no existen en chef, se pueden utilizar LWRP en los cookbooks. Cada plataforma cuenta con una implementación específica para la misma de cada Proveedor.
+</div>
+
+<div class="slide">
+ <hgroup>
+  <h5>Elementos básicos de Chef</h5>
+  <h6>Recursos (Resources)</h6>
+ </hgroup>
+Los Recursos son la unidad básica de trabajo en Chef: fragmentos discretos de la configuración del sistema que son declarados en Recetas y Definiciones, y aplicados a los Nodos. Son comunmente una abstracción multiplataforma de la configuración que se quiere realizar en el host.
+Por ejemplo, los paquetes pueden ser instalados via apt, yum, o los ports de BSD, sin embargo, el Recurso "paquete" abstrae esas diferencias de manera que se puede especificar la instalación de un paquete en una Receta sin importar la plataforma sobre la que después será ejecutada la misma. Automáticamente, Chef eligirá el manejador de paquetes requerido mediante la aplicación del Proveedor indicado.
+</div>
+
+<div class="slide">
+ <hgroup>
+  <h5>Elementos básicos de Chef</h5>
+  <h6>Recursos (Resources)</h6>
+ </hgroup>
+ Ejemplo de un Recurso <code>cookbooks/ntp/recipe/default.rb</code>
+<pre>package "ntp" do
+    action [:install]
+end
+</pre>
+
+Para un servidor CentOS ese fragmento de la Receta ejecutaria el comando <code>yum install ntp</code> mientras que para un Debian seria <code>apt-get install ntp</code>
+</div>
+
+<div class="slide">
+ <hgroup>
+  <h5>Elementos básicos de Chef</h5>
+Roles
+ </hgroup>
+Un Role proporciona una forma de agrupar funcionalidades similares en nodos similares, proporcionando un mecanismo que facilite la creación de estos grupos de funcionalidad.<br />
+Los Roles están compuestos por las mismas partes que un Nodo: Atributos y una Lista de Ejecución. Se puede asignar mas de un Role a un Nodo, por lo que en el momento de ejecución del Cliente de Chef, todos los Roles expanden sus listas de Recetas hasta conformar el listado final que será aplicado al Nodo. 
+
+</div>
+
+<div class="slide">
+ <hgroup>
+  <h5>Elementos básicos de Chef</h5>
+  <h6>Búsqueda(Search)</h6>
+ </hgroup>
+La Búsqueda es una funcionalidad del Servidor de Chef que permite interactuar con un motor de búsqueda de texto (basado en Apache Solr) para realizar consultas sobre la infrastructura y las aplicaciones.<br />
+Se pueden realizar estas búsquedas a traves de llamadas en una Receta o la opción de search del comando knife.<br />
+La mayoría de la información que Chef almacena es automáticamente indexada en Solr, incluyendo los Data Bags, los Nodos y los Roles.
+</div>
+
+<div class="slide">
+ <hgroup>
+  <h5>Ejemplos</h5>
+  <h6>Roles</h6>
+ </hgroup>
+ <code>roles/base.rb </code>
+<pre>name "base"
+description "base role"
+run_list [
+    "recipe[base]",
+    "recipe[iptables]",
+    "recipe[openssh]",
+    "recipe[users::sysadmins]"
+]</pre>
+</div>
+
+<div class="slide">
+ <hgroup>
+  <h5>Atributos</h5>
+  <h6>Data Bags (1/3)</h6>
+ </hgroup>
+ Se declara un atributo en un Data Bag<br />
+ <code>data_bags/ntp/default_server.json</code>
+<pre>{
+  "id" : "default_server",
+  "value" : "10.10.10.252"
+}</pre>
+</div>
+
+<div class="slide">
+ <hgroup>
+  <h5>Atributos</h5>
+  <h6>Data Bags (2/3)</h6>
+ </hgroup>
+ que luego se puede utilizar en un archivo Plantilla:<br />
+ <code>cookbooks/ntp/templates/default/ntp.conf.erb</code>
+<pre># generated by Chef.
+restrict default kod nomodify notrap nopeer noquery
+restrict -6 default kod nomodify notrap nopeer noquery
+restrict 127.0.0.1
+restrict -6 ::1
+#  data_bag_item('ntp', 'default_server')
+server  127.127.1.0     # local clock
+driftfile /var/lib/ntp/drift
+keys /etc/ntp/keys</pre>
+</div>
+
+<div class="slide">
+ <hgroup>
+  <h5>Atributos</h5>
+  <h6>Data Bags (3/3)</h6>
+ </hgroup>
+de una Receta:<br />
+ <code>cookbooks/ntp/recipes/default.rb</code>
+<pre>data_bag_ntp_server = data_bag_item('ntp', 'default_server')
+template "/etc/ntp.conf" do
+    source "ntp.conf.erb"
+    owner   "root"
+    group   "root"
+    mode    "0644
+    variables( 
+		:data_bag_ntp_server => data_bag_ntp_server['value']
+    )
+end</pre>
+</div>
+
+
+<div class="slide">
+ <hgroup>
+  <h5>Atributos</h5>
+  <h6>Dinámicos (1/2)</h6>
+ </hgroup>
+Se puede obtener el atributo dinámicamente, por ejemplo, en base a información del propio nodo. Si resulta que el servidor de NTP sea el default gateway del host, una manera de configurar esto seria:<br />
+ <code>cookbooks/ntp/templates/default/ntp.conf.erb</code>
+<pre># generated by Chef.
+restrict default kod nomodify notrap nopeer noquery
+restrict -6 default kod nomodify notrap nopeer noquery
+restrict 127.0.0.1
+restrict -6 ::1
+server <%= node['network']['default_gateway'] %></pre>
+</div>
+
+<div class="slide">
+ <hgroup>
+  <h5>Atributos</h5>
+  <h6>Dinámicos (2/2)</h6>
+ </hgroup>
+y luego solo necesitamos en la Receta declarar la Plantilla:<br />
+ <code>cookbooks/ntp/recipes/default.rb</code>
+<pre>template "/etc/ntp.conf" do
+    source "ntp.conf.erb"
+    owner   "root"
+    group   "root"
+    mode    "0644
+end</pre>
+</div>
+
+
+<div class="slide">
+ <hgroup>
+  <h5>Atributos</h5>
+  <h6>Ambientes</h6>
+ </hgroup>
+Si el caso fuera de que el servidor de NTP se declara por Ambiente, entonces se pudiera utilizar una declaración como la siguiente:<br />
+ <code>environments/localdev.rb</code>
+<pre>name "localdev"
+description "local development environment"
+override_attributes ({
+    "ntp" => {
+        "ntp_server" => "time.apple.com"
+    }
+})</pre>
+</div>
+
+
+
+
+
+<div class="slide">
+ <hgroup>
+  <h5>Atributos</h5>
+  <h6>Combinados (1/3)</h6>
+ </hgroup>
+Digamos que tenemos un password de root distinto para cada ambiente (desarrollo, producción). Declaramos una variable: stage en el environment con el valor correspondiente, en este caso "dev".<br />
+ <code>environments/localdev.rb</code>
+<pre>name "localdev"
+description "local development environment"
+override_attributes ({
+    "ntp" => {
+        "ntp_server" => "time.apple.com"
+    },
+    :stage => "dev"
+})</pre>
+</div>
+
+<div class="slide">
+ <hgroup>
+  <h5>Atributos</h5>
+  <h6>Combinados (2/3)</h6>
+ </hgroup>
+luego creamos un Data Bag para contener el password del usuario root
+<br />
+ <code>data_bags/passwords/rootuser.json</code>
+<pre>{
+  "id": "rootuser",
+ "prod": {
+    "password": "123456"
+  },  
+ "dev": {
+    "password": "ABCDEF"
+  },  
+}</pre>
+
+</div>
+
+<div class="slide">
+ <hgroup>
+  <h5>Atributos</h5>
+  <h6>Combinados (3/3)</h6>
+ </hgroup>
+
+entonces, para un nodo que pertenezca al ambiente mencionado (localdev) podemos obtener el valor que necesitamos en una receta combinando el valor del atributo de ambiente con el valor correspondiente en el data bag:
+<pre>passwords = Chef::DataBagItem.load("passwords", "rootuser")
+devpass = passwords[node[:stage]]</pre>
+</div>
+
+
+<div class="light slide">
+ <h4>FIN</h4>
+
+ <p>Gracias.</p>
+</div>
+
+<script src="CSSS/classList.js"></script> 
+<script src="CSSS/slideshow.js"></script> 
+<script>
+/* <![CDATA[ */
+	var slideshow = new SlideShow(document.getElementById('presentation'));
+/* ]]> */
+</script> 
+	
+</body> 
+</html>

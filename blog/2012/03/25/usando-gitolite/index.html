@@ -1,0 +1,721 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>usando gitolite - devops-ar</title>
+  <meta name="author" content="osvaldo">
+
+  
+  <meta name="description" content="Una de las ventajas de git es el trabajo en equipos. Como compartir el codigo seria la pregunta. Existen varias alternativas. Hay servicios que &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.devops.com.ar/blog/2012/03/25/usando-gitolite/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="devops-ar" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-5155520-9']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">devops-ar</a></h1>
+  
+    <h2>devops en castellano</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.devops.com.ar" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Usando Gitolite</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-25T03:04:00-03:00" pubdate data-updated="true">Mar 25<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Una de las ventajas de git es el trabajo en equipos. Como compartir el codigo seria la pregunta. Existen varias alternativas. Hay servicios que ofrecen hospedaje de repositorios para git como el propio github. Entre las opciones si queremos hospedar el repositorio en un servidor propio destacan las siguientes:</p>
+
+<ul>
+<li><a href="http://gitorious.org/">gitorious</a>. Es una aplicación Rails para la gestión de proyectos. Permite un manejo via web de los repositorios git. Similar a github en algunos aspectos.</li>
+<li><a href="http://repo.or.cz/w/girocco.git/blob/HEAD:/README">girocco</a>. No tiene tantas funcionalidades como gitorious pero la instalación parece mas sencilla. Buena opción a considerar si se requiere una interface web para la administración del repositorio.</li>
+<li><a href="https://github.com/tv42/gitosis">gitosis</a>. Permite el acceso a repositorios git via ssh, garantizando control de accesos por repositorio y sin requerir cuentas locales (shell accounts) en el servidor. Esta implementado en Python pero la ultima actualizacion del codigo fue hace 3 años.</li>
+<li><a href="https://github.com/sitaramc/gitolite">gitolite</a>. Muy similar a gitosis, implementado en Perl. Se mantiene en desarrollo activo.</li>
+</ul>
+
+
+<p>Como una interface web para administrar usuarios y repositorios no era un requerimiento y gitosis no se mantiene activo, la elección fue gitolite.</p>
+
+<!-- more -->
+
+
+<p>La forma de trabajo de gitolite es sencilla pero con su propia lógica de funcionamiento. En el servidor donde se instala gitolite no se realiza ninguna configuración de usuarios y/o repositorios en absoluto. Cuando se termina la instalación de gitolite, se crea un repositorio llamado <code>gitolite-admin</code> (dos repositorios en realidad, el otro se llama <code>testing</code> y su objetivo es tal cual describe su nombre: pruebas).</p>
+
+<p>La instalación de gitolite comienza creando una cuenta de usuario en el servidor. Puede ser gitolite (predeterminado si se instala de paquete .deb o .rpm) o git (el username que utilizamos en esta instalación). El acceso a los repositorios será en este caso via ssh. Gitolite utiliza autenticación para el ssh por llaves (públicas/privadas), por lo cual, para acceder a los repositorios, vamos a necesitar las llaves públicas de aquellos usuarios que se conecten a los repositorios.</p>
+
+<p>Copiamos la llave pública de un primer usuario (osvaldo) y creamos el usuario de acceso a los repositorios. Como la instalación la realizamos en un server local, en vez del tradicional mecanismo para copiar llaves públicas que seria <code>ssh-copy-id</code>, logueados como root, se utiliza un simple <code>cp</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo su -
+</span><span class='line'>adduser git
+</span><span class='line'>cp /home/osvaldo/.ssh/id_rsa.pub /home/git/osvaldo.pub
+</span><span class='line'>chown git /home/git/*
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Se procede a la instalación de gitolite.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>su - git
+</span><span class='line'>git clone git://github.com/sitaramc/gitolite
+</span><span class='line'>cat &gt;&gt;~/.bashrc<span class="s">&lt;&lt;&#39;EOF&#39;</span>
+</span><span class='line'><span class="s">PATH=/home/git/bin:$PATH</span>
+</span><span class='line'><span class="s">EOF</span>
+</span><span class='line'>. .bashrc
+</span><span class='line'>gitolite/src/gl-system-install
+</span><span class='line'>gl-setup -q ~/osvaldo.pub
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>La instalación crea el repositorio donde se va a almacenar la configuración de gitolite. Hay dos subdirectorios de interes, <code>conf</code> donde se almacena el archivo de configuración: gitolite.conf y <code>keydir</code> donde se van a almacenar las llaves públicas de los usuarios que trabajen con los repositorios.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git@vostro:~<span class="nv">$ </span>gitolite/src/gl-system-install
+</span><span class='line'>using default values <span class="k">for </span><span class="nv">EUID</span><span class="o">=</span>1002:
+</span><span class='line'>/home/git/bin, /home/git/share/gitolite/conf, /home/git/share/gitolite/hooks
+</span><span class='line'>git@vostro:~<span class="nv">$ </span>
+</span><span class='line'>git@vostro:~<span class="nv">$ </span>gl-setup -q osvaldo.pub
+</span><span class='line'>creating gitolite-admin...
+</span><span class='line'>Initialized empty Git repository in /home/git/repositories/gitolite-admin.git/
+</span><span class='line'>creating testing...
+</span><span class='line'>Initialized empty Git repository in /home/git/repositories/testing.git/
+</span><span class='line'><span class="o">[</span>master <span class="o">(</span>root-commit<span class="o">)</span> 6aedb93<span class="o">]</span> gl-setup -q osvaldo.pub
+</span><span class='line'> 2 files changed, 8 insertions<span class="o">(</span>+<span class="o">)</span>, 0 deletions<span class="o">(</span>-<span class="o">)</span>
+</span><span class='line'> create mode 100644 conf/gitolite.conf
+</span><span class='line'> create mode 100644 keydir/osvaldo.pub
+</span><span class='line'>git@vostro:~<span class="nv">$ </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Los usuarios remotos no van a tener cuentas locales de shell. El acceso a los repositorios es a través del usuario bajo el cual se instalo gitolite (en este caso: git) y utilizando el comando git directamente. Sin embargo, existe un comando que se encuentra disponible a cualquier usuario: info. Este comando se ejecuta via ssh y permite conocer las versiones de gitolite y de git que se encuentran instaladas en el servidor asi como los repositorios  a los cuales el usuario tiene acceso. La lista de repositorios resulta especialmente útil cuando se tienen dudas sobre el nombre exacto con el que fue creado.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>osvaldo@vostro:~<span class="nv">$ </span>ssh git@vostro info
+</span><span class='line'>hello osvaldo, this is gitolite v2.3-33-g233a33d running on git 1.7.2.5
+</span><span class='line'>the gitolite config gives you the following access:
+</span><span class='line'>     R   W    gitolite-admin
+</span><span class='line'>    @R_ @W_   testing
+</span><span class='line'>osvaldo@vostro:~<span class="nv">$ </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Para comenzar a trabajar, clonamos el repositorio de administración.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>osvaldo@vostro:~/src/gitolite/vostro<span class="nv">$ </span>git clone git@vostro:gitolite-admin
+</span><span class='line'>Cloning into gitolite-admin...
+</span><span class='line'>remote: Counting objects: 6, <span class="k">done</span>.
+</span><span class='line'>remote: Compressing objects: 100% <span class="o">(</span>4/4<span class="o">)</span>, <span class="k">done</span>.
+</span><span class='line'>remote: Total 6 <span class="o">(</span>delta 0<span class="o">)</span>, reused 0 <span class="o">(</span>delta 0<span class="o">)</span>
+</span><span class='line'>Receiving objects: 100% <span class="o">(</span>6/6<span class="o">)</span>, <span class="k">done</span>.
+</span><span class='line'>osvaldo@vostro:~/src/gitolite/vostro<span class="nv">$ </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Creando usuarios</h2>
+
+<p>Para crear un usuario, adicionamos su llave pública al directorio keyring y comiteamos el repo.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cp fernando.pub gitolite-admin/keyring
+</span><span class='line'>git add .
+</span><span class='line'>git commit -m <span class="s2">&quot;adding fernando&#39;s pub key&quot;</span>
+</span><span class='line'>git push
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>En la consola aparecería algo así.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>osvaldo@vostro:~/src/gitolite/vostro/gitolite-admin<span class="nv">$ </span>git commit -m <span class="s2">&quot;adding fernando&#39;s pub key&quot;</span>
+</span><span class='line'><span class="o">[</span>master dc4dfed<span class="o">]</span> adding fernando<span class="err">&#39;</span>s pub key
+</span><span class='line'> 1 files changed, 1 insertions<span class="o">(</span>+<span class="o">)</span>, 0 deletions<span class="o">(</span>-<span class="o">)</span>
+</span><span class='line'> create mode 100644 keydir/fernando.pub
+</span><span class='line'>osvaldo@vostro:~/src/gitolite/vostro/gitolite-admin<span class="nv">$ </span>git push
+</span><span class='line'>Counting objects: 6, <span class="k">done</span>.
+</span><span class='line'>Delta compression using up to 2 threads.
+</span><span class='line'>Compressing objects: 100% <span class="o">(</span>4/4<span class="o">)</span>, <span class="k">done</span>.
+</span><span class='line'>Writing objects: 100% <span class="o">(</span>4/4<span class="o">)</span>, 860 bytes, <span class="k">done</span>.
+</span><span class='line'>Total 4 <span class="o">(</span>delta 0<span class="o">)</span>, reused 0 <span class="o">(</span>delta 0<span class="o">)</span>
+</span><span class='line'>remote:
+</span><span class='line'>remote:       ***** WARNING *****
+</span><span class='line'>remote:         the following users <span class="o">(</span>pubkey files in parens<span class="o">)</span> <span class="k">do </span>not appear in any access rules:
+</span><span class='line'>remote: fernando<span class="o">(</span>fernando.pub<span class="o">)</span>
+</span><span class='line'>To git@vostro:gitolite-admin
+</span><span class='line'>   6aedb93..dc4dfed  master -&gt; master
+</span><span class='line'>osvaldo@vostro:~/src/gitolite/vostro/gitolite-admin<span class="nv">$ </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Creando repos</h2>
+
+<p>Para crear un repositorio se define en el archivo de configuración: conf/gitolite.conf y se le asignan permisos a los usuarios que corresponda. Al comitear el repo de administración, gitolite se encarga de crear el repositorio y luego queda clonarlo y comenzar a trabajar con el mismo.</p>
+
+<p>A manera de ejemplo se van a crear dos repositorios. Uno llamado &#8220;publico&#8221; donde tengan acceso los dos desarrolladores y otro que se llamará &#8220;privado&#8221;  donde solo un desarrollador tendrá acceso.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='aconf'><span class='line'><span class="err">conf/gitolite</span>.<span class="nb">conf</span>
+</span><span class='line'>
+</span><span class='line'>repo    gitolite-admin
+</span><span class='line'>        <span class="err">RW+</span>     <span class="err">=</span>   <span class="nb">osvaldo</span>
+</span><span class='line'>
+</span><span class='line'>repo    testing
+</span><span class='line'>        <span class="err">RW+</span>     <span class="err">=</span>   <span class="err">@</span><span class="nb">all</span>
+</span><span class='line'>
+</span><span class='line'>repo  publico
+</span><span class='line'>        <span class="err">RW+</span>     <span class="err">=</span>   <span class="nb">osvaldo</span>
+</span><span class='line'>        RW+     =   fernando
+</span><span class='line'>
+</span><span class='line'><span class="nb">repo</span>  privado
+</span><span class='line'>        <span class="err">RW+</span>     <span class="err">=</span>   <span class="nb">osvaldo</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>vi conf/gitolite.conf
+</span><span class='line'>git add conf/gitolite.conf
+</span><span class='line'>git commit -m <span class="s2">&quot;probando visibilidad de repos&quot;</span>
+</span><span class='line'>git push
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>En la consola se pueden ver las operaciones que realiza el gitolite.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>osvaldo@vostro:~/src/gitolite/vostro/gitolite-admin<span class="nv">$ </span>git push
+</span><span class='line'>Counting objects: 7, <span class="k">done</span>.
+</span><span class='line'>Delta compression using up to 2 threads.
+</span><span class='line'>Compressing objects: 100% <span class="o">(</span>3/3<span class="o">)</span>, <span class="k">done</span>.
+</span><span class='line'>Writing objects: 100% <span class="o">(</span>4/4<span class="o">)</span>, 429 bytes, <span class="k">done</span>.
+</span><span class='line'>Total 4 <span class="o">(</span>delta 0<span class="o">)</span>, reused 0 <span class="o">(</span>delta 0<span class="o">)</span>
+</span><span class='line'>remote: creating privado...
+</span><span class='line'>remote: Initialized empty Git repository in /home/git/repositories/privado.git/
+</span><span class='line'>remote: creating publico...
+</span><span class='line'>remote: Initialized empty Git repository in /home/git/repositories/publico.git/
+</span><span class='line'>To git@vostro:gitolite-admin
+</span><span class='line'>   dc4dfed..ade026e  master -&gt; master
+</span><span class='line'>osvaldo@vostro:~/src/gitolite/vostro/gitolite-admin<span class="err">$</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Ahora, ambos desarrolladores pueden ejecutar el comando info, pero el resultado va a ser distinto en cada caso. El usuario Osvaldo puede tener acceso a todos los repositorios.</p>
+
+<figure class='code'><figcaption><span>Repositorios disponibles para Osvaldo</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>osvaldo@vostro:~/src/gitolite/vostro/gitolite-admin<span class="nv">$ </span>ssh git@vostro info
+</span><span class='line'>hello osvaldo, this is gitolite v2.3-33-g233a33d running on git 1.7.2.5
+</span><span class='line'>the gitolite config gives you the following access:
+</span><span class='line'>     R   W    gitolite-admin
+</span><span class='line'>     R   W    privado
+</span><span class='line'>     R   W    publico
+</span><span class='line'>    @R_ @W_   testing
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Se nota la ausencia del repositorio &#8220;privado&#8221; para el usuario Fernando.</p>
+
+<figure class='code'><figcaption><span>Repositorios disponibles para Fernando</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>fernando@vostro:~<span class="nv">$ </span>ssh git@vostro info
+</span><span class='line'>hello fernando, this is gitolite v2.3-33-g233a33d running on git 1.7.2.5
+</span><span class='line'>the gitolite config gives you the following access:
+</span><span class='line'>     R   W    publico
+</span><span class='line'>    @R_ @W_   testing
+</span><span class='line'>fernando@vostro:~<span class="nv">$ </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Trabajando con los repos</h2>
+
+<p>El trabajo con los repositorios es similar a cualquier otro. Lo primero es clonar el repo, se trabaja sobre el mismo y al final, se comitean los cambios al server (push)</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>fernando@vostro:~/src<span class="nv">$ </span>git clone git@vostro:publico
+</span><span class='line'>Cloning into publico...
+</span><span class='line'>warning: You appear to have cloned an empty repository.
+</span><span class='line'>fernando@vostro:~/src<span class="nv">$ </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Es probable que el siguiente error aparezca la primera vez que se hace un <code>git push</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>osvaldo@vostro:~/src/gitolite/vostro/publico<span class="nv">$ </span>git push
+</span><span class='line'>No refs in common and none specified; doing nothing.
+</span><span class='line'>Perhaps you should specify a branch such as <span class="s1">&#39;master&#39;</span>.
+</span><span class='line'>fatal: The remote end hung up unexpectedly
+</span><span class='line'>error: failed to push some refs to <span class="s1">&#39;git@vostro:publico&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Tanto en la <a href="http://sitaramc.github.com/gitolite/nagp.html">wiki de gitolite</a> como en <a href="http://stackoverflow.com/questions/6529136/gitolite-default-remotes-for-new-repository">stackoverflow</a> se encuentra la respuesta. No es un problema de gitolite sino de git. El primer <code>git push</code> siempre requiere especificar la &#8220;branch&#8221; a la que le queremos hacer el commit (push), por esta razón, se debe ejecutar de la siguiente manera: <code>git push origin master</code>. La próxima vez, ya bastará con con <code>git push</code>.</p>
+
+<p>La rutina normal seria crear un archivo, hacerle el commit y luego el push al repo.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>osvaldo@vostro:~/src/gitolite/vostro/publico<span class="nv">$ </span>vi README.md
+</span><span class='line'>osvaldo@vostro:~/src/gitolite/vostro/publico<span class="nv">$ </span>git add .
+</span><span class='line'>osvaldo@vostro:~/src/gitolite/vostro/publico<span class="nv">$ </span>git commit -m <span class="s2">&quot;adding readme file&quot;</span>
+</span><span class='line'><span class="o">[</span>master <span class="o">(</span>root-commit<span class="o">)</span> db7e57b<span class="o">]</span> adding readme file
+</span><span class='line'> 1 files changed, 1 insertions<span class="o">(</span>+<span class="o">)</span>, 0 deletions<span class="o">(</span>-<span class="o">)</span>
+</span><span class='line'> create mode 100644 README.md
+</span><span class='line'>osvaldo@vostro:~/src/gitolite/vostro/publico<span class="nv">$ </span>git push origin master
+</span><span class='line'>Counting objects: 3, <span class="k">done</span>.
+</span><span class='line'>Writing objects: 100% <span class="o">(</span>3/3<span class="o">)</span>, 241 bytes, <span class="k">done</span>.
+</span><span class='line'>Total 3 <span class="o">(</span>delta 0<span class="o">)</span>, reused 0 <span class="o">(</span>delta 0<span class="o">)</span>
+</span><span class='line'>To git@vostro:publico
+</span><span class='line'> * <span class="o">[</span>new branch<span class="o">]</span>      master -&gt; master
+</span><span class='line'>osvaldo@vostro:~/src/gitolite/vostro/publico<span class="nv">$ </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Y si un colega edita  el archivo.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>fernando@vostro:~/src/publico<span class="nv">$ </span>git commit -a
+</span><span class='line'>Aborting commit due to empty commit message.
+</span><span class='line'>fernando@vostro:~/src/publico<span class="nv">$ </span>git commit -am <span class="s2">&quot;editing readme file&quot;</span>
+</span><span class='line'><span class="o">[</span>master 535b69b<span class="o">]</span> editing readme file
+</span><span class='line'> 1 files changed, 2 insertions<span class="o">(</span>+<span class="o">)</span>, 0 deletions<span class="o">(</span>-<span class="o">)</span>
+</span><span class='line'>fernando@vostro:~/src/publico<span class="nv">$ </span>git log
+</span><span class='line'>commit 535b69b7b2ca9ab383e5b59eb0285a307056181c
+</span><span class='line'>Author: Fernando &lt;fernando@drupblue.com&gt;
+</span><span class='line'>Date:   Sun Mar 25 02:54:03 2012 -0300
+</span><span class='line'>
+</span><span class='line'>    editing readme file
+</span><span class='line'>
+</span><span class='line'>commit db7e57b4cf414ff6a493941e5915f106548981eb
+</span><span class='line'>Author: Osvaldo T. Suarez &lt;otsuarez@gmail.com&gt;
+</span><span class='line'>Date:   Sun Mar 25 02:51:48 2012 -0300
+</span><span class='line'>
+</span><span class='line'>    adding readme file
+</span><span class='line'>fernando@vostro:~/src/publico<span class="nv">$ </span>git push
+</span><span class='line'>Counting objects: 5, <span class="k">done</span>.
+</span><span class='line'>Writing objects: 100% <span class="o">(</span>3/3<span class="o">)</span>, 278 bytes, <span class="k">done</span>.
+</span><span class='line'>Total 3 <span class="o">(</span>delta 0<span class="o">)</span>, reused 0 <span class="o">(</span>delta 0<span class="o">)</span>
+</span><span class='line'>To git@vostro:publico
+</span><span class='line'>   db7e57b..535b69b  master -&gt; master
+</span><span class='line'>fernando@vostro:~/src/publico<span class="nv">$ </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Con solo ejecutar un <code>git pull</code> vamos a mantener nuestro repositorio actualizado como debe ser.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>osvaldo@vostro:~/src/gitolite/vostro/publico<span class="nv">$ </span>git  pull
+</span><span class='line'>Updating db7e57b..535b69b
+</span><span class='line'>Fast-forward
+</span><span class='line'> README.md |    2 ++
+</span><span class='line'> 1 files changed, 2 insertions<span class="o">(</span>+<span class="o">)</span>, 0 deletions<span class="o">(</span>-<span class="o">)</span>
+</span><span class='line'>osvaldo@vostro:~/src/gitolite/vostro/publico<span class="nv">$ </span>git log
+</span><span class='line'>commit 535b69b7b2ca9ab383e5b59eb0285a307056181c
+</span><span class='line'>Author: Fernando &lt;fernando@drupblue.com&gt;
+</span><span class='line'>Date:   Sun Mar 25 02:54:03 2012 -0300
+</span><span class='line'>
+</span><span class='line'>    editing readme file
+</span><span class='line'>
+</span><span class='line'>commit db7e57b4cf414ff6a493941e5915f106548981eb
+</span><span class='line'>Author: Osvaldo T. Suarez &lt;otsuarez@gmail.com&gt;
+</span><span class='line'>Date:   Sun Mar 25 02:51:48 2012 -0300
+</span><span class='line'>
+</span><span class='line'>    adding readme file
+</span><span class='line'>osvaldo@vostro:~/src/gitolite/vostro/publico<span class="err">$</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Por último, pero no menos importante, agradecemos este <a href="http://blacka.com/david/2010/09/28/hosting-your-own-git-repositories/">post de David Blacka</a> sirvio como punto de partida para este articulo.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">osvaldo</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-25T03:04:00-03:00" pubdate data-updated="true">Mar 25<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/git/'>git</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.devops.com.ar/blog/2012/03/25/usando-gitolite/" data-via="devops_ar" data-counturl="http://www.devops.com.ar/blog/2012/03/25/usando-gitolite/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/03/05/instalando-blueprint-en-centos-5-dot-5/" title="Previous Post: instalando blueprint en CentOS 5.5">&laquo; instalando blueprint en CentOS 5.5</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/04/09/instalando-el-proxy-de-perforce/" title="Next Post: instalando el proxy de perforce">instalando el proxy de perforce &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">definiendo un smarthost en mac os x</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">usando https detras de un proxy reverso</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">borrando viejos builds en jenkins</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/07/permisos-en-directorio-www/">permisos en directorio www</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/configurando-jboss-6/">configurando jboss 6</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("devops_ar", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/devops_ar" class="twitter-follow-button" data-show-count="false">Follow @devops_ar</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - osvaldo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'devops-ar';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.devops.com.ar/blog/2012/03/25/usando-gitolite/';
+        var disqus_url = 'http://www.devops.com.ar/blog/2012/03/25/usando-gitolite/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

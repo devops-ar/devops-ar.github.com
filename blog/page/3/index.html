@@ -1,0 +1,1688 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>devops-ar</title>
+  <meta name="author" content="osvaldo">
+
+  
+  <meta name="description" content="Siguiendo los consejos de Sébastien Wains: 1
+2
+3
+4
+5
+6
+yum install bind bind-chroot bind-libs bind-utils caching-nameserver
+cd /var/named/chroot/etc &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.devops.com.ar/blog/page/3/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="devops-ar" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-5155520-9']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">devops-ar</a></h1>
+  
+    <h2>devops en castellano</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.devops.com.ar" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/01/transfiriendo-zonas-con-tsig/">Transfiriendo Zonas Con Tsig</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-01T16:45:00-03:00" pubdate data-updated="true">Mar 1<span>st</span>, 2012</time>
+        
+         | <a href="/blog/2012/03/01/transfiriendo-zonas-con-tsig/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Siguiendo los consejos de <a href="http://blog.wains.be/2007/12/13/centos-5-chroot-dns-with-bind/">Sébastien Wains</a>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>yum install <span class="nb">bind bind</span>-chroot <span class="nb">bind</span>-libs <span class="nb">bind</span>-utils caching-nameserver
+</span><span class='line'><span class="nb">cd</span> /var/named/chroot/etc
+</span><span class='line'>rndc-confgen &gt; rndc.key
+</span><span class='line'>chown root:named rndc.key
+</span><span class='line'><span class="c"># just in case ....</span>
+</span><span class='line'>sed -i <span class="s1">&#39;s/^unset ROOTDIR/#unset ROOTDIR/&#39;</span> /etc/sysconfig/named
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Vamos a configurar dos dns servers, uno primario y uno secundario:</p>
+
+<ul>
+<li>example1.com
+  101.33.99.66</li>
+<li>anotherhost.example1.com
+  65.138.84.46</li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/03/01/transfiriendo-zonas-con-tsig/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/02/03/empezando-con-chef/">Empezando Con Chef</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-03T02:20:00-03:00" pubdate data-updated="true">Feb 3<span>rd</span>, 2012</time>
+        
+         | <a href="/blog/2012/02/03/empezando-con-chef/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>Componentes de una instalación de Chef</h1>
+
+<p>Una instalación de Chef va a contar típicamente con tres componentes.</p>
+
+<ul>
+<li><strong>Chef Server</strong> Es el host donde esta la base de datos de los nodes registrados, los certificados de las credenciales de los mismos y los cookbooks.</li>
+<li><strong>Chef Client</strong> Es el node gestionado a través del Chef Server. Una vez hecho el bootstraping, cada vez que se ejecute el cliente de chef (comando chef-client) se conecta al Chef Server, descarga y aplica la configuración establecida por las recetas, roles y environments que tenga asignado.</li>
+<li><strong>Workstation</strong> Puede o no ser un node de chef, pero si va tener las credenciales de un usuario registrado con el Chef Server. Desde este equipo se ejecutan comandos de knife y se trabajan con los cookbooks.</li>
+</ul>
+
+
+<h1>Bootstraping</h1>
+
+<p>La instalación de chef en un host (node) para que pueda ser gestionado por un chef server se llama bootstraping. Se realiza con el comando <a href="http://wiki.opscode.com/display/chef/Knife">knife</a> y el subcomando <a href="http://wiki.opscode.com/display/chef/Knife+Bootstrap">bootstrap</a>.</p>
+
+<p>Por ejemplo:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>knife bootstrap 10.24.2.51 -x osvaldo --sudo  -N unixtools.tx.corp.acme.com -r <span class="s1">&#39;role[demo]&#39;</span> -d rhel5-demo
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Con ese comando, se esta ejecutando el comando knife, el subcomando bootstrap, la dirección IP del server que se le va a hacer el bootstrap y los parámetros, que entonces, serán del subcomando.</p>
+
+<pre><code>--sudo:
+    El bootstrap se ejecuta via sudo.
+-x, --ssh-user USERNAME:
+    El username (nombre de usuario) con el que se realiza la conexión ssh.
+-N, --node-name NAME:
+    El nombre con el que el host va a ser registrado (como un node) en el server Chef. Usamos el fqdn (el node name tiene que ser único).
+-r, --run-list RUN_LIST:
+    Un listado separado por comas de los roles o recetas que se van a aplicar en el momento del bootstrapping.
+-d, --distro DISTRO:
+    El template que se va a utilizar para el bootstrap.
+</code></pre>
+
+<p>El bootstraping se debe realizar desde la workstation. Los templates del bootstrap son scripts en ruby pero con codigo en bash y se colocan en alguna de las locaciones predeterminadas.</p>
+
+<figure class='code'><figcaption><span>tree ~/chef-repo/.chef</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>|-- bootstrap
+</span><span class='line'>|   <span class="sb">`</span>-- glb-rhel5.erb
+</span><span class='line'>|-- knife.rb
+</span><span class='line'>|-- osvaldo.pem
+</span><span class='line'><span class="sb">`</span>-- validation.pem
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Una locación común seria ~/chef-repo/.chef. En esta carpeta tenemos:</p>
+
+<ul>
+<li><strong>validation.pem</strong>: Es el certificado que utilizan los nodes para validarse ante el Chef Server</li>
+<li><strong>osvaldo.pem</strong>: Certificado del cliente. Lo utiliza el operador para trabajar desde ese host como workstation.</li>
+<li><strong>knife.rb</strong>: Archivo de configuración del comando knife.</li>
+<li><strong>bootstrap</strong>: Directorio donde se almacenan los templates para el bootstrap.</li>
+<li><strong>glb-rhel5.rb</strong>: Template para la instalación de un servidor RedHat (CentOS) de ACME.</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>bootstrap/glb-rhel5.erb </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">bash</span> <span class="o">-</span><span class="n">c</span> <span class="s1">&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">echo &lt;%= @config[:chef_node_name] %&gt; &gt; /tmp/chef_node_name</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">PROPERHOSTNAME=`cat /tmp/chef_node_name | cut -d. -f1`</span>
+</span><span class='line'><span class="s1">PROPERDNSDOMAINNAME=`cat /tmp/chef_node_name | sed s/^$PROPERHOSTNAME.//` </span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">IPV4ADDR=`/sbin/ip addr | grep eth0 | grep &quot;inet &quot; | cut -d &quot; &quot; -f 6 | cut -d \/ -f 1`</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">cp /etc/hosts /etc/hosts.chef-bck</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">NETCONF=&quot;/etc/sysconfig/network&quot;</span>
+</span><span class='line'><span class="s1">grep &quot;^HOSTNAME=${PROPERHOSTNAME}$&quot; ${NETCONF} || ( sed -i s/^HOSTNAME.*$// ${NETCONF} &amp;&amp; echo &quot;HOSTNAME=${PROPERHOSTNAME}&quot; &gt;&gt; ${NETCONF})</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">(</span>
+</span><span class='line'><span class="s1">cat &lt;&lt;EOF</span>
+</span><span class='line'><span class="s1">127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4</span>
+</span><span class='line'><span class="s1">::1         localhost localhost.localdomain localhost6 localhost6.localdomain6</span>
+</span><span class='line'><span class="s1">${IPV4ADDR} ${PROPERHOSTNAME}.${PROPERDNSDOMAINNAME} ${PROPERHOSTNAME}</span>
+</span><span class='line'><span class="s1">EOF</span>
+</span><span class='line'><span class="s1">) &gt; /etc/hosts</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">hostname $PROPERHOSTNAME</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">if [ ! -d /usr/local/rvm ]; then</span>
+</span><span class='line'><span class="s1">    wget http://192.168.20.50/rvm-chef-0.10.4-r0.noarch.rpm -P /tmp</span>
+</span><span class='line'><span class="s1">    rpm -ivh /tmp/rvm-chef-0.10.4-r0.noarch.rpm</span>
+</span><span class='line'><span class="s1">fi</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">(</span>
+</span><span class='line'><span class="s1">cat &lt;&lt;&#39;</span><span class="no">EOP</span><span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">[[ -s &quot;/usr/local/rvm/scripts/rvm&quot; ]] &amp;&amp; . &quot;/usr/local/rvm/scripts/rvm&quot; </span>
+</span><span class='line'><span class="s1">EOP</span>
+</span><span class='line'><span class="s1">) &gt;&gt; .bashrc</span>
+</span><span class='line'><span class="s1">[[ -s &quot;/usr/local/rvm/scripts/rvm&quot; ]] &amp;&amp; . &quot;/usr/local/rvm/scripts/rvm&quot; </span>
+</span><span class='line'><span class="s1">rvm use --default ruby-1.9.2</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">mkdir -p /etc/chef</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">(</span>
+</span><span class='line'><span class="s1">cat &lt;&lt;&#39;</span><span class="no">EOP</span><span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">&lt;%= validation_key %&gt;</span>
+</span><span class='line'><span class="s1">EOP</span>
+</span><span class='line'><span class="s1">) &gt; /tmp/validation.pem</span>
+</span><span class='line'><span class="s1">awk NF /tmp/validation.pem &gt; /etc/chef/validation.pem</span>
+</span><span class='line'><span class="s1">rm /tmp/validation.pem</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">(</span>
+</span><span class='line'><span class="s1">cat &lt;&lt;&#39;</span><span class="no">EOP</span><span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">&lt;%= config_content %&gt;</span>
+</span><span class='line'><span class="s1">EOP</span>
+</span><span class='line'><span class="s1">) &gt; /etc/chef/client.rb</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">(</span>
+</span><span class='line'><span class="s1">cat &lt;&lt;&#39;</span><span class="no">EOP</span><span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">&lt;%= { &quot;run_list&quot; =&gt; @run_list }.to_json %&gt;</span>
+</span><span class='line'><span class="s1">EOP</span>
+</span><span class='line'><span class="s1">) &gt; /etc/chef/first-boot.json</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">chef-client -j /etc/chef/first-boot.json&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/02/03/guia-rapida-de-git-para-equipos/">Guia Rapida De Git Para Equipos</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-03T01:54:00-03:00" pubdate data-updated="true">Feb 3<span>rd</span>, 2012</time>
+        
+         | <a href="/blog/2012/02/03/guia-rapida-de-git-para-equipos/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>¿Quien soy?</h2>
+
+<p>Si se ejecuta <code>git config -l</code> deberia obtenerse algo asi.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>git config -l
+</span><span class='line'>user.name<span class="o">=</span>Osvaldo
+</span><span class='line'>user.email<span class="o">=</span>osvaldo@example.com
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Si no hemos configurado aun git, empecemos por ahi.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git config --global user.email <span class="s2">&quot;osvaldo@example.com&quot;</span>
+</span><span class='line'>git config --global user.name <span class="s2">&quot;Osvaldo&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Crear un repo</h2>
+
+<p>Se puede crear un repositorio nuevo</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git init
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>o se puede clonar un ya existente</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git clone ssh://192.168.20.52/home/osvaldo/chef-repo .
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Branches</h2>
+
+<p>Una branch puede ser creado por un próposito definido (arreglar un bug, <a href="http://nvie.com/posts/a-successful-git-branching-model/">introducir una nueva funcionalidad</a>. También puede ser por usuario. De esta manera, cada uno tiene su branch, donde puede realizar las modificaciones sin afectar el trabajo que estén haciendo otros. Una vez el código esta listo para producción, se hace el merge a la branch master (<a href="http://kentnguyen.com/development/visualized-git-practices-for-team/">haciendo primero un <code>git pull -rebase</code></a>).</p>
+
+<h2>Flujo de trabajo</h2>
+
+<p>El flujo de trabajo con las branches seria</p>
+
+<ul>
+<li>configurar git</li>
+<li>clonar el repo <code>git fetch</code></li>
+<li>crear/moverme a la branch personal <code>git checkout -b otsuarez</code></li>
+<li>editar <code>git -m -a ".. cambios .."</code> (nota. en la branch personal: &#8220;otsuarez&#8221;).</li>
+<li>cambiar a la branch principal y copiar los cambios para ahi <code>git checkout master</code> y despues <code>git merge otsuarez</code></li>
+<li>actualizar el repo central. <code>git push origin master</code></li>
+<li>opcionalmente podemos borrar la rama creada <code>git branch -D otsuarez</code></li>
+</ul>
+
+
+<h3>Referencias</h3>
+
+<ul>
+<li><a href="http://www.spheredev.org/wiki/Git_for_the_lazy">http://www.spheredev.org/wiki/Git_for_the_lazy</a></li>
+<li><a href="http://help.github.com/git-cheat-sheets/">http://help.github.com/git-cheat-sheets/</a></li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/01/02/manejando-trazas/">Instalando Graylog2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-01-02T15:43:00-03:00" pubdate data-updated="true">Jan 2<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/01/02/manejando-trazas/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>Elasticsearch</h2>
+
+<p>Primero necesitamos instalar elasticsearch.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">cd</span> /opt
+</span><span class='line'><span class="c"># Elasticsearch :</span>
+</span><span class='line'><span class="nv">ES_PACKAGE</span><span class="o">=</span>elasticsearch-0.18.6.zip <span class="c"># Latest release as of publishing.</span>
+</span><span class='line'><span class="nv">ES_DIR</span><span class="o">=</span><span class="k">${</span><span class="nv">ES_PACKAGE</span><span class="p">%%.zip</span><span class="k">}</span>
+</span><span class='line'><span class="nv">SITE</span><span class="o">=</span>http://github.com/downloads/elasticsearch/elasticsearch
+</span><span class='line'><span class="k">if</span> <span class="o">[</span> ! -d <span class="s2">&quot;$ES_DIR&quot;</span> <span class="o">]</span> ; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span>wget --no-check-certificate <span class="nv">$SITE</span>/<span class="nv">$ES_PACKAGE</span>
+</span><span class='line'>  unzip <span class="nv">$ES_PACKAGE</span>
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>ln -s  <span class="nv">$ES_DIR</span> elasticsearch
+</span><span class='line'><span class="nb">cd </span>elasticsearch
+</span><span class='line'><span class="c"># se puede utilizar -f para mantener en foreground</span>
+</span><span class='line'>./bin/elasticsearch
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Graylog2</h2>
+
+<h3>requerimientos</h3>
+
+<p>Sobre CentOS necesitamos adicionar el repo</p>
+
+<figure class='code'><figcaption><span>/etc/yum.repos.d/10gen.repo</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ini'><span class='line'><span class="k">[10gen]</span>
+</span><span class='line'><span class="na">name</span><span class="o">=</span><span class="s">10gen Repository</span>
+</span><span class='line'><span class="na">baseurl</span><span class="o">=</span><span class="s">http://downloads-distro.mongodb.org/repo/redhat/os/i686</span>
+</span><span class='line'><span class="na">gpgcheck</span><span class="o">=</span><span class="s">0</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Instalamos el paquete.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>yum install mongo-10gen-server
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Los siguientes pasos serian:
+- Editar el archivo de configuración
+- Iniciar el servicio
+- Crear un usuario
+- Reiniciar el servicio</p>
+
+<p>La configuración del servicio de mongodb.</p>
+
+<figure class='code'><figcaption><span>/etc/mongod.conf</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ini'><span class='line'><span class="na">port</span> <span class="o">=</span> <span class="s">27017</span>
+</span><span class='line'><span class="na">auth</span> <span class="o">=</span> <span class="s">true</span>
+</span><span class='line'><span class="na">nohttpinterface</span> <span class="o">=</span> <span class="s">false</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Iniciar el servicio.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>/etc/init.d/mongod start
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Crear las credenciales.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo mongo
+</span><span class='line'>use graylog2
+</span><span class='line'>db.addUser<span class="o">(</span><span class="s2">&quot;perez&quot;</span>, <span class="s2">&quot;justsomepAss&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="nb">exit</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Reiniciar el servicio para activar las credenciales declaradas.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>/etc/init.d/mongod restart
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>El servidor de Graylog2 requiere que se instale openjdk.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>yum install java-1.6.0-openjdk apr-devel apr-util-devel httpd-devel  curl-devel  zlib-devel gcc-c++
+</span><span class='line'><span class="c"># make autoconf openssl-devel readline-devel expat-devel gettext-devel gcc </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>graylog2 server</h2>
+
+<p>Primero probamos con 0.9.5 &#8230;.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">GSF</span><span class="o">=</span><span class="s2">&quot;graylog2-server-0.9.5p1.tar.gz&quot;</span>
+</span><span class='line'><span class="nv">GSD</span><span class="o">=</span><span class="k">${</span><span class="nv">GSF</span><span class="p">%%.tar.gz</span><span class="k">}</span>
+</span><span class='line'>wget https://github.com/downloads/Graylog2/graylog2-server/<span class="nv">$GSF</span> --no-check-certificate -P /tmp
+</span><span class='line'><span class="nb">cd</span> /opt/
+</span><span class='line'>rm -f graylog2-server
+</span><span class='line'>tar zxf /tmp/<span class="nv">$GSF</span>
+</span><span class='line'>ln -s <span class="nv">$GSD</span> graylog2-server
+</span><span class='line'>rm -f /tmp/<span class="nv">$GSF</span>
+</span><span class='line'>cp graylog2-server/graylog2.conf.example /etc/graylog2.conf
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># download graylog2 from https://github.com/Graylog2/graylog2-server/downloads</span>
+</span><span class='line'><span class="nb">cd</span> /tmp
+</span><span class='line'>wget https://github.com/downloads/Graylog2/graylog2-server/graylog2-server-0.9.6-beta.tar.gz --no-check-certificate
+</span><span class='line'><span class="nb">cd</span> /opt/
+</span><span class='line'>tar zxf /tmp/graylog2-server-0.9.6-beta.tar.gz
+</span><span class='line'>ln -s graylog2-server-0.9.6-beta graylog2-server
+</span><span class='line'>cp graylog2-server/graylog2.conf.example /etc/graylog2.conf
+</span><span class='line'>
+</span><span class='line'>/etc/graylog2.conf
+</span><span class='line'><span class="nv">mongodb_user</span> <span class="o">=</span> perez
+</span><span class='line'><span class="nv">mongodb_password</span> <span class="o">=</span> justsomepAss
+</span><span class='line'><span class="c"># por ahora no toco el syslog udp port </span>
+</span><span class='line'>
+</span><span class='line'>sed -i <span class="s1">&#39;s/mongodb_user = grayloguser/mongodb_user = perez/&#39;</span> /etc/graylog2.conf
+</span><span class='line'>sed -i <span class="s1">&#39;s/mongodb_password = 123/mongodb_password = justsomepAss/&#39;</span> /etc/graylog2.conf
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="nb">cd</span> /opt/graylog2-server/bin/
+</span><span class='line'><span class="c">#java -Djava.net.preferIPv4Stack=true -jar /opt/graylog2-server/graylog2-server.jar </span>
+</span><span class='line'>sed -i <span class="s1">&#39;s/java -jar/java  -Djava.net.preferIPv4Stack=true -jar/&#39;</span> graylog2ctl
+</span><span class='line'>./graylog2ctl start
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>graylog2-web-interface</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>adduser -m graylog
+</span><span class='line'>wget https://github.com/downloads/Graylog2/graylog2-web-interface/graylog2-web-interface-0.9.5p2.tar.gz  --no-check-certificate -P /tmp
+</span><span class='line'><span class="nb">cd</span> /opt
+</span><span class='line'>tar zxf /tmp/graylog2-web-interface-0.9.5p2.tar.gz
+</span><span class='line'>rm -f  graylog2-web-interface
+</span><span class='line'>ln -s graylog2-web-interface-0.9.5p2 graylog2-web-interface
+</span><span class='line'>chown -R graylog /opt/graylog2-web-interface-0.9.5p2
+</span><span class='line'><span class="nb">cd</span> /opt/graylog2-web-interface
+</span><span class='line'>
+</span><span class='line'>gem install bundler
+</span><span class='line'>bundle install
+</span><span class='line'>
+</span><span class='line'>vi /opt/graylog2-web-interface/config/<span class="o">{</span>email.yml,general.yml,mongoid.yml<span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>/opt/graylog2-web-interface/config/email.yml
+</span><span class='line'>sed -i <span class="s1">&#39;s/host: smtp.example.org/host: localhost/&#39;</span> /opt/graylog2-web-interface/config/email.yml
+</span><span class='line'><span class="c">#sed -i &#39;s///&#39;</span>
+</span><span class='line'>sed -i <span class="s1">&#39;s/enable_starttls_auto: true/enable_starttls_auto: false/&#39;</span> /opt/graylog2-web-interface/config/email.yml
+</span><span class='line'><span class="nv">$HOSTNAME</span><span class="o">=</span><span class="sb">`</span>hostname -f<span class="sb">`</span>
+</span><span class='line'>sed -i <span class="s1">&#39;s/external_hostname: &quot;your-graylog2.example.org&quot;/external_hostname: &quot;${HOSTNAME}&quot;/&#39;</span> /opt/graylog2-web-interface/config/general.yml
+</span><span class='line'><span class="c"># manually edited mongoid.yml</span>
+</span><span class='line'>sed -i <span class="s1">&#39;1,6s/^/#/&#39;</span> /opt/graylog2-web-interface/config/mongoid.yml
+</span><span class='line'>sed -i <span class="s1">&#39;8,$ s/^#//&#39;</span> /opt/graylog2-web-interface/config/mongoid.yml
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="nb">cd</span> /opt/graylog2-web-interface
+</span><span class='line'>mkdir tmp log
+</span><span class='line'>chmod -R 777 tmp log
+</span><span class='line'>
+</span><span class='line'>gem install passenger
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Una vez que haya terminado la instalación, se muestra un mensaje similar al siguiente.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>The Apache 2 module was successfully installed.
+</span><span class='line'>
+</span><span class='line'>Please edit your Apache configuration file, and add these lines:
+</span><span class='line'>
+</span><span class='line'>   LoadModule passenger_module /usr/local/rvm/gems/ruby-1.9.2-p290/gems/passenger-3.0.11/ext/apache2/mod_passenger.so
+</span><span class='line'>   PassengerRoot /usr/local/rvm/gems/ruby-1.9.2-p290/gems/passenger-3.0.11
+</span><span class='line'>   PassengerRuby /usr/local/rvm/wrappers/ruby-1.9.2-p290/ruby
+</span><span class='line'>
+</span><span class='line'>After you restart Apache, you are ready to deploy any number of Ruby on Rails
+</span><span class='line'>applications on Apache, without any further Ruby on Rails-specific
+</span><span class='line'>configuration!
+</span><span class='line'>
+</span><span class='line'>Press ENTER to <span class="k">continue</span>.
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Configuramos apache. Primero el módulo.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cat &gt; /etc/httpd/conf.d/passenger.conf <span class="s">&lt;&lt;&#39;EOF&#39;</span>
+</span><span class='line'><span class="s">LoadModule passenger_module /usr/local/rvm/gems/ruby-1.9.2-p290/gems/passenger-3.0.11/ext/apache2/mod_passenger.so</span>
+</span><span class='line'><span class="s">PassengerRoot /usr/local/rvm/gems/ruby-1.9.2-p290/gems/passenger-3.0.11</span>
+</span><span class='line'><span class="s">PassengerRuby /usr/local/rvm/wrappers/ruby-1.9.2-p290/ruby</span>
+</span><span class='line'><span class="s">EOF</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Despues creamos la declaración para el host virtual.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">HOSTNAME</span><span class="o">=</span>unixtools.example.com
+</span><span class='line'>cat &gt; /etc/httpd/vhost.d/unixtools.conf <span class="s">&lt;&lt;EOF</span>
+</span><span class='line'><span class="s">&lt;VirtualHost *:80&gt;</span>
+</span><span class='line'><span class="s">  ServerName ${HOSTNAME}</span>
+</span><span class='line'><span class="s">  DocumentRoot /opt/graylog2-web-interface/public</span>
+</span><span class='line'><span class="s">  &lt;Directory /opt/graylog2-web-interface/public&gt;</span>
+</span><span class='line'><span class="s">     AllowOverride all</span>
+</span><span class='line'><span class="s">     Options -MultiViews</span>
+</span><span class='line'><span class="s">  &lt;/Directory&gt;</span>
+</span><span class='line'><span class="s">&lt;/VirtualHost&gt;</span>
+</span><span class='line'><span class="s">EOF</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>sending a test message</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">echo</span> <span class="s1">&#39;{</span>
+</span><span class='line'><span class="s1">  &quot;host&quot;:&quot;192.168.0.3&quot;,</span>
+</span><span class='line'><span class="s1">  &quot;version&quot;:&quot;1.0&quot;,</span>
+</span><span class='line'><span class="s1">  &quot;facility&quot;:&quot;testing&quot;,</span>
+</span><span class='line'><span class="s1">  &quot;short_message&quot;:&quot;testing gelf message&quot;</span>
+</span><span class='line'><span class="s1">}&#39;</span> | gzip -f - | nc -u localhost 12201
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Si este error aparece.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>FATAL: org.graylog2.Main - Could not start syslog server core thread. Do you have permissions to listen on port 514?
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>El problema puede ser que no este escuchando el graylog2 server en ese puerto, pues ya estaba escuchando el syslog.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@unixtools bin<span class="o">]</span><span class="c"># netstat -ntapul | grep 514</span>
+</span><span class='line'>udp        0      0 0.0.0.0:514                 0.0.0.0:*                               2670/syslogd
+</span><span class='line'><span class="o">[</span>root@unixtools bin<span class="o">]</span><span class="c"># </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>La solución es cambiar el syslog para otro puerto. Algo poco intuitivo pues la única forma de cambiar el puerto por el que escucha el syslogd (en CentOS al menos) es cambiando la definición del puerto utilizado por syslog en el archivo /etc/services <a href="http://community.zenoss.org/docs/DOC-4553">http://community.zenoss.org/docs/DOC-4553</a>.
+Se sugiere comentarear la línea original y adicionar otra con la nueva definición.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#syslog     514/udp                   # original syslog setting</span>
+</span><span class='line'>syslog      10514/udp                 <span class="c"># setting to accomodate zenoss</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Comprobar que el syslog esta escuchando en el nuevo puerto.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@unixtools bin<span class="o">]</span><span class="c"># netstat -ntapul | grep 514</span>
+</span><span class='line'>udp        0      0 0.0.0.0:10514               0.0.0.0:*                               32276/syslogd
+</span><span class='line'><span class="o">[</span>root@unixtools bin<span class="o">]</span><span class="c"># </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Ya se puede lanzar el proceso de graylog2.</p>
+
+<h3>Centralized logging</h3>
+
+<p>Probando logstash  &#8230;</p>
+
+<p>http://logstash.net/docs/1.0.17/getting-started-centralized</p>
+
+<p>http://semicomplete.com/files/logstash/logstash-1.0.17-monolithic.jar</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">input</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">file</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">type</span> <span class="o">=&gt;</span> <span class="s2">&quot;syslog&quot;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="err">#</span> <span class="nx">Wildcards</span> <span class="nx">work</span> <span class="nx">here</span> <span class="o">:</span><span class="p">)</span>
+</span><span class='line'>    <span class="nx">path</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="s2">&quot;/var/log/messages&quot;</span><span class="p">,</span> <span class="s2">&quot;/var/log/syslog&quot;</span><span class="p">,</span> <span class="s2">&quot;/var/log/*.log&quot;</span> <span class="p">]</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">file</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">type</span> <span class="o">=&gt;</span> <span class="s2">&quot;apache-access&quot;</span>
+</span><span class='line'>    <span class="nx">path</span> <span class="o">=&gt;</span> <span class="s2">&quot;/var/log/apache2/access.log&quot;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">file</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">type</span> <span class="o">=&gt;</span> <span class="s2">&quot;apache-error&quot;</span>
+</span><span class='line'>    <span class="nx">path</span> <span class="o">=&gt;</span> <span class="s2">&quot;/var/log/apache2/error.log&quot;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">output</span> <span class="p">{</span>
+</span><span class='line'>  <span class="err">#</span> <span class="nx">Output</span> <span class="nx">events</span> <span class="nx">to</span> <span class="nx">stdout</span> <span class="k">for</span> <span class="nx">debugging</span><span class="p">.</span> <span class="nx">Feel</span> <span class="nx">free</span> <span class="nx">to</span> <span class="nx">remove</span>
+</span><span class='line'>  <span class="err">#</span> <span class="k">this</span> <span class="nx">output</span> <span class="k">if</span> <span class="nx">you</span> <span class="nx">don</span><span class="err">&#39;</span><span class="nx">t</span> <span class="nx">need</span> <span class="nx">it</span><span class="p">.</span>
+</span><span class='line'>  <span class="nx">stdout</span> <span class="p">{</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Se puede utilizar.</p>
+
+<ul>
+<li>gelf://yourgraylog2server:port   # ship logs to the graylog2 server <a href="http://weboperations.blogspot.com/2011/04/fwd-non-intrusive-way-to-send-messages.html">http://weboperations.blogspot.com/2011/04/fwd-non-intrusive-way-to-send-messages.html</a>.</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">java</span> <span class="o">-</span><span class="nx">jar</span> <span class="nx">logstash</span><span class="o">-</span><span class="mf">1.0</span><span class="p">.</span><span class="mi">17</span><span class="o">-</span><span class="nx">monolithic</span><span class="p">.</span><span class="nx">jar</span> <span class="nx">agent</span> <span class="o">-</span><span class="nx">f</span> <span class="nx">stash</span><span class="p">.</span><span class="nx">conf</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Exception</span> <span class="k">in</span> <span class="nx">thread</span> <span class="s2">&quot;main&quot;</span> <span class="nx">java</span><span class="p">.</span><span class="nx">lang</span><span class="p">.</span><span class="nx">UnsupportedClassVersionError</span><span class="o">:</span> <span class="nx">Bad</span> <span class="nx">version</span> <span class="nx">number</span> <span class="k">in</span> <span class="p">.</span><span class="kr">class</span> <span class="nx">file</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Este error aparece cuando se compila un archivo .java con una version de JDK y se ejecuta el archivo .class con una versión diferente de JVM.</p>
+
+<p>Confundido? Pudiera pensar, la misma versión no es necesaria para compilar y para ejecutar.</p>
+
+<p>Correcto, esta en lo cierto. Pero no puede ejecutar archivos .class que fueron compilados con una versión mas actual que la JVM que esta utilizando.</p>
+
+<p>En este caso, la versión de openjdk que instaló el CentOS era anterior a la versión de JDK con que fue compilado el jar del logstash. <a href="https://github.com/logstash/logstash/wiki/Building-and-running-logstash-from-source">https://github.com/logstash/logstash/wiki/Building-and-running-logstash-from-source</a></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">Prerequisites</span>
+</span><span class='line'><span class="nx">Sun</span> <span class="nx">Java</span> <span class="mi">6</span> <span class="nx">JDK</span> <span class="p">(</span><span class="nx">don</span><span class="err">&#39;</span><span class="nx">t</span> <span class="k">try</span> <span class="k">this</span> <span class="kd">with</span> <span class="nx">openjdk</span><span class="p">)</span>
+</span><span class='line'><span class="nx">JRuby</span> <span class="nx">version</span> <span class="nx">that</span> <span class="nx">matches</span> <span class="nx">what</span> <span class="nx">logstash</span> <span class="nx">uses</span> <span class="p">(</span><span class="nx">You</span> <span class="nx">can</span> <span class="nx">get</span> <span class="k">this</span> <span class="nx">from</span> <span class="nx">the</span> <span class="nx">top</span> <span class="nx">of</span> <span class="nx">the</span> <span class="nx">Makefile</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>not a good choice for legacy servers &#8230;.</p>
+
+<h3>syslog using ruby</h3>
+
+<figure class='code'><figcaption><span>hi.rb </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="nb">require</span> <span class="s1">&#39;syslog&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</span><span class='line'>  <span class="c1"># $0 is the current script name</span>
+</span><span class='line'>  <span class="no">Syslog</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="vg">$0</span><span class="p">,</span> <span class="no">Syslog</span><span class="o">::</span><span class="no">LOG_PID</span> <span class="o">|</span> <span class="no">Syslog</span><span class="o">::</span><span class="no">LOG_CONS</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">s</span><span class="o">|</span> <span class="n">s</span><span class="o">.</span><span class="n">warning</span> <span class="n">message</span> <span class="p">}</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="n">log</span><span class="p">(</span><span class="s1">&#39;hello world&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Comprobando que funciona</h3>
+
+<p>A GELF message is a GZIP&#8217;d or ZLIB&#8217;d JSON string with the following fields: &#8230;
+Un mensaje GELF es una cadena JSON compactada con GZIP o ZLIB &#8230;
+<a href="https://github.com/Graylog2/graylog2-docs/wiki/GELF">https://github.com/Graylog2/graylog2-docs/wiki/GELF</a></p>
+
+<p>Esa la razón por la cual se utiliza el gzip en el comando:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">echo</span> <span class="s1">&#39;{</span>
+</span><span class='line'><span class="s1">  &quot;host&quot;:&quot;192.168.0.3&quot;,</span>
+</span><span class='line'><span class="s1">  &quot;version&quot;:&quot;1.0&quot;,</span>
+</span><span class='line'><span class="s1">  &quot;facility&quot;:&quot;testing&quot;,</span>
+</span><span class='line'><span class="s1">  &quot;short_message&quot;:&quot;testing gelf message&quot;</span>
+</span><span class='line'><span class="s1">}&#39;</span> | gzip -f - | nc -u localhost 12201
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>deberiamos ver esto:</p>
+
+<figure class='code'><figcaption><span>/var/log/messages</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>2011-12-22 16:56:01,186 DEBUG: org.graylog2.messagehandlers.gelf.GELFClientHandlerThread - Received message is not chunked. Handling now.
+</span><span class='line'>2011-12-22 16:56:01,189 DEBUG: org.graylog2.messagehandlers.gelf.SimpleGELFClientHandler - Handling GZIP compressed SimpleGELFClient
+</span><span class='line'>2011-12-22 16:56:01,326 DEBUG: org.graylog2.messagehandlers.gelf.SimpleGELFClientHandler - Got GELF message: shortMessage: testing gelf message | fullMessage: null | level: 1 | host: 192.168.0.3 | file: null | line: -1 | facility: testing | version: 1.0 | additional: 0
+</span><span class='line'>2011-12-22 16:56:01,410 INFO : org.graylog2.periodical.BulkIndexerThread - About to index max 4000 messages. You have a total of 1 messages in the queue. <span class="o">[</span>freq:1s<span class="o">]</span>
+</span><span class='line'>2011-12-22 16:56:01,411 DEBUG: org.graylog2.messagequeue.MessageQueue - Read 1 messages from queue.
+</span><span class='line'>2011-12-22 16:56:01,411 INFO : org.graylog2.periodical.BulkIndexerThread - ... indexing 1 messages.
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Referencias</h3>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/17/creating-an-rpm-package-from-on-a-tgz-file/">Creating an Rpm Package From on Tgz File</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-17T15:26:00-03:00" pubdate data-updated="true">Dec 17<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/17/creating-an-rpm-package-from-on-a-tgz-file/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><em>disclaimer: this is only for creating an rpm for installing a set of files, no compiling, just a bunch of file being copied into a server.</em></p>
+
+<p>Starting from a tgz file, an rpm package will be created. Sometimes, a tgz file is quicker/easier to use. However, in the long run, sticking to a package management system for handling the installation of applications on a system will pay off for sure.</p>
+
+<p>Creating an rpm package from a tgz file isn&#8217;t that hard as it&#8217;s shown below.</p>
+
+<h3>setting up rpm build environment</h3>
+
+<p>Let&#8217;s start by setting a dev environment, also, setting some variables which will be handly at the rpm creation process.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo yum install rpm-build
+</span><span class='line'>mkdir -p ~/rpm/<span class="o">{</span>BUILD,RPMS,SOURCES,SRPMS,SPECS,tmp<span class="o">}</span>
+</span><span class='line'>mkdir ~/rpm/RPMS/<span class="o">{</span>i386,i586,i686,noarch<span class="o">}</span>
+</span><span class='line'><span class="nb">echo</span> <span class="s1">&#39;%packager Osvaldo &lt;osvaldo@devops.com.ar&gt;&#39;</span> &gt;
+</span><span class='line'>~/.rpmmacros
+</span><span class='line'><span class="nb">echo</span> <span class="s1">&#39;%_topdir %(echo $HOME)/rpm&#39;</span> &gt;&gt; ~/.rpmmacros
+</span><span class='line'><span class="nb">echo</span> <span class="s1">&#39;%_tmppath %(echo $HOME)/rpm/tmp&#39;</span> &gt;&gt; ~/.rpmmacros
+</span><span class='line'><span class="nb">echo</span> <span class="s2">&quot;%_query_all_fmt %%{name}-%%{version}-%%{release}.%%{arch}&quot;</span> &gt;&gt;
+</span><span class='line'>~/.rpmmacros
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Since we&#8217;re be creating an rpm file just for installing a set of already existing files, it will only be needed three steps.</p>
+
+<ol>
+<li>First to place all of the files to be included on the rpm file under a directory in the BUILD directory.</li>
+<li>Second, to create the spec file</li>
+<li>and last, to execute the rpmbuild command.</li>
+</ol>
+
+
+<h3>using yum commands</h3>
+
+<p>Here, commands are shown for how to search for the file and to install the package.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>-bash-3.2<span class="nv">$ </span>yum search glassfish
+</span><span class='line'>Loaded plugins: downloadonly, <span class="nv">fastestmirror</span>
+</span><span class='line'><span class="o">=================</span> Matched: <span class="nv">glassfish</span> <span class="o">=================</span>
+</span><span class='line'>glassfish-loadbalancer.i386 : Sun GlassFish Enterprise Server Load Balancing Plugin
+</span><span class='line'>-bash-3.2<span class="err">$</span>
+</span><span class='line'>
+</span><span class='line'>-bash-3.2<span class="nv">$ </span>sudo yum install glassfish-loadbalancer
+</span><span class='line'>Loaded plugins: downloadonly, fastestmirror
+</span><span class='line'>Loading mirror speeds from cached hostfile
+</span><span class='line'>* base: mirror.cogentco.com
+</span><span class='line'>* epel: mirror.hiwaay.net
+</span><span class='line'>* extras: mirror.flhsi.com
+</span><span class='line'>* updates: mirrors.igsobe.com
+</span><span class='line'>Setting up Install Process
+</span><span class='line'>Package glassfish-loadbalancer-2.1.1-r2.i386 already installed and
+</span><span class='line'>latest version
+</span><span class='line'>Nothing to <span class="k">do</span>
+</span><span class='line'>-bash-3.2<span class="err">$</span>
+</span><span class='line'>-bash-3.2<span class="nv">$ </span>rpm -qa | grep glassfish
+</span><span class='line'>glassfish-loadbalancer-2.1.1-r2.i386
+</span><span class='line'>-bash-3.2<span class="err">$</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Actually, the package had been already installed, the process remains the same ;).</p>
+
+<p>Now, instead of wondering how certain file came from, those belonging to this package will be fully identified and accesible (and controllable) via the package management system. For example, now we list exactly which files were installed by that rpm file (try that with a tgz file &#8230; asumming you delete it, well, it wasn&#8217;t needed any more, right? ;)</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>-bash-3.2<span class="nv">$ </span>rpm -ql glassfish-loadbalancer
+</span><span class='line'>/opt/webserver7/lib/libicudata.so.2
+</span><span class='line'>/opt/webserver7/lib/libicui18n.so.2
+</span><span class='line'>/opt/webserver7/lib/libicuuc.so.2
+</span><span class='line'>/opt/webserver7/lib/libxerces-c.so
+</span><span class='line'>/opt/webserver7/plugins/lbplugin/bin/libpassthrough.so
+</span><span class='line'>/opt/webserver7/plugins/lbplugin/errorpages/default-error.html
+</span><span class='line'>/opt/webserver7/plugins/lbplugin/errorpages/sun-http-lberror.html
+</span><span class='line'>/opt/webserver7/plugins/lbplugin/resource/LBPluginDefault_root.res
+</span><span class='line'>/opt/webserver7/plugins/lbplugin/resource/LBPlugin_root.res
+</span><span class='line'>-bash-3.2<span class="err">$</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Where that file came from? Just use <code>rpm -qf <filename with full path></code> and you&#8217;ll have the answer (again, try that on an file that came from a tgz file, ah, which tgz file btw ;).</p>
+
+<h3>extracting the files from the rpm package</h3>
+
+<p>Just in case someone needs the tgz file, here&#8217;s how to convert the rpm file into a tgz file (pretty easy this way around ;) and extract it to the final destination as it had been installed using the tgz file.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>rpm2cpio glassfish-loadbalancer-2.1.1-r1.i386.rpm | cpio -idmv
+</span><span class='line'>tar zcf glassfish-loadbalancer-2.1.1-r1.tgz opt/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Notes</h3>
+
+<p>First time the rpm file was created, during installation the following error showed up:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@cpweb1 i386<span class="o">]</span><span class="c"># rpm -i loadbalancer-2.2-1.i386.rpm</span>
+</span><span class='line'>error: Failed dependencies:
+</span><span class='line'>       libns-httpd40.so is needed by loadbalancer-2.2-1.i386
+</span><span class='line'><span class="o">[</span>root@cpweb1 i386<span class="o">]</span><span class="c">#</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Interesting thing to know about rpm file creation is, there&#8217;s an automatic dependency resolution process being handled automatically by the package management system. When you first create the rpm file, the included files are checked for dependencies, which are then, declared on the metadata of the rpm file. Then, at installation time, those dependencies are checked and if not already fullfilled, a warning message will show up (like it happened on this case). Usually, this wouldn&#8217;t be a problem, since that  dependency would had been already provided by another installed package or, the yum command will find out which package would satisfy the dependency and suggest to install it. Sadly enough, we were dealing with a mixed scenario, one where manual installation were being done at the same time. This particular dependency had been already been satisfied because of a manually installed package. So the real issue at this point was how to force the package management system into doing something he was created
+to avoid in the first place.</p>
+
+<p>Exceptions, while rare, do exists. And good systems are prepared to deal with such situations. <strong>The AutoReqProv</strong> tag is used to control the automatic dependency processing performed when the package is being built. To disable automatic dependency processing, add the following line to the spec file:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>AutoReqProv: no
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Files</h3>
+
+<p>In order to automate things (we&#8217;re supposed to be lazy, right? ;) I use ol&#8217; make command, so the following Makefile make my life easier. I do rpm work on my workstation, then, upload the new packages to the repo server. So, What it takes?: <code>make all</code>.</p>
+
+<figure class='code'><figcaption><span>Makefile</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='make'><span class='line'><span class="nf">all</span><span class="o">:</span>
+</span><span class='line'>       rpmbuild -ba glassfish-loadbalancer-2.1.1.spec
+</span><span class='line'>       sudo cp ../RPMS/i386/glassfish-loadbalancer-2.1.1-r*.i386.rpm /var/www/repo/i386
+</span><span class='line'>       sudo createrepo /var/www/repo/i386
+</span><span class='line'>       scp ../RPMS/i386/glassfish-loadbalancer-2.1.1-r*.i386.rpm repo.example.com:/var/www/html/centos/5/netsol/i386
+</span><span class='line'>       ssh repo.example.com createrepo /var/www/html/centos/5/netsol/i386/
+</span><span class='line'>       ssh repo.example.com createrepo /var/www/html/centos/5/netsol/i686/
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The spec file used to create the rpm file.</p>
+
+<figure class='code'><figcaption><span>glassfish-loadbalancer-2.1.1.spec</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="err">%</span><span class="l-Scalar-Plain">define name    glassfish-loadbalancer</span>
+</span><span class='line'><span class="l-Scalar-Plain">%define version 2.1.1</span>
+</span><span class='line'><span class="l-Scalar-Plain">%define release r2</span>
+</span><span class='line'>
+</span><span class='line'><span class="l-Scalar-Plain">Summary</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Sun GlassFish Enterprise Server Load Balancing Plugin</span>
+</span><span class='line'><span class="l-Scalar-Plain">Name</span><span class="p-Indicator">:</span> <span class="err">%</span><span class="p-Indicator">{</span><span class="nv">name</span><span class="p-Indicator">}</span>
+</span><span class='line'><span class="l-Scalar-Plain">Version</span><span class="p-Indicator">:</span> <span class="err">%</span><span class="p-Indicator">{</span><span class="nv">version</span><span class="p-Indicator">}</span>
+</span><span class='line'><span class="l-Scalar-Plain">Release</span><span class="p-Indicator">:</span> <span class="err">%</span><span class="p-Indicator">{</span><span class="nv">release</span><span class="p-Indicator">}</span>
+</span><span class='line'><span class="c1">#Copyright: GPL</span>
+</span><span class='line'><span class="l-Scalar-Plain">Group</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">ACME/Networking/Daemons</span>
+</span><span class='line'><span class="l-Scalar-Plain">BuildArch</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">i386</span>
+</span><span class='line'><span class="c1">#BuildRoot: %{_builddir}/%{name}-%{version}-%{release}</span>
+</span><span class='line'><span class="l-Scalar-Plain">BuildRoot</span><span class="p-Indicator">:</span> <span class="err">%</span><span class="p-Indicator">{</span><span class="nv">_builddir</span><span class="p-Indicator">}</span><span class="l-Scalar-Plain">/%{name}-%{version}</span>
+</span><span class='line'><span class="l-Scalar-Plain">URL</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">http://www.oracle.com/</span>
+</span><span class='line'><span class="l-Scalar-Plain">Distribution</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">whatever</span>
+</span><span class='line'><span class="l-Scalar-Plain">Vendor</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Oracle</span>
+</span><span class='line'><span class="l-Scalar-Plain">Packager</span><span class="p-Indicator">:</span> <span class="err">%</span><span class="p-Indicator">{</span><span class="nv">packager</span><span class="p-Indicator">}</span>
+</span><span class='line'><span class="l-Scalar-Plain">Provides</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Load Balancer Plugin</span>
+</span><span class='line'><span class="c1">#Requires:</span>
+</span><span class='line'><span class="l-Scalar-Plain">AutoReqProv</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">no</span>
+</span><span class='line'><span class="l-Scalar-Plain">License</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Restricted</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">%</span><span class="l-Scalar-Plain">description</span>
+</span><span class='line'><span class="l-Scalar-Plain">This package contains the  Sun GlassFish Enterprise Server Load</span>
+</span><span class='line'><span class="l-Scalar-Plain">Balancing Plugin.</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">%</span><span class="l-Scalar-Plain">prep</span>
+</span><span class='line'><span class="l-Scalar-Plain">exit 0</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">%</span><span class="l-Scalar-Plain">build</span>
+</span><span class='line'><span class="l-Scalar-Plain">exit 0</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">%</span><span class="l-Scalar-Plain">install</span>
+</span><span class='line'><span class="l-Scalar-Plain">exit 0</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">%</span><span class="l-Scalar-Plain">clean</span>
+</span><span class='line'><span class="l-Scalar-Plain">exit 0</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">%</span><span class="l-Scalar-Plain">files</span>
+</span><span class='line'><span class="err">%</span><span class="l-Scalar-Plain">defattr(-,root,root)</span>
+</span><span class='line'><span class="l-Scalar-Plain">/opt/webserver7/plugins/lbplugin/bin/libpassthrough.so</span>
+</span><span class='line'><span class="l-Scalar-Plain">/opt/webserver7/plugins/lbplugin/errorpages/default-error.html</span>
+</span><span class='line'><span class="l-Scalar-Plain">/opt/webserver7/plugins/lbplugin/errorpages/sun-http-lberror.html</span>
+</span><span class='line'><span class="l-Scalar-Plain">/opt/webserver7/plugins/lbplugin/resource/LBPluginDefault_root.res</span>
+</span><span class='line'><span class="l-Scalar-Plain">/opt/webserver7/plugins/lbplugin/resource/LBPlugin_root.res</span>
+</span><span class='line'><span class="l-Scalar-Plain">/opt/webserver7/lib/libicudata.so.2</span>
+</span><span class='line'><span class="l-Scalar-Plain">/opt/webserver7/lib/libicui18n.so.2</span>
+</span><span class='line'><span class="l-Scalar-Plain">/opt/webserver7/lib/libicuuc.so.2</span>
+</span><span class='line'><span class="l-Scalar-Plain">/opt/webserver7/lib/libxerces-c.so</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>testing with differente spec values</p>
+
+<figure class='code'><figcaption><span>diff loadbalancer-2.2.1.spec glassfish-loadbalancer-2.1.1.spec</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='diff'><span class='line'>1,3c1,3
+</span><span class='line'>&lt; %define       name    loadbalancer
+</span><span class='line'>&lt; %define version       2.2
+</span><span class='line'>&lt; %define release       1
+</span><span class='line'><span class="gd">---</span>
+</span><span class='line'>&gt; %define       name    glassfish-loadbalancer
+</span><span class='line'>&gt; %define version       2.1.1
+</span><span class='line'>&gt; %define release       r2
+</span><span class='line'>10c10
+</span><span class='line'>&lt; Group: Amusements/Graphics
+</span><span class='line'><span class="gd">---</span>
+</span><span class='line'>&gt; Group: Netsol/Networking/Daemons
+</span><span class='line'>12c12,13
+</span><span class='line'>&lt; BuildRoot: %{_builddir}/%{name}-%{version}.%{release}
+</span><span class='line'><span class="gd">---</span>
+</span><span class='line'>&gt; #BuildRoot: %{_builddir}/%{name}-%{version}-%{release}
+</span><span class='line'>&gt; BuildRoot: %{_builddir}/%{name}-%{version}
+</span><span class='line'>18a20
+</span><span class='line'>&gt; AutoReqProv: no
+</span><span class='line'><span class="gd">-bash-3.2$</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>the final directory tree (including trash = i mean, dev files, no time for cleaning it up)</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>|-- BUILD
+</span><span class='line'>|   <span class="sb">`</span>-- glassfish-loadbalancer-2.1.1
+</span><span class='line'>|       <span class="sb">`</span>-- opt
+</span><span class='line'>|           <span class="sb">`</span>-- webserver7
+</span><span class='line'>|               |-- lib
+</span><span class='line'>|               |   |-- libicudata.so.2
+</span><span class='line'>|               |   |-- libicui18n.so.2
+</span><span class='line'>|               |   |-- libicuuc.so.2
+</span><span class='line'>|               |   <span class="sb">`</span>-- libxerces-c.so
+</span><span class='line'>|               <span class="sb">`</span>-- plugins
+</span><span class='line'>|                   <span class="sb">`</span>-- lbplugin
+</span><span class='line'>|                       |-- bin
+</span><span class='line'>|                       |   <span class="sb">`</span>-- libpassthrough.so
+</span><span class='line'>|                       |-- errorpages
+</span><span class='line'>|                       |   |-- default-error.html
+</span><span class='line'>|                       |   <span class="sb">`</span>-- sun-http-lberror.html
+</span><span class='line'>|                       <span class="sb">`</span>-- resource
+</span><span class='line'>|                           |-- LBPluginDefault_root.res
+</span><span class='line'>|                           <span class="sb">`</span>-- LBPlugin_root.res
+</span><span class='line'>|-- RPMS
+</span><span class='line'>|   |-- i386
+</span><span class='line'>|   |   |-- glassfish-2.1.1-loadbalancer-2.1-1.i386.rpm
+</span><span class='line'>|   |   |-- glassfish-loadbalancer-2.1-1.i386.rpm
+</span><span class='line'>|   |   |-- glassfish-loadbalancer-2.1.1-r0.i386.rpm
+</span><span class='line'>|   |   |-- glassfish-loadbalancer-2.1.1-r1.i386.rpm
+</span><span class='line'>|   |   |-- glassfish-loadbalancer-2.1.1-r2.i386.rpm
+</span><span class='line'>|   |   <span class="sb">`</span>-- loadbalancer-2.2-1.i386.rpm
+</span><span class='line'>|   |-- i586
+</span><span class='line'>|   |-- i686|-- BUILD
+</span><span class='line'>|   <span class="sb">`</span>-- glassfish-loadbalancer-2.1.1
+</span><span class='line'>|       <span class="sb">`</span>-- opt
+</span><span class='line'>|           <span class="sb">`</span>-- webserver7
+</span><span class='line'>|               |-- lib
+</span><span class='line'>|               |   |-- libicudata.so.2
+</span><span class='line'>|               |   |-- libicui18n.so.2
+</span><span class='line'>|               |   |-- libicuuc.so.2
+</span><span class='line'>|               |   <span class="sb">`</span>-- libxerces-c.so
+</span><span class='line'>|               <span class="sb">`</span>-- plugins
+</span><span class='line'>|                   <span class="sb">`</span>-- lbplugin
+</span><span class='line'>|                       |-- bin
+</span><span class='line'>|                       |   <span class="sb">`</span>-- libpassthrough.so
+</span><span class='line'>|                       |-- errorpages
+</span><span class='line'>|                       |   |-- default-error.html
+</span><span class='line'>|                       |   <span class="sb">`</span>-- sun-http-lberror.html
+</span><span class='line'>|                       <span class="sb">`</span>-- resource
+</span><span class='line'>|                           |-- LBPluginDefault_root.res
+</span><span class='line'>|                           <span class="sb">`</span>-- LBPlugin_root.res
+</span><span class='line'>|-- RPMS
+</span><span class='line'>|   |-- i386
+</span><span class='line'>|   |   |-- glassfish-2.1.1-loadbalancer-2.1-1.i386.rpm
+</span><span class='line'>|   |   |-- glassfish-loadbalancer-2.1-1.i386.rpm
+</span><span class='line'>|   |   |-- glassfish-loadbalancer-2.1.1-r0.i386.rpm
+</span><span class='line'>|   |   |-- glassfish-loadbalancer-2.1.1-r1.i386.rpm
+</span><span class='line'>|   |   |-- glassfish-loadbalancer-2.1.1-r2.i386.rpm
+</span><span class='line'>|   |   <span class="sb">`</span>-- loadbalancer-2.2-1.i386.rpm
+</span><span class='line'>|   |-- i586
+</span><span class='line'>|   |-- i686
+</span><span class='line'>|   <span class="sb">`</span>-- noarch
+</span><span class='line'>|-- SOURCES
+</span><span class='line'>|-- SPECS
+</span><span class='line'>|   |-- Makefile
+</span><span class='line'>|   |-- glassfish-loadbalancer-2.1.1.spec
+</span><span class='line'>|   <span class="sb">`</span>-- loadbalancer-2.2.1.spec
+</span><span class='line'>|-- SRPMS
+</span><span class='line'>|   |-- glassfish-2.1.1-loadbalancer-2.1-1.src.rpm
+</span><span class='line'>|   |-- glassfish-loadbalancer-2.1-1.src.rpm
+</span><span class='line'>|   |-- glassfish-loadbalancer-2.1.1-r0.src.rpm
+</span><span class='line'>|   |-- glassfish-loadbalancer-2.1.1-r1.src.rpm
+</span><span class='line'>|   |-- glassfish-loadbalancer-2.1.1-r2.src.rpm
+</span><span class='line'>|   <span class="sb">`</span>-- loadbalancer-2.2-1.src.rpm
+</span><span class='line'><span class="sb">`</span>-- tmp
+</span><span class='line'>
+</span><span class='line'>19 directories, 24 files
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Some handy links</h3>
+
+<ul>
+<li><a href="http://www.lamolabs.org/blog/164/centos-rpm-tutorial-1/">http://www.lamolabs.org/blog/164/centos-rpm-tutorial-1/</a></li>
+<li><a href="http://wiki.centos.org/HowTos/SetupRpmBuildEnvironment">http://wiki.centos.org/HowTos/SetupRpmBuildEnvironment</a></li>
+<li><a href="http://wiki.centos.org/TipsAndTricks/YumAndRPM">http://wiki.centos.org/TipsAndTricks/YumAndRPM</a></li>
+<li><a href="http://ramblings.narrabilis.com/wp/creating-a-yum-repository-repo-and-creating-a-yum-group-to-install-kickstart/">http://ramblings.narrabilis.com/wp/creating-a-yum-repository-repo-and-creating-a-yum-group-to-install-kickstart/</a></li>
+<li><a href="http://www.tim-riemenschneider.de/linux/rpmbook/node310.html">http://www.tim-riemenschneider.de/linux/rpmbook/node310.html</a></li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/4/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/2/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">definiendo un smarthost en mac os x</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">usando https detras de un proxy reverso</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">borrando viejos builds en jenkins</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/07/permisos-en-directorio-www/">permisos en directorio www</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/configurando-jboss-6/">configurando jboss 6</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("devops_ar", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/devops_ar" class="twitter-follow-button" data-show-count="false">Follow @devops_ar</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - osvaldo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'devops-ar';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

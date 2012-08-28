@@ -1,0 +1,594 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>transfiriendo zonas con tsig - devops-ar</title>
+  <meta name="author" content="osvaldo">
+
+  
+  <meta name="description" content="Siguiendo los consejos de Sébastien Wains: 1
+2
+3
+4
+5
+6
+yum install bind bind-chroot bind-libs bind-utils caching-nameserver
+cd /var/named/chroot/etc &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.devops.com.ar/blog/2012/03/01/transfiriendo-zonas-con-tsig/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="devops-ar" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-5155520-9']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">devops-ar</a></h1>
+  
+    <h2>devops en castellano</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.devops.com.ar" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Transfiriendo Zonas Con Tsig</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-01T16:45:00-03:00" pubdate data-updated="true">Mar 1<span>st</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Siguiendo los consejos de <a href="http://blog.wains.be/2007/12/13/centos-5-chroot-dns-with-bind/">Sébastien Wains</a>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>yum install <span class="nb">bind bind</span>-chroot <span class="nb">bind</span>-libs <span class="nb">bind</span>-utils caching-nameserver
+</span><span class='line'><span class="nb">cd</span> /var/named/chroot/etc
+</span><span class='line'>rndc-confgen &gt; rndc.key
+</span><span class='line'>chown root:named rndc.key
+</span><span class='line'><span class="c"># just in case ....</span>
+</span><span class='line'>sed -i <span class="s1">&#39;s/^unset ROOTDIR/#unset ROOTDIR/&#39;</span> /etc/sysconfig/named
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Vamos a configurar dos dns servers, uno primario y uno secundario:</p>
+
+<ul>
+<li>example1.com
+  101.33.99.66</li>
+<li>anotherhost.example1.com
+  65.138.84.46</li>
+</ul>
+
+
+<!-- more -->
+
+
+<p>Una configuracion tradicional seria similar a la siguiente (guiandonos por <a href="http://prithak.blogspot.com/2010/08/bind-master-and-slave-server.html">aca</a>).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='aconf'><span class='line'><span class="err">/var/named/chroot/etc/named</span>.<span class="nb">conf</span>
+</span><span class='line'>acl master_servers {
+</span><span class='line'>    <span class="err">101</span>.<span class="err">33</span>.<span class="err">99</span>.<span class="err">66/32</span> <span class="err">;</span>
+</span><span class='line'><span class="err">};</span>
+</span><span class='line'><span class="nb">zone</span> <span class="s2">&quot;example1.com&quot;</span> {
+</span><span class='line'>    <span class="nb">type</span> slave;
+</span><span class='line'>    <span class="nb">file</span> <span class="s2">&quot;slaves/example1.com&quot;</span>;
+</span><span class='line'>    <span class="nb">masters</span> { master_servers; };
+</span><span class='line'>    <span class="err">allow-</span><span class="nb">transfer</span> { <span class="k">none</span>; };
+</span><span class='line'>    <span class="err">allow-</span><span class="nb">query</span> { <span class="k">any</span>; } ;
+</span><span class='line'>    <span class="err">allow-</span><span class="nb">notify</span> { master_servers; };
+</span><span class='line'><span class="err">};</span>
+</span><span class='line'><span class="nb">zone</span> <span class="s2">&quot;exampleone.com&quot;</span> {
+</span><span class='line'>  <span class="nb">type</span> slave;
+</span><span class='line'>  <span class="nb">file</span> <span class="s2">&quot;slaves/exampleone.com&quot;</span>;
+</span><span class='line'>  <span class="nb">masters</span> { master_servers; };
+</span><span class='line'>  <span class="err">allow-</span><span class="nb">transfer</span> { <span class="k">none</span>; };
+</span><span class='line'>  <span class="err">allow-</span><span class="nb">query</span> { <span class="k">any</span>; } ;
+</span><span class='line'>  <span class="err">allow-</span><span class="nb">notify</span> { master_servers; };
+</span><span class='line'><span class="err">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>THIS METHOD OF ZONE TRANSFER IS HIGHLY INSECURE AS IT USES IP as the basis of transfer. Malicious hackers can use IP Spoofing tricks to trick a DNS server into performing zone transfers. To mitigate this risk it is advised to use TSIG or Transaction signature which uses  a one-way hash function to provide authentication and data integrity.</p>
+
+<p>Seguimos entonces <a href="http://www.cyberciti.biz/faq/unix-linux-bind-named-configuring-tsig/">otra</a> guia.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>rndc-confgen -a hmac-md5 -k rndc-key -b 256
+</span><span class='line'>dnssec-keygen -a HMAC-MD5 -b 512 -n HOST rndc-key
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>@master</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">cd</span> /var/named/chroot/etc/
+</span><span class='line'>dnssec-keygen -a HMAC-MD5 -b 512 -n HOST rndc-key
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>cat Krndc-key.+157+32073.private
+</span><span class='line'>Private-key-format: v1.2
+</span><span class='line'>Algorithm: 157 <span class="o">(</span>HMAC_MD5<span class="o">)</span>
+</span><span class='line'>Key: GFivxZnevSPcNsgaGCc9RHasIzZFSEiKTtme0UIPnNiOZk6ZQ3kXuwXetS9iE+ynei2p5pkp4DUm33YiVICZlA<span class="o">==</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>/var/named/chroot/etc/rndc.key</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='aconf'><span class='line'><span class="nb">key</span> <span class="s2">&quot;TRANSFER&quot;</span> {
+</span><span class='line'>          <span class="nb">algorithm</span> hmac-md5;
+</span><span class='line'>          <span class="nb">secret</span> <span class="s2">&quot;GFivxZnevSPcNsgaGCc9RHasIzZFSEiKTtme0UIPnNiOZk6ZQ3kXuwXetS9iE+ynei2p5pkp4DUm33YiVICZlA==&quot;</span>;
+</span><span class='line'><span class="err">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>/etc/rndc.conf </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='aconf'><span class='line'><span class="nb">key</span> <span class="s2">&quot;TRANSFER&quot;</span> {
+</span><span class='line'>          <span class="nb">algorithm</span> hmac-md5;
+</span><span class='line'>          <span class="nb">secret</span> <span class="s2">&quot;GFivxZnevSPcNsgaGCc9RHasIzZFSEiKTtme0UIPnNiOZk6ZQ3kXuwXetS9iE+ynei2p5pkp4DUm33YiVICZlA==&quot;</span>;
+</span><span class='line'><span class="err">};</span>
+</span><span class='line'><span class="nb">options</span> {     default-key <span class="s2">&quot;TRANSFER&quot;</span>;   default-server <span class="m">127.0.0.1</span>;    default-port <span class="m">953</span>; };
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>/var/named/chroot/etc/named.conf</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='aconf'><span class='line'><span class="nb">include</span> <span class="s2">&quot;/etc/bind/rndc.key&quot;</span>;
+</span><span class='line'><span class="c"># Slave server IP # 1</span>
+</span><span class='line'><span class="nb">server</span> <span class="m">65.138.84.46</span> {
+</span><span class='line'>        <span class="nb">keys</span> {
+</span><span class='line'>                <span class="err">TRANSFER;</span>
+</span><span class='line'>    <span class="err">};</span>
+</span><span class='line'><span class="err">};</span>
+</span><span class='line'><span class="nb">controls</span> {
+</span><span class='line'>        <span class="nb">inet</span> <span class="m">127.0.0.1</span> port <span class="m">953</span>
+</span><span class='line'>                <span class="nb">allow</span> { <span class="m">127.0.0.1</span>; } keys { <span class="s2">&quot;TRANSFER&quot;</span>; };
+</span><span class='line'><span class="err">};</span>
+</span><span class='line'><span class="nb">options</span> {
+</span><span class='line'>    <span class="nb">directory</span>                <span class="s2">&quot;/var/named&quot;</span>; // the default
+</span><span class='line'>    <span class="err">pid-</span><span class="nb">file</span>                 <span class="s2">&quot;/var/run/named/named.pid&quot;</span>;
+</span><span class='line'>    <span class="err">dump-</span><span class="nb">file</span>                <span class="s2">&quot;data/cache_dump.db&quot;</span>;
+</span><span class='line'>    <span class="err">statistics-</span><span class="nb">file</span>          <span class="s2">&quot;data/named_stats.txt&quot;</span>;
+</span><span class='line'>    <span class="err">allow-</span><span class="nb">transfer</span> {<span class="s2">&quot;none&quot;</span>;};
+</span><span class='line'>    <span class="err">also-</span><span class="nb">notify</span> { <span class="m">65.138.84.46</span>; };
+</span><span class='line'>    <span class="nb">notify</span> no;
+</span><span class='line'><span class="err">};</span>
+</span><span class='line'><span class="nb">zone</span> <span class="s2">&quot;example1.com&quot;</span> {
+</span><span class='line'>    <span class="nb">type</span> master;
+</span><span class='line'>    <span class="nb">file</span> <span class="s2">&quot;data/example1.com&quot;</span>;
+</span><span class='line'>    <span class="err">allow-</span><span class="nb">transfer</span> { key TRANSFER; };
+</span><span class='line'>    <span class="err">allow-</span><span class="nb">query</span> { <span class="k">any</span>; } ;
+</span><span class='line'>    <span class="nb">notify</span> explicit;
+</span><span class='line'><span class="err">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">zone</span> <span class="s2">&quot;exampleone.com&quot;</span> {
+</span><span class='line'>  <span class="nb">type</span> master;
+</span><span class='line'>  <span class="nb">file</span> <span class="s2">&quot;data/exampleone.com&quot;</span>;
+</span><span class='line'>  <span class="err">allow-</span><span class="nb">transfer</span> { key TRANSFER; };
+</span><span class='line'>  <span class="err">allow-</span><span class="nb">query</span> { <span class="k">any</span>; } ;
+</span><span class='line'>  <span class="nb">notify</span> explicit;
+</span><span class='line'><span class="err">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>rndc reload
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>rndc reload
+</span><span class='line'>server reload successful
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>@slave</h2>
+
+<p>/var/named/chroot/etc/rndc.key
+key &#8220;TRANSFER&#8221; {</p>
+
+<pre><code>algorithm hmac-md5;
+secret "GFivxZnevSPcNsgaGCc9RHasIzZFSEiKTtme0UIPnNiOZk6ZQ3kXuwXetS9iE+ynei2p5pkp4DUm33YiVICZlA==";
+</code></pre>
+
+<p>};</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="sb">```</span>aconf /var/named/chroot/etc/named.conf
+</span><span class='line'>include <span class="s2">&quot;/etc/rndc.key&quot;</span>;
+</span><span class='line'>
+</span><span class='line'>controls <span class="o">{</span> inet 127.0.0.1 port 953 allow <span class="o">{</span> 127.0.0.1; <span class="o">}</span> keys <span class="o">{</span> <span class="s2">&quot;TRANSFER&quot;</span>; <span class="o">}</span>; <span class="o">}</span>;
+</span><span class='line'>
+</span><span class='line'>options <span class="o">{</span>
+</span><span class='line'>    // Put files that named is allowed to write in the data/ directory:
+</span><span class='line'>    directory                <span class="s2">&quot;/var/named&quot;</span>; // the default
+</span><span class='line'>    pid-file                 <span class="s2">&quot;/var/run/named/named.pid&quot;</span>;
+</span><span class='line'>    dump-file                <span class="s2">&quot;data/cache_dump.db&quot;</span>;
+</span><span class='line'>    statistics-file          <span class="s2">&quot;data/named_stats.txt&quot;</span>;
+</span><span class='line'>   /* memstatistics-file     <span class="s2">&quot;data/named_mem_stats.txt&quot;</span>; */
+</span><span class='line'>    allow-transfer <span class="o">{</span><span class="s2">&quot;none&quot;</span>;<span class="o">}</span>;
+</span><span class='line'><span class="o">}</span>;
+</span><span class='line'>
+</span><span class='line'>logging <span class="o">{</span>
+</span><span class='line'>    channel default_debug <span class="o">{</span>
+</span><span class='line'>            file <span class="s2">&quot;data/named.run&quot;</span>;
+</span><span class='line'>            severity dynamic;
+</span><span class='line'>    <span class="o">}</span>;
+</span><span class='line'><span class="o">}</span>;
+</span><span class='line'>
+</span><span class='line'><span class="c"># Master server IP</span>
+</span><span class='line'>server 101.33.99.66 <span class="o">{</span> keys <span class="o">{</span> TRANSFER; <span class="o">}</span>; <span class="o">}</span>;
+</span><span class='line'>
+</span><span class='line'>zone <span class="s2">&quot;example1.com&quot;</span> <span class="o">{</span>
+</span><span class='line'>    <span class="nb">type </span>slave;
+</span><span class='line'>    file <span class="s2">&quot;slaves/example1.com&quot;</span>;
+</span><span class='line'>    allow-transfer <span class="o">{</span> none; <span class="o">}</span>;
+</span><span class='line'>    allow-query <span class="o">{</span> any; <span class="o">}</span> ;
+</span><span class='line'>    masters <span class="o">{</span> 101.33.99.66; <span class="o">}</span>;
+</span><span class='line'>  allow-notify <span class="o">{</span> key secret-key; <span class="o">}</span>;
+</span><span class='line'><span class="o">}</span>;
+</span><span class='line'>zone <span class="s2">&quot;exampleone.com&quot;</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nb">type </span>slave;
+</span><span class='line'>  file <span class="s2">&quot;slaves/exampleone.com&quot;</span>;
+</span><span class='line'>    masters <span class="o">{</span> 101.33.99.66; <span class="o">}</span>;
+</span><span class='line'>  allow-notify <span class="o">{</span> key secret-key; <span class="o">}</span>;
+</span><span class='line'>  allow-transfer <span class="o">{</span> none; <span class="o">}</span>;
+</span><span class='line'>  allow-query <span class="o">{</span> any; <span class="o">}</span> ;
+</span><span class='line'><span class="o">}</span>;
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">osvaldo</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-01T16:45:00-03:00" pubdate data-updated="true">Mar 1<span>st</span>, 2012</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.devops.com.ar/blog/2012/03/01/transfiriendo-zonas-con-tsig/" data-via="devops_ar" data-counturl="http://www.devops.com.ar/blog/2012/03/01/transfiriendo-zonas-con-tsig/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/02/03/empezando-con-chef/" title="Previous Post: empezando con chef">&laquo; empezando con chef</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/03/05/instalando-blueprint-en-centos-5-dot-5/" title="Next Post: instalando blueprint en CentOS 5.5">instalando blueprint en CentOS 5.5 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">definiendo un smarthost en mac os x</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">usando https detras de un proxy reverso</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">borrando viejos builds en jenkins</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/07/permisos-en-directorio-www/">permisos en directorio www</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/configurando-jboss-6/">configurando jboss 6</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("devops_ar", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/devops_ar" class="twitter-follow-button" data-show-count="false">Follow @devops_ar</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - osvaldo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'devops-ar';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.devops.com.ar/blog/2012/03/01/transfiriendo-zonas-con-tsig/';
+        var disqus_url = 'http://www.devops.com.ar/blog/2012/03/01/transfiriendo-zonas-con-tsig/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,543 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>permisos en directorio www - devops-ar</title>
+  <meta name="author" content="osvaldo">
+
+  
+  <meta name="description" content="tl;dr Suele suceder que un equipo de desarrolladores necesita trabajar de manera conjunta sobre un mismo directorio. La solución es sencilla. 1
+2
+3
+4 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.devops.com.ar/blog/2012/08/07/permisos-en-directorio-www/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="devops-ar" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-5155520-9']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">devops-ar</a></h1>
+  
+    <h2>devops en castellano</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.devops.com.ar" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Permisos en Directorio Www</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-07T18:18:00-03:00" pubdate data-updated="true">Aug 7<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>tl;dr</h2>
+
+<p>Suele suceder que un equipo de desarrolladores necesita trabajar de manera conjunta sobre un mismo directorio.</p>
+
+<p>La solución es sencilla.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>chown -R root /var/www/html/
+</span><span class='line'>chmod 775  /var/www/html/
+</span><span class='line'>chgrp -R dev  /var/www/html/
+</span><span class='line'>chmod g+s   /var/www/html/
+</span><span class='line'>setfacl -d -m g::rwx /var/www/html
+</span><span class='line'>setfacl -d -m o::rx /var/www/html
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!-- more -->
+
+
+<h2>En detalle</h2>
+
+<p>Primero comprobamos que valores tiene umask.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@webserver ~<span class="o">]</span><span class="c"># su - john.doe</span>
+</span><span class='line'><span class="o">[</span>john.doe@webserver ~<span class="o">]</span><span class="nv">$ </span><span class="nb">umask</span> -S
+</span><span class='line'><span class="nv">u</span><span class="o">=</span>rwx,g<span class="o">=</span>rx,o<span class="o">=</span>rx
+</span><span class='line'><span class="o">[</span>john.doe@webserver ~<span class="o">]</span><span class="nv">$ </span>
+</span><span class='line'><span class="o">[</span>john.doe@webserver ~<span class="o">]</span><span class="nv">$ </span><span class="nb">umask</span>
+</span><span class='line'>0022
+</span><span class='line'><span class="o">[</span>john.doe@webserver ~<span class="o">]</span><span class="nv">$ </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Se utiliza como referencia <a href="http://www.cyberciti.biz/tips/understanding-linux-unix-umask-value-usage.html">este enlace</a>.</p>
+
+<p>Revisando como funcionan las distingas umask en los  permisos de archivos y directorios.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>john.doe@webserver tmp<span class="o">]</span><span class="nv">$ </span><span class="k">for </span>i in <span class="sb">`</span>seq 7<span class="sb">`</span> ; <span class="k">do </span>rm -fr hi foo ; <span class="nb">echo</span> <span class="s2">&quot;-- usando umask 00$i --&quot;</span> ; <span class="nb">umask </span>00<span class="nv">$i</span> ; mkdir hi ; touch foo ; ls -l | grep -v total;  <span class="k">done</span>
+</span><span class='line'>-- usando <span class="nb">umask </span>001 --
+</span><span class='line'>-rw-rw-rw- 1 john.doe users  0 Aug  7 15:30 foo
+</span><span class='line'>drwxrwxrw- 2 john.doe users 48 Aug  7 15:30 hi
+</span><span class='line'>-- usando <span class="nb">umask </span>002 --
+</span><span class='line'>-rw-rw-r-- 1 john.doe users  0 Aug  7 15:30 foo
+</span><span class='line'>drwxrwxr-x 2 john.doe users 48 Aug  7 15:30 hi
+</span><span class='line'>-- usando <span class="nb">umask </span>003 --
+</span><span class='line'>-rw-rw-r-- 1 john.doe users  0 Aug  7 15:30 foo
+</span><span class='line'>drwxrwxr-- 2 john.doe users 48 Aug  7 15:30 hi
+</span><span class='line'>-- usando <span class="nb">umask </span>004 --
+</span><span class='line'>-rw-rw--w- 1 john.doe users  0 Aug  7 15:30 foo
+</span><span class='line'>drwxrwx-wx 2 john.doe users 48 Aug  7 15:30 hi
+</span><span class='line'>-- usando <span class="nb">umask </span>005 --
+</span><span class='line'>-rw-rw--w- 1 john.doe users  0 Aug  7 15:30 foo
+</span><span class='line'>drwxrwx-w- 2 john.doe users 48 Aug  7 15:30 hi
+</span><span class='line'>-- usando <span class="nb">umask </span>006 --
+</span><span class='line'>-rw-rw---- 1 john.doe users  0 Aug  7 15:30 foo
+</span><span class='line'>drwxrwx--x 2 john.doe users 48 Aug  7 15:30 hi
+</span><span class='line'>-- usando <span class="nb">umask </span>007 --
+</span><span class='line'>-rw-rw---- 1 john.doe users  0 Aug  7 15:30 foo
+</span><span class='line'>drwxrwx--- 2 john.doe users 48 Aug  7 15:30 hi
+</span><span class='line'><span class="o">[</span>john.doe@webserver tmp<span class="o">]</span><span class="nv">$ </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>El objetivo es crear una carpeta <code>/var/www/html</code> donde todos los desarrolladores puedan trabajar. Para esto, se creo el grupo <b>dev</b> y se adicionaron todos los desarrolladores al mismo.  Primero se prueba en directorio que creamos temporalmente <code>/var/www/shared</code>.</p>
+
+<p>Hay que activar el sticky bit en el directorio (<code>chmod g+s shared</code>). Esto es lo que garantiza que los nuevos archivos y directorios, sean creados con el mismo grupo del directorio padre. Luego, se asigna el grupo <b>dev</b> como grupo por defecto para ese directorio (<code>setfacl -Rm d:g:dev:rwX shared</code>).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@webserver www<span class="o">]</span><span class="c"># chmod g+s shared</span>
+</span><span class='line'><span class="o">[</span>root@webserver www<span class="o">]</span><span class="c"># getfacl shared</span>
+</span><span class='line'><span class="c"># file: shared</span>
+</span><span class='line'><span class="c"># owner: root</span>
+</span><span class='line'><span class="c"># group: root</span>
+</span><span class='line'><span class="c"># flags: -s-</span>
+</span><span class='line'>user::rwx
+</span><span class='line'>group::r-x
+</span><span class='line'>other::r-x
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>root@webserver www<span class="o">]</span><span class="c"># </span>
+</span><span class='line'><span class="o">[</span>root@webserver www<span class="o">]</span><span class="c"># setfacl -Rm d:g:dev:rwX shared</span>
+</span><span class='line'><span class="o">[</span>root@webserver www<span class="o">]</span><span class="c"># getfacl shared</span>
+</span><span class='line'><span class="c"># file: shared</span>
+</span><span class='line'><span class="c"># owner: root</span>
+</span><span class='line'><span class="c"># group: root</span>
+</span><span class='line'><span class="c"># flags: -s-</span>
+</span><span class='line'>user::rwx
+</span><span class='line'>group::r-x
+</span><span class='line'>other::r-x
+</span><span class='line'>default:user::rwx
+</span><span class='line'>default:group::r-x
+</span><span class='line'>default:group:dev:rwx
+</span><span class='line'>default:mask::rwx
+</span><span class='line'>default:other::r-x
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>root@webserver www<span class="o">]</span><span class="c"># </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>En resumen, son estos los comandos.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>rm -fr /var/www/shared
+</span><span class='line'>mkdir /var/www/shared
+</span><span class='line'>chmod 775 /var/www/shared
+</span><span class='line'>chgrp dev /var/www/shared
+</span><span class='line'>chmod g+s /var/www/shared
+</span><span class='line'>setfacl -d -m g::rwx /var/www/shared
+</span><span class='line'>setfacl -d -m o::rx /var/www/shared
+</span><span class='line'>su - john.doe
+</span><span class='line'>touch /var/www/shared/foo
+</span><span class='line'>ls -al /var/www/shared
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Asi quedan los permisos de un archivo creado por un desarrollador.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>john.doe@webserver ~<span class="o">]</span><span class="nv">$ </span>ls -al /var/www/shared
+</span><span class='line'>total 20
+</span><span class='line'>drwxrwsr-x+ 2 root         dev  4096 Aug  7 15:47 .
+</span><span class='line'>drwxr-xr-x  8 root         root 4096 Aug  7 15:47 ..
+</span><span class='line'>-rw-rw-r--  1 john.doe dev     0 Aug  7 15:47 foo
+</span><span class='line'><span class="o">[</span>john.doe@webserver ~<span class="o">]</span><span class="nv">$ </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Ahora, se realiza la configuración en el directorio html.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>chown -R root /var/www/html/
+</span><span class='line'>chmod 775  /var/www/html/
+</span><span class='line'>chgrp -R dev  /var/www/html/
+</span><span class='line'>chmod g+s   /var/www/html/
+</span><span class='line'>setfacl -d -m g::rwx /var/www/html
+</span><span class='line'>setfacl -d -m o::rx /var/www/html
+</span><span class='line'><span class="c"># para un sitio en wordpress</span>
+</span><span class='line'>chown -R apache /var/www/html/wp-content/uploads
+</span><span class='line'>chown -R apache /var/www/html/wp-content/themes
+</span><span class='line'>
+</span><span class='line'>find /var/www/html -type d -exec chmod g+s <span class="o">{}</span> <span class="se">\;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Como era un sitio de wordpress, hacemos unos ajustes finales.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@webserver html<span class="o">]</span><span class="c"># ls -al wp-content/</span>
+</span><span class='line'>total 56
+</span><span class='line'>drwxrwxr-x  6 root   dev 4096 Jul  6 16:13 .
+</span><span class='line'>drwxrwsr-x+ 5 root   dev 4096 Jul 11 10:10 ..
+</span><span class='line'>drwxr-xr-x  2 root   dev 4096 Jul  4 11:20 acme
+</span><span class='line'>-rw-rw-r--  1 root   dev   30 May  4  2007 index.php
+</span><span class='line'>drwxrwxr-x  4 root   dev 4096 Jul  6 11:06 plugins
+</span><span class='line'>drwxrwxr-x  5 apache dev 4096 Jul  3 15:51 themes
+</span><span class='line'>drwxrwxr-x  3 apache dev 4096 Jul  3 15:33 uploads
+</span><span class='line'><span class="o">[</span>root@webserver html<span class="o">]</span><span class="c"># find /var/www/html -type d -exec chmod g+s {} \;</span>
+</span><span class='line'><span class="o">[</span>root@webserver html<span class="o">]</span><span class="c"># ls -al wp-content/</span>
+</span><span class='line'>total 56
+</span><span class='line'>drwxrwsr-x  6 root   dev 4096 Jul  6 16:13 .
+</span><span class='line'>drwxrwsr-x+ 5 root   dev 4096 Jul 11 10:10 ..
+</span><span class='line'>drwxr-sr-x  2 root   dev 4096 Jul  4 11:20 acme
+</span><span class='line'>-rw-rw-r--  1 root   dev   30 May  4  2007 index.php
+</span><span class='line'>drwxrwsr-x  4 root   dev 4096 Jul  6 11:06 plugins
+</span><span class='line'>drwxrwsr-x  5 apache dev 4096 Jul  3 15:51 themes
+</span><span class='line'>drwxrwsr-x  3 apache dev 4096 Jul  3 15:33 uploads
+</span><span class='line'><span class="o">[</span>root@webserver html<span class="o">]</span><span class="c"># </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">osvaldo</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-07T18:18:00-03:00" pubdate data-updated="true">Aug 7<span>th</span>, 2012</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.devops.com.ar/blog/2012/08/07/permisos-en-directorio-www/" data-via="devops_ar" data-counturl="http://www.devops.com.ar/blog/2012/08/07/permisos-en-directorio-www/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/06/14/configurando-jboss-6/" title="Previous Post: configurando jboss 6">&laquo; configurando jboss 6</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/" title="Next Post: borrando viejos builds en jenkins">borrando viejos builds en jenkins &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">definiendo un smarthost en mac os x</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">usando https detras de un proxy reverso</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">borrando viejos builds en jenkins</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/07/permisos-en-directorio-www/">permisos en directorio www</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/configurando-jboss-6/">configurando jboss 6</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("devops_ar", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/devops_ar" class="twitter-follow-button" data-show-count="false">Follow @devops_ar</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - osvaldo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'devops-ar';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.devops.com.ar/blog/2012/08/07/permisos-en-directorio-www/';
+        var disqus_url = 'http://www.devops.com.ar/blog/2012/08/07/permisos-en-directorio-www/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

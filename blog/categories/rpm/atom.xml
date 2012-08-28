@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: rpm | devops-ar]]></title>
+  <link href="http://www.devops.com.ar/blog/categories/rpm/atom.xml" rel="self"/>
+  <link href="http://www.devops.com.ar/"/>
+  <updated>2012-08-27T23:02:40-03:00</updated>
+  <id>http://www.devops.com.ar/</id>
+  <author>
+    <name><![CDATA[osvaldo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[creating an rpm package from on tgz file]]></title>
+    <link href="http://www.devops.com.ar/blog/2011/12/17/creating-an-rpm-package-from-on-a-tgz-file/"/>
+    <updated>2011-12-17T15:26:00-03:00</updated>
+    <id>http://www.devops.com.ar/blog/2011/12/17/creating-an-rpm-package-from-on-a-tgz-file</id>
+    <content type="html"><![CDATA[<p><em>disclaimer: this is only for creating an rpm for installing a set of files, no compiling, just a bunch of file being copied into a server.</em></p>
+
+<p>Starting from a tgz file, an rpm package will be created. Sometimes, a tgz file is quicker/easier to use. However, in the long run, sticking to a package management system for handling the installation of applications on a system will pay off for sure.</p>
+
+<p>Creating an rpm package from a tgz file isn't that hard as it's shown below.</p>
+
+<h3>setting up rpm build environment</h3>
+
+<p>Let's start by setting a dev environment, also, setting some variables which will be handly at the rpm creation process.</p>
+
+<p><code>sh
+sudo yum install rpm-build
+mkdir -p ~/rpm/{BUILD,RPMS,SOURCES,SRPMS,SPECS,tmp}
+mkdir ~/rpm/RPMS/{i386,i586,i686,noarch}
+echo '%packager Osvaldo &lt;osvaldo@devops.com.ar&gt;' &gt;
+~/.rpmmacros
+echo '%_topdir %(echo $HOME)/rpm' &gt;&gt; ~/.rpmmacros
+echo '%_tmppath %(echo $HOME)/rpm/tmp' &gt;&gt; ~/.rpmmacros
+echo "%_query_all_fmt %%{name}-%%{version}-%%{release}.%%{arch}" &gt;&gt;
+~/.rpmmacros
+</code></p>
+
+<p>Since we're be creating an rpm file just for installing a set of already existing files, it will only be needed three steps.</p>
+
+<ol>
+<li>First to place all of the files to be included on the rpm file under a directory in the BUILD directory.</li>
+<li>Second, to create the spec file</li>
+<li>and last, to execute the rpmbuild command.</li>
+</ol>
+
+
+<h3>using yum commands</h3>
+
+<p>Here, commands are shown for how to search for the file and to install the package.</p>
+
+<p>```
+-bash-3.2$ yum search glassfish
+Loaded plugins: downloadonly, fastestmirror
+================= Matched: glassfish =================
+glassfish-loadbalancer.i386 : Sun GlassFish Enterprise Server Load Balancing Plugin
+-bash-3.2$</p>
+
+<p>-bash-3.2$ sudo yum install glassfish-loadbalancer
+Loaded plugins: downloadonly, fastestmirror
+Loading mirror speeds from cached hostfile
+* base: mirror.cogentco.com
+* epel: mirror.hiwaay.net
+* extras: mirror.flhsi.com
+* updates: mirrors.igsobe.com
+Setting up Install Process
+Package glassfish-loadbalancer-2.1.1-r2.i386 already installed and
+latest version
+Nothing to do
+-bash-3.2$
+-bash-3.2$ rpm -qa | grep glassfish
+glassfish-loadbalancer-2.1.1-r2.i386
+-bash-3.2$
+```
+Actually, the package had been already installed, the process remains the same ;).</p>
+
+<p>Now, instead of wondering how certain file came from, those belonging to this package will be fully identified and accesible (and controllable) via the package management system. For example, now we list exactly which files were installed by that rpm file (try that with a tgz file ... asumming you delete it, well, it wasn't needed any more, right? ;)</p>
+
+<p><code>sh
+-bash-3.2$ rpm -ql glassfish-loadbalancer
+/opt/webserver7/lib/libicudata.so.2
+/opt/webserver7/lib/libicui18n.so.2
+/opt/webserver7/lib/libicuuc.so.2
+/opt/webserver7/lib/libxerces-c.so
+/opt/webserver7/plugins/lbplugin/bin/libpassthrough.so
+/opt/webserver7/plugins/lbplugin/errorpages/default-error.html
+/opt/webserver7/plugins/lbplugin/errorpages/sun-http-lberror.html
+/opt/webserver7/plugins/lbplugin/resource/LBPluginDefault_root.res
+/opt/webserver7/plugins/lbplugin/resource/LBPlugin_root.res
+-bash-3.2$
+</code></p>
+
+<p>Where that file came from? Just use <code>rpm -qf <filename with full path></code> and you'll have the answer (again, try that on an file that came from a tgz file, ah, which tgz file btw ;).</p>
+
+<h3>extracting the files from the rpm package</h3>
+
+<p>Just in case someone needs the tgz file, here's how to convert the rpm file into a tgz file (pretty easy this way around ;) and extract it to the final destination as it had been installed using the tgz file.</p>
+
+<p><code>sh
+rpm2cpio glassfish-loadbalancer-2.1.1-r1.i386.rpm | cpio -idmv
+tar zcf glassfish-loadbalancer-2.1.1-r1.tgz opt/
+</code></p>
+
+<h3>Notes</h3>
+
+<p>First time the rpm file was created, during installation the following error showed up:</p>
+
+<p>```sh
+[root@cpweb1 i386]# rpm -i loadbalancer-2.2-1.i386.rpm
+error: Failed dependencies:</p>
+
+<pre><code>   libns-httpd40.so is needed by loadbalancer-2.2-1.i386
+</code></pre>
+
+<p>[root@cpweb1 i386]#
+```</p>
+
+<p>Interesting thing to know about rpm file creation is, there's an automatic dependency resolution process being handled automatically by the package management system. When you first create the rpm file, the included files are checked for dependencies, which are then, declared on the metadata of the rpm file. Then, at installation time, those dependencies are checked and if not already fullfilled, a warning message will show up (like it happened on this case). Usually, this wouldn't be a problem, since that  dependency would had been already provided by another installed package or, the yum command will find out which package would satisfy the dependency and suggest to install it. Sadly enough, we were dealing with a mixed scenario, one where manual installation were being done at the same time. This particular dependency had been already been satisfied because of a manually installed package. So the real issue at this point was how to force the package management system into doing something he was created
+to avoid in the first place.</p>
+
+<p>Exceptions, while rare, do exists. And good systems are prepared to deal with such situations. <strong>The AutoReqProv</strong> tag is used to control the automatic dependency processing performed when the package is being built. To disable automatic dependency processing, add the following line to the spec file:</p>
+
+<p><code>
+AutoReqProv: no
+</code></p>
+
+<h3>Files</h3>
+
+<p>In order to automate things (we're supposed to be lazy, right? ;) I use ol' make command, so the following Makefile make my life easier. I do rpm work on my workstation, then, upload the new packages to the repo server. So, What it takes?: <code>make all</code>.</p>
+
+<p>```make Makefile
+all:</p>
+
+<pre><code>   rpmbuild -ba glassfish-loadbalancer-2.1.1.spec
+   sudo cp ../RPMS/i386/glassfish-loadbalancer-2.1.1-r*.i386.rpm /var/www/repo/i386
+   sudo createrepo /var/www/repo/i386
+   scp ../RPMS/i386/glassfish-loadbalancer-2.1.1-r*.i386.rpm repo.example.com:/var/www/html/centos/5/netsol/i386
+   ssh repo.example.com createrepo /var/www/html/centos/5/netsol/i386/
+   ssh repo.example.com createrepo /var/www/html/centos/5/netsol/i686/
+</code></pre>
+
+<p>```</p>
+
+<p>The spec file used to create the rpm file.</p>
+
+<p>```yaml glassfish-loadbalancer-2.1.1.spec
+%define name    glassfish-loadbalancer
+%define version 2.1.1
+%define release r2</p>
+
+<p>Summary: Sun GlassFish Enterprise Server Load Balancing Plugin
+Name: %{name}
+Version: %{version}
+Release: %{release}</p>
+
+<h1>Copyright: GPL</h1>
+
+<p>Group: ACME/Networking/Daemons
+BuildArch: i386</p>
+
+<h1>BuildRoot: %{_builddir}/%{name}-%{version}-%{release}</h1>
+
+<p>BuildRoot: %{_builddir}/%{name}-%{version}
+URL: http://www.oracle.com/
+Distribution: whatever
+Vendor: Oracle
+Packager: %{packager}
+Provides: Load Balancer Plugin</p>
+
+<h1>Requires:</h1>
+
+<p>AutoReqProv: no
+License: Restricted</p>
+
+<p>%description
+This package contains the  Sun GlassFish Enterprise Server Load
+Balancing Plugin.</p>
+
+<p>%prep
+exit 0</p>
+
+<p>%build
+exit 0</p>
+
+<p>%install
+exit 0</p>
+
+<p>%clean
+exit 0</p>
+
+<p>%files
+%defattr(-,root,root)
+/opt/webserver7/plugins/lbplugin/bin/libpassthrough.so
+/opt/webserver7/plugins/lbplugin/errorpages/default-error.html
+/opt/webserver7/plugins/lbplugin/errorpages/sun-http-lberror.html
+/opt/webserver7/plugins/lbplugin/resource/LBPluginDefault_root.res
+/opt/webserver7/plugins/lbplugin/resource/LBPlugin_root.res
+/opt/webserver7/lib/libicudata.so.2
+/opt/webserver7/lib/libicui18n.so.2
+/opt/webserver7/lib/libicuuc.so.2
+/opt/webserver7/lib/libxerces-c.so
+```</p>
+
+<p>testing with differente spec values</p>
+
+<p>```diff diff loadbalancer-2.2.1.spec glassfish-loadbalancer-2.1.1.spec
+1,3c1,3
+&lt; %define       name    loadbalancer
+&lt; %define version       2.2</p>
+
+<h2>&lt; %define release       1</h2>
+
+<blockquote><p>%define       name    glassfish-loadbalancer
+%define version       2.1.1
+%define release       r2
+10c10</p>
+
+<h2>&lt; Group: Amusements/Graphics</h2>
+
+<p>Group: Netsol/Networking/Daemons
+12c12,13</p>
+
+<h2>&lt; BuildRoot: %{_builddir}/%{name}-%{version}.%{release}</h2>
+
+<h1>BuildRoot: %{_builddir}/%{name}-%{version}-%{release}</h1>
+
+<p>BuildRoot: %{_builddir}/%{name}-%{version}
+18a20
+AutoReqProv: no
+-bash-3.2$
+```</p></blockquote>
+
+<p>the final directory tree (including trash = i mean, dev files, no time for cleaning it up)</p>
+
+<p><code>``sh
+|-- BUILD
+|  </code>-- glassfish-loadbalancer-2.1.1
+|       <code>-- opt
+|          </code>-- webserver7
+|               |-- lib
+|               |   |-- libicudata.so.2
+|               |   |-- libicui18n.so.2
+|               |   |-- libicuuc.so.2
+|               |   <code>-- libxerces-c.so
+|              </code>-- plugins
+|                   <code>-- lbplugin
+|                       |-- bin
+|                       |  </code>-- libpassthrough.so
+|                       |-- errorpages
+|                       |   |-- default-error.html
+|                       |   <code>-- sun-http-lberror.html
+|                      </code>-- resource
+|                           |-- LBPluginDefault_root.res
+|                           <code>-- LBPlugin_root.res
+|-- RPMS
+|   |-- i386
+|   |   |-- glassfish-2.1.1-loadbalancer-2.1-1.i386.rpm
+|   |   |-- glassfish-loadbalancer-2.1-1.i386.rpm
+|   |   |-- glassfish-loadbalancer-2.1.1-r0.i386.rpm
+|   |   |-- glassfish-loadbalancer-2.1.1-r1.i386.rpm
+|   |   |-- glassfish-loadbalancer-2.1.1-r2.i386.rpm
+|   |  </code>-- loadbalancer-2.2-1.i386.rpm
+|   |-- i586
+|   |-- i686|-- BUILD
+|   <code>-- glassfish-loadbalancer-2.1.1
+|      </code>-- opt
+|           <code>-- webserver7
+|               |-- lib
+|               |   |-- libicudata.so.2
+|               |   |-- libicui18n.so.2
+|               |   |-- libicuuc.so.2
+|               |  </code>-- libxerces-c.so
+|               <code>-- plugins
+|                  </code>-- lbplugin
+|                       |-- bin
+|                       |   <code>-- libpassthrough.so
+|                       |-- errorpages
+|                       |   |-- default-error.html
+|                       |  </code>-- sun-http-lberror.html
+|                       <code>-- resource
+|                           |-- LBPluginDefault_root.res
+|                          </code>-- LBPlugin_root.res
+|-- RPMS
+|   |-- i386
+|   |   |-- glassfish-2.1.1-loadbalancer-2.1-1.i386.rpm
+|   |   |-- glassfish-loadbalancer-2.1-1.i386.rpm
+|   |   |-- glassfish-loadbalancer-2.1.1-r0.i386.rpm
+|   |   |-- glassfish-loadbalancer-2.1.1-r1.i386.rpm
+|   |   |-- glassfish-loadbalancer-2.1.1-r2.i386.rpm
+|   |   <code>-- loadbalancer-2.2-1.i386.rpm
+|   |-- i586
+|   |-- i686
+|  </code>-- noarch
+|-- SOURCES
+|-- SPECS
+|   |-- Makefile
+|   |-- glassfish-loadbalancer-2.1.1.spec
+|   <code>-- loadbalancer-2.2.1.spec
+|-- SRPMS
+|   |-- glassfish-2.1.1-loadbalancer-2.1-1.src.rpm
+|   |-- glassfish-loadbalancer-2.1-1.src.rpm
+|   |-- glassfish-loadbalancer-2.1.1-r0.src.rpm
+|   |-- glassfish-loadbalancer-2.1.1-r1.src.rpm
+|   |-- glassfish-loadbalancer-2.1.1-r2.src.rpm
+|  </code>-- loadbalancer-2.2-1.src.rpm
+`-- tmp</p>
+
+<p>19 directories, 24 files</p>
+
+<p>```</p>
+
+<h3>Some handy links</h3>
+
+<ul>
+<li><a href="http://www.lamolabs.org/blog/164/centos-rpm-tutorial-1/">http://www.lamolabs.org/blog/164/centos-rpm-tutorial-1/</a></li>
+<li><a href="http://wiki.centos.org/HowTos/SetupRpmBuildEnvironment">http://wiki.centos.org/HowTos/SetupRpmBuildEnvironment</a></li>
+<li><a href="http://wiki.centos.org/TipsAndTricks/YumAndRPM">http://wiki.centos.org/TipsAndTricks/YumAndRPM</a></li>
+<li><a href="http://ramblings.narrabilis.com/wp/creating-a-yum-repository-repo-and-creating-a-yum-group-to-install-kickstart/">http://ramblings.narrabilis.com/wp/creating-a-yum-repository-repo-and-creating-a-yum-group-to-install-kickstart/</a></li>
+<li><a href="http://www.tim-riemenschneider.de/linux/rpmbook/node310.html">http://www.tim-riemenschneider.de/linux/rpmbook/node310.html</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

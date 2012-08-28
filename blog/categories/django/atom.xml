@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: django | devops-ar]]></title>
+  <link href="http://www.devops.com.ar/blog/categories/django/atom.xml" rel="self"/>
+  <link href="http://www.devops.com.ar/"/>
+  <updated>2012-08-27T23:02:40-03:00</updated>
+  <id>http://www.devops.com.ar/</id>
+  <author>
+    <name><![CDATA[osvaldo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Usando python con virtualenv ]]></title>
+    <link href="http://www.devops.com.ar/blog/2011/11/26/usando-python-con-virtualenv/"/>
+    <updated>2011-11-26T00:08:00-03:00</updated>
+    <id>http://www.devops.com.ar/blog/2011/11/26/usando-python-con-virtualenv</id>
+    <content type="html"><![CDATA[<p>Una buena introducción se puede encontrar aca en los siguientes posts, uno en <a href="http://www.saltycrane.com/blog/2009/05/notes-using-pip-and-virtualenv-django/">inglés</a> y otro en <a href="http://elweb.co/uncategorized/django-deployment-3-virtualenv-virtualenvwrapper-pip/">castellano</a>.</p>
+
+<p>Sistemas Operativos como CentOS o Gentoo hacen uso de python para sus herramientas de gestión de paquetes, no es recomendable modificar manualmente la versión de python o jugar con las versiones de los módulos. Pero puede suceder que nos haga falta utilizar una versión superior de python o cierto módulo para un proyecto en el que estemos trabajando. En este caso, virtualenv es una solución.</p>
+
+<p>Virtualenv nos permite tener una instalacion de python aislada de la versión del sistema. Junto con esta versión de python, se pueden instalar los módulos que se necesiten sin que esto influya en absoluto en la instalación de python del sistema.</p>
+
+<p>El primer paso seria instalar algunos paquetes que vamos a necesitar. Como estamos trabajando sobre Debian 6 Squeeze, apt-get es nuestro amigo. Utilizamos sudo porque nunca trabajamos como root, correcto? :P</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get install python-setuptools python-dev build-essential&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;h1>export http_proxy="http://proxy.example.com:3128/"&lt;/h1>
+</span><span class='line'>
+</span><span class='line'>&lt;p>sudo easy_install -U pip
+</span><span class='line'>sudo pip install -U virtualenv
+</span><span class='line'>sudo easy_install -U virtualenvwrapper</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>El siguiente paso sería crear la carpeta donde vamos a guardar nuestro proyecto. Tambien nos aseguramos de que cada vez que creemos una sesion de trabajo, las variables de entorno requeridas sean creadas. Con el comando mkvirtualenv creamos el entorno que vamos a utilizar.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mkdir -p ~/Sites/.virtualenvs/status.devops.com.ar
+</span><span class='line'>cat >> ~/.bashrc &lt;&lt;EOF
+</span><span class='line'>export WORKON_HOME=$HOME/Sites/.virtualenvs
+</span><span class='line'>source /usr/local/bin/virtualenvwrapper.sh
+</span><span class='line'>EOF
+</span><span class='line'>mkvirtualenv --no-site-packages --distribute  status.devops.com.ar</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>En la consola se obtendría algo similar a lo siguiente.</p>
+
+<p><code>
+osvaldo@vostro:~$ mkvirtualenv --no-site-packages  --distribute  status.devops.com.ar
+New python executable in status.devops.com.ar/bin/python
+Installing distribute....................................................................................................................................................................................done.
+Installing pip...............done.
+virtualenvwrapper.user_scripts creating /home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/predeactivate
+virtualenvwrapper.user_scripts creating /home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/postdeactivate
+virtualenvwrapper.user_scripts creating /home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/preactivate
+virtualenvwrapper.user_scripts creating /home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/postactivate
+virtualenvwrapper.user_scripts creating /home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/get_env_details
+</code></p>
+
+<p>Para probar, utilizamos un interesante dashboard creado por la gente de discus.com utilizando Django: <a href="http://code.disqus.com/code/projects/overseer.html">overseer</a></p>
+
+<p>Se puede descargar overseer desde github o simplemente instalarlo utilizando pip.</p>
+
+<p>El comando (workon) nos permite acceder al entorno aislado recién creado. Una vez dentro del mismo, podemos trabajar sin relación con el python o los módulos del sistema, solo lo que haya dentro de ese entorno.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>workon status.devops.com.ar
+</span><span class='line'>mkdir -p ~/Sites/status_devops/requirements/
+</span><span class='line'>cat &gt; ~/Sites/status_devops/requirements/requirements.txt &amp;lt;&amp;lt;EOF
+</span><span class='line'>django
+</span><span class='line'>EOF
+</span><span class='line'>pip install -r ~/Sites/status_devops/requirements/requirements.txt
+</span><span class='line'>pip install overseer
+</span><span class='line'>python manage.py syncdb
+</span><span class='line'>./manage.py migrate overseer
+</span><span class='line'>python manage.py runserver
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Una vez dentro del entorno podemos comprobar que el binario de python que se esta utilizando es él que instalamos dentro de dicho entorno y no él del sistem.</p>
+
+<p>```
+osvaldo@vostro:~$ workon status.devops.com.ar
+(status.devops.com.ar)osvaldo@vostro:~$
+(status.devops.com.ar)osvaldo@vostro:~$ which python
+/home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/python
+(status.devops.com.ar)osvaldo@vostro:~$ cd ~/Sites/status_devops/example_project
+(status.devops.com.ar)osvaldo@vostro:~/Sites/status_devops/example_project$ python manage.py runserver
+Validating models...
+0 errors found</p>
+
+<p>Django version 1.2.4, using settings 'example_project.settings'
+Running django-devserver 0.3.1
+Threaded django server is running at http://127.0.0.1:8000/
+Quit the server with CONTROL-C.
+```</p>
+
+<p>Y el sitio se encuentra disponible para recibir consultas a traves de la url que recién se habilito.</p>
+
+<p><code>
+http://127.0.0.1:8000/
+</code></p>
+
+<p>Una vez terminado el trabajo en el entorno, lo desactivamos para regresar a nuestro entorno habitual con el siguiente comando.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>deactivate</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>et voila!</p>
+]]></content>
+  </entry>
+  
+</feed>

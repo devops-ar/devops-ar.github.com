@@ -1,0 +1,400 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Usando python con virtualenv  - devops-ar</title>
+  <meta name="author" content="osvaldo">
+
+  
+  <meta name="description" content="Una buena introducción se puede encontrar aca en los siguientes posts, uno en inglés y otro en castellano. Sistemas Operativos como CentOS o Gentoo &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.devops.com.ar/blog/2011/11/26/usando-python-con-virtualenv/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="devops-ar" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-5155520-9']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">devops-ar</a></h1>
+  
+    <h2>devops en castellano</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.devops.com.ar" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Usando Python Con Virtualenv</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-11-26T00:08:00-03:00" pubdate data-updated="true">Nov 26<span>th</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Una buena introducción se puede encontrar aca en los siguientes posts, uno en <a href="http://www.saltycrane.com/blog/2009/05/notes-using-pip-and-virtualenv-django/">inglés</a> y otro en <a href="http://elweb.co/uncategorized/django-deployment-3-virtualenv-virtualenvwrapper-pip/">castellano</a>.</p>
+
+<p>Sistemas Operativos como CentOS o Gentoo hacen uso de python para sus herramientas de gestión de paquetes, no es recomendable modificar manualmente la versión de python o jugar con las versiones de los módulos. Pero puede suceder que nos haga falta utilizar una versión superior de python o cierto módulo para un proyecto en el que estemos trabajando. En este caso, virtualenv es una solución.</p>
+
+<p>Virtualenv nos permite tener una instalacion de python aislada de la versión del sistema. Junto con esta versión de python, se pueden instalar los módulos que se necesiten sin que esto influya en absoluto en la instalación de python del sistema.</p>
+
+<p>El primer paso seria instalar algunos paquetes que vamos a necesitar. Como estamos trabajando sobre Debian 6 Squeeze, apt-get es nuestro amigo. Utilizamos sudo porque nunca trabajamos como root, correcto? :P</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get install python-setuptools python-dev build-essential
+</span><span class='line'># export http_proxy="http://proxy.example.com:3128/"
+</span><span class='line'>sudo easy_install -U pip
+</span><span class='line'>sudo pip install -U virtualenv
+</span><span class='line'>sudo easy_install -U virtualenvwrapper</span></code></pre></td></tr></table></div></figure>
+
+
+<p>El siguiente paso sería crear la carpeta donde vamos a guardar nuestro proyecto. Tambien nos aseguramos de que cada vez que creemos una sesion de trabajo, las variables de entorno requeridas sean creadas. Con el comando mkvirtualenv creamos el entorno que vamos a utilizar.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mkdir -p ~/Sites/.virtualenvs/status.devops.com.ar
+</span><span class='line'>cat >> ~/.bashrc &lt;&lt;EOF
+</span><span class='line'>export WORKON_HOME=$HOME/Sites/.virtualenvs
+</span><span class='line'>source /usr/local/bin/virtualenvwrapper.sh
+</span><span class='line'>EOF
+</span><span class='line'>mkvirtualenv --no-site-packages --distribute  status.devops.com.ar</span></code></pre></td></tr></table></div></figure>
+
+
+<p>En la consola se obtendría algo similar a lo siguiente.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>osvaldo@vostro:~$ mkvirtualenv --no-site-packages  --distribute  status.devops.com.ar 
+</span><span class='line'>New python executable in status.devops.com.ar/bin/python
+</span><span class='line'>Installing distribute....................................................................................................................................................................................done.
+</span><span class='line'>Installing pip...............done.
+</span><span class='line'>virtualenvwrapper.user_scripts creating /home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/predeactivate
+</span><span class='line'>virtualenvwrapper.user_scripts creating /home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/postdeactivate
+</span><span class='line'>virtualenvwrapper.user_scripts creating /home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/preactivate
+</span><span class='line'>virtualenvwrapper.user_scripts creating /home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/postactivate
+</span><span class='line'>virtualenvwrapper.user_scripts creating /home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/get_env_details</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Para probar, utilizamos un interesante dashboard creado por la gente de discus.com utilizando Django: <a href="http://code.disqus.com/code/projects/overseer.html">overseer</a></p>
+
+<p>Se puede descargar overseer desde github o simplemente instalarlo utilizando pip.</p>
+
+<p>El comando (workon) nos permite acceder al entorno aislado recién creado. Una vez dentro del mismo, podemos trabajar sin relación con el python o los módulos del sistema, solo lo que haya dentro de ese entorno.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>workon status.devops.com.ar
+</span><span class='line'>mkdir -p ~/Sites/status_devops/requirements/
+</span><span class='line'>cat &gt; ~/Sites/status_devops/requirements/requirements.txt <span class="s">&lt;&lt;EOF</span>
+</span><span class='line'><span class="s">django</span>
+</span><span class='line'><span class="s">EOF</span>
+</span><span class='line'>pip install -r ~/Sites/status_devops/requirements/requirements.txt
+</span><span class='line'>pip install overseer
+</span><span class='line'>python manage.py syncdb
+</span><span class='line'>./manage.py migrate overseer
+</span><span class='line'>python manage.py runserver
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Una vez dentro del entorno podemos comprobar que el binario de python que se esta utilizando es él que instalamos dentro de dicho entorno y no él del sistem.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>osvaldo@vostro:~$ workon status.devops.com.ar
+</span><span class='line'>(status.devops.com.ar)osvaldo@vostro:~$ 
+</span><span class='line'>(status.devops.com.ar)osvaldo@vostro:~$ which python
+</span><span class='line'>/home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/python
+</span><span class='line'>(status.devops.com.ar)osvaldo@vostro:~$ cd ~/Sites/status_devops/example_project
+</span><span class='line'>(status.devops.com.ar)osvaldo@vostro:~/Sites/status_devops/example_project$ python manage.py runserver
+</span><span class='line'>Validating models...
+</span><span class='line'>0 errors found
+</span><span class='line'>
+</span><span class='line'>Django version 1.2.4, using settings 'example_project.settings'
+</span><span class='line'>Running django-devserver 0.3.1
+</span><span class='line'>Threaded django server is running at http://127.0.0.1:8000/
+</span><span class='line'>Quit the server with CONTROL-C.</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Y el sitio se encuentra disponible para recibir consultas a traves de la url que recién se habilito.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>http://127.0.0.1:8000/</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Una vez terminado el trabajo en el entorno, lo desactivamos para regresar a nuestro entorno habitual con el siguiente comando.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>deactivate</span></code></pre></td></tr></table></div></figure>
+
+
+<p>et voila!</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">osvaldo</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-11-26T00:08:00-03:00" pubdate data-updated="true">Nov 26<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/django/'>django</a>, <a class='category' href='/blog/categories/python/'>python</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.devops.com.ar/blog/2011/11/26/usando-python-con-virtualenv/" data-via="devops_ar" data-counturl="http://www.devops.com.ar/blog/2011/11/26/usando-python-con-virtualenv/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2011/11/16/ora-01882-timezone-region-not-found/" title="Previous Post: ORA-01882: timezone region  not found">&laquo; ORA-01882: timezone region  not found</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2011/11/30/instalacion-de-un-server-de-ci/" title="Next Post: instalacion de un server de ci">instalacion de un server de ci &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">definiendo un smarthost en mac os x</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">usando https detras de un proxy reverso</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">borrando viejos builds en jenkins</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/07/permisos-en-directorio-www/">permisos en directorio www</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/configurando-jboss-6/">configurando jboss 6</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("devops_ar", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/devops_ar" class="twitter-follow-button" data-show-count="false">Follow @devops_ar</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - osvaldo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'devops-ar';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.devops.com.ar/blog/2011/11/26/usando-python-con-virtualenv/';
+        var disqus_url = 'http://www.devops.com.ar/blog/2011/11/26/usando-python-con-virtualenv/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

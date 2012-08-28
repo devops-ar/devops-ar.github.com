@@ -1,0 +1,459 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>configurando vncserver en centos - devops-ar</title>
+  <meta name="author" content="osvaldo">
+
+  
+  <meta name="description" content="Primero nos aseguramos de que los paquetes estan instalados. 1
+2
+3
+4
+[root@nirvana ~]# rpm -qa | grep vnc
+vnc-4.1.2-9.el5
+vnc-server-4.1.2-9.el5
+[ &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.devops.com.ar/blog/2012/04/10/configurando-vncserver-en-centos/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="devops-ar" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-5155520-9']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">devops-ar</a></h1>
+  
+    <h2>devops en castellano</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.devops.com.ar" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Configurando Vncserver en Centos</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-10T18:09:00-03:00" pubdate data-updated="true">Apr 10<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Primero nos aseguramos de que los paquetes estan instalados.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@nirvana ~<span class="o">]</span><span class="c"># rpm -qa | grep vnc</span>
+</span><span class='line'>vnc-4.1.2-9.el5
+</span><span class='line'>vnc-server-4.1.2-9.el5
+</span><span class='line'><span class="o">[</span>root@nirvana ~<span class="o">]</span><span class="c"># </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Para un CentOS se puede instalar utilizan yum, para un RHEL &#8230; buscar las rpm en los CD de instalación.</p>
+
+<p>La primera vez que intentamos iniciar el servicio puede fallar.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@nirvana .vnc<span class="o">]</span><span class="c"># service vncserver start</span>
+</span><span class='line'>Starting VNC server: no displays configured                <span class="o">[</span>  OK  <span class="o">]</span>
+</span><span class='line'><span class="o">[</span>root@nirvana .vnc<span class="o">]</span><span class="c">#</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>El mensaje de error es explícito: el servicio no ha sido configurado. Hay tener en cuenta que el vnc se utiliza para acceder a una sesión gráfica en un servidor remoto. Esto quiere decir que se accede a una sesión directamente, no a un gestor de sesiones. El vnc server va a escuchar en un puerto distinto para cada sesión que se defina. De manera predeterminada el vnc server escucha en el puerto 5900 y cada sesión escucha por un puerto consecutivo a partir de ese número. Por lo tanto, para conectar con el cliente VNC, serán el 5900 + &#8220;número de pantalla o display number&#8221;, 5901 para el 1, 5902 para el 2 y asi sucesivamente.</p>
+
+<!-- more -->
+
+
+<p>Se utiliza como guía el <a href="http://wiki.centos.org/HowTos/VNC-Server">tutorial de CentOS</a>.</p>
+
+<p>Primero se crea la cuenta de usuario si no existiera. En la sesión de dicho usuario se crea una contraseña para conectarse por vnc (puede ser similar pero es independiente de la contraseña del sistema).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>adduser juan
+</span><span class='line'>su - juan
+</span><span class='line'>vncpasswd
+</span><span class='line'><span class="c"># tecleamos la contraseña para el vnc</span>
+</span><span class='line'><span class="nb">exit</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>El vnc utiliza un archivo para iniciar aplicaciones al iniciar la sesión gráfica. Este archivo <code>xstartup</code> deberia quedar de la siguiente manera:</p>
+
+<figure class='code'><figcaption><span>/home/juan/.vnc/xstartup </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">(</span><span class="k">while </span><span class="nb">true</span> ; <span class="k">do </span>xterm ; <span class="k">done</span> <span class="o">)</span> &amp;
+</span><span class='line'><span class="c"># Uncomment the following two lines for normal desktop:</span>
+</span><span class='line'><span class="nb">unset </span>SESSION_MANAGER
+</span><span class='line'><span class="nb">exec</span> /etc/X11/xinit/xinitrc
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span> -x /etc/vnc/xstartup <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="nb">exec</span> /etc/vnc/xstartup
+</span><span class='line'><span class="o">[</span> -r <span class="nv">$HOME</span>/.Xresources <span class="o">]</span> <span class="o">&amp;&amp;</span> xrdb <span class="nv">$HOME</span>/.Xresources
+</span><span class='line'>xsetroot -solid grey
+</span><span class='line'>vncconfig -iconic &amp;
+</span><span class='line'>xterm -geometry 80x24+10+10 -ls -title <span class="s2">&quot;$VNCDESKTOP Desktop&quot;</span> &amp;
+</span><span class='line'>twm &amp;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Nota: las modificaciones se señalan en negritas, el resto es el archivo original que se creo al ejecutar el comando <code>vncpasswd</code>.</p>
+
+<p>El siguiente paso seria configurar el vnc server. Para esto se edita el archivo correspondiente.</p>
+
+<figure class='code'><figcaption><span>/etc/sysconfig/vncservers</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># The VNCSERVERS variable is a list of display:user pairs.</span>
+</span><span class='line'><span class="c">#</span>
+</span><span class='line'><span class="c"># Uncomment the lines below to start a VNC server on display :2</span>
+</span><span class='line'><span class="c"># as my &#39;myusername&#39; (adjust this to your own).  You will also</span>
+</span><span class='line'><span class="c"># need to set a VNC password; run &#39;man vncpasswd&#39; to see how</span>
+</span><span class='line'><span class="c"># to do that.  </span>
+</span><span class='line'><span class="c">#</span>
+</span><span class='line'><span class="c"># DO NOT RUN THIS SERVICE if your local area network is</span>
+</span><span class='line'><span class="c"># untrusted!  For a secure way of using VNC, see</span>
+</span><span class='line'><span class="c"># &lt;URL:http://www.uk.research.att.com/archive/vnc/sshvnc.html&gt;.</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Use &quot;-nolisten tcp&quot; to prevent X connections to your VNC server via TCP.</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Use &quot;-nohttpd&quot; to prevent web-based VNC clients connecting.</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Use &quot;-localhost&quot; to prevent remote VNC clients connecting except when</span>
+</span><span class='line'><span class="c"># doing so through a secure tunnel.  See the &quot;-via&quot; option in the</span>
+</span><span class='line'><span class="c"># `man vncviewer&#39; manual page.</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># VNCSERVERS=&quot;2:myusername&quot;</span>
+</span><span class='line'><span class="c"># VNCSERVERARGS[2]=&quot;-geometry 800x600 -nolisten tcp -nohttpd -localhost&quot;</span>
+</span><span class='line'><span class="nv">VNCSERVERS</span><span class="o">=</span><span class="s2">&quot;1:juan&quot;</span>
+</span><span class='line'>VNCSERVERARGS<span class="o">[</span>1<span class="o">]=</span><span class="s2">&quot;-geometry 1024x768&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Solo queda reiniciar el servicio y ya se podra realizar una conexión remota por vnc, a la ip del server, por el puerto 5901, para iniciar una sesión gráfica como el usuario juan.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@nirvana ~<span class="o">]</span><span class="c"># service vncserver restart</span>
+</span><span class='line'>Shutting down VNC server: 1:juan                         <span class="o">[</span>  OK  <span class="o">]</span>
+</span><span class='line'>Starting VNC server: 1:juan
+</span><span class='line'>New <span class="s1">&#39;nirvana:1 (juan)&#39;</span> desktop is nirvana:1
+</span><span class='line'>
+</span><span class='line'>Starting applications specified in /home/juan/.vnc/xstartup
+</span><span class='line'>Log file is /home/juan/.vnc/nirvana:1.log
+</span><span class='line'>
+</span><span class='line'>                                                           <span class="o">[</span>  OK  <span class="o">]</span>
+</span><span class='line'><span class="o">[</span>root@nirvana ~<span class="o">]</span><span class="c"># </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Si se quieren definir mas sesiones, se ejecuta el comando vncpasswd para cada usuario y se declaran el archivo de configuración del vnc server</p>
+
+<figure class='code'><figcaption><span>/etc/sysconfig/vncservers</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">VNCSERVERS</span><span class="o">=</span><span class="s2">&quot;1:juan 2:osvaldo&quot;</span>
+</span><span class='line'>VNCSERVERARGS<span class="o">[</span>1<span class="o">]=</span><span class="s2">&quot;-geometry 800x600&quot;</span>
+</span><span class='line'>VNCSERVERARGS<span class="o">[</span>2<span class="o">]=</span><span class="s2">&quot;-geometry 1024x768&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Si se quisiera modificar el puerto, por ejemplo, hacer que la primera sesión escuche por el puerto 5900, se puede editar el archivo vncserver directamente, definir que el vnc server se inicie utilizando el puerto 5899 de manera tal que cuando se le sume 1 por el primer desktop, quede corriendo por el 5900 como se quiere.</p>
+
+<figure class='code'><figcaption><span>Original /usr/bin/vncserver - linea 125</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="nv">$vncPort</span> <span class="o">=</span> <span class="mi">5900</span> <span class="o">+</span> <span class="nv">$displayNumber</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>Modificado /usr/bin/vncserver </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='perl'><span class='line'><span class="nv">$vncPort</span> <span class="o">=</span> <span class="mi">5899</span> <span class="o">+</span> <span class="nv">$displayNumber</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Se reinicia el servicio para aplicar los cambios realizados.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>service vncserver restart
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">osvaldo</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-10T18:09:00-03:00" pubdate data-updated="true">Apr 10<span>th</span>, 2012</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.devops.com.ar/blog/2012/04/10/configurando-vncserver-en-centos/" data-via="devops_ar" data-counturl="http://www.devops.com.ar/blog/2012/04/10/configurando-vncserver-en-centos/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/04/09/instalando-el-proxy-de-perforce/" title="Previous Post: instalando el proxy de perforce">&laquo; instalando el proxy de perforce</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/05/19/sendmail-cookbook/" title="Next Post: sendmail cookbook">sendmail cookbook &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">definiendo un smarthost en mac os x</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">usando https detras de un proxy reverso</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">borrando viejos builds en jenkins</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/07/permisos-en-directorio-www/">permisos en directorio www</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/configurando-jboss-6/">configurando jboss 6</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("devops_ar", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/devops_ar" class="twitter-follow-button" data-show-count="false">Follow @devops_ar</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - osvaldo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'devops-ar';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.devops.com.ar/blog/2012/04/10/configurando-vncserver-en-centos/';
+        var disqus_url = 'http://www.devops.com.ar/blog/2012/04/10/configurando-vncserver-en-centos/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

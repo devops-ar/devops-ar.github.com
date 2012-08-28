@@ -1,0 +1,345 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>sendmail cookbook - devops-ar</title>
+  <meta name="author" content="osvaldo">
+
+  
+  <meta name="description" content="Postfix se ha convertido en el MTA por excelencia para la mayoría de las distribuciones Linux. Sin embargo, algunas, como CentOS (hasta la 5 al menos &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.devops.com.ar/blog/2012/05/19/sendmail-cookbook/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="devops-ar" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-5155520-9']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">devops-ar</a></h1>
+  
+    <h2>devops en castellano</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.devops.com.ar" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Sendmail Cookbook</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-19T14:02:00-03:00" pubdate data-updated="true">May 19<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Postfix se ha convertido en el MTA por excelencia para la mayoría de las distribuciones Linux. Sin embargo, algunas, como CentOS (hasta la 5 al menos) instalan sendmail de manera predeterminada. A menos que estemos instalando un servidor de mensajeria, utilizar sendmail sería la mejor opción. Es sencillo de configurar, ya esta instalado y para el uso que le vamos a dar, cumple su cometido.</p>
+
+<p>Para cubrir la parte de configuración y ahorrarnos ese paso, se armo un cookbook que solo contiene tres archivos.</p>
+
+<p>Lo primero que hacemos es crear un archivo de atributos donde se define el smarthost que se este utilizando. Como todo atributo, puede ser modificado luego a nivel de role o de ambiente (environment), incluso, a nivel de node mediante el uso de un data bag.</p>
+
+<figure class='code'><figcaption><span>cookbooks/sendmail/attributes/default.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">default</span><span class="o">[</span><span class="s2">&quot;sendmail&quot;</span><span class="o">][</span><span class="s2">&quot;smarthost&quot;</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&quot;mail-gateway.acme.com&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Sendmail maneja sus archivos de configuración a través de macros m4. Nunca se editan los archivos .cf tal como se aclaran en los mismos:</p>
+
+<figure class='code'><figcaption><span>sendmail.cf line 25</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#####   DO NOT EDIT THIS FILE!  Only edit the source .mc file.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>El archivo de template de sendmail.mc es una copia del archivo original, solo se adiciona la linea de definición del smarthost utilizando el atributo antes definido.</p>
+
+<figure class='code'><figcaption><span>cookbooks/sendmail/templates/default/sendmail.mc.erb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">define</span><span class="p">(</span><span class="sb">`SMART_HOST&#39;, `</span><span class="o">&lt;%=</span> <span class="n">node</span><span class="o">[</span><span class="s1">&#39;sendmail&#39;</span><span class="o">][</span><span class="s1">&#39;smarthost&#39;</span><span class="o">]</span> <span class="o">%&gt;</span><span class="err">&#39;</span><span class="p">)</span><span class="n">dnl</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>El tercer archivo es la receta como tal.</p>
+
+<figure class='code'><figcaption><span>cookbooks/sendmail/recipes/default.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">package</span> <span class="s2">&quot;m4&quot;</span>
+</span><span class='line'><span class="n">package</span> <span class="s2">&quot;sendmail&quot;</span>
+</span><span class='line'><span class="n">package</span> <span class="s2">&quot;sendmail-cf&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">service</span> <span class="s1">&#39;sendmail&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">template</span> <span class="s2">&quot;/etc/mail/sendmail.mc&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">source</span> <span class="s2">&quot;sendmail.mc.erb&quot;</span>
+</span><span class='line'>  <span class="n">mode</span> <span class="mo">0644</span>
+</span><span class='line'>  <span class="n">owner</span> <span class="s2">&quot;root&quot;</span>
+</span><span class='line'>  <span class="n">group</span> <span class="s2">&quot;root&quot;</span>
+</span><span class='line'>  <span class="n">notifies</span> <span class="ss">:run</span><span class="p">,</span> <span class="s2">&quot;execute[create_sendmailcf_file]&quot;</span><span class="p">,</span> <span class="ss">:immediately</span>
+</span><span class='line'>  <span class="n">notifies</span> <span class="ss">:restart</span><span class="p">,</span> <span class="s2">&quot;service[sendmail]&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">execute</span> <span class="s2">&quot;create_sendmailcf_file&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">command</span> <span class="s2">&quot;/usr/bin/m4 /etc/mail/sendmail.mc &gt; /etc/mail/sendmail.cf&quot;</span>
+</span><span class='line'>  <span class="n">action</span> <span class="ss">:nothing</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Las tres primeras lineas se aseguran de que los paquetes requeridos se encuentren instalados en el sistema.</p>
+
+<p>La declaración del servicio <code>sendmail</code> se encarga de configurarlo para que inicie de manera automática y poder enviarle notificaciones desde otras partes de la receta.</p>
+
+<p>Se crea el archivo de configuración del sendmail: sendmail.mc a partir del template. En el caso de que ya existiera no se hace mas nada. Para los casos en que se crea o fue modificado, se ejecuta de manera inmediata el comando de creación del archivo sendmail.cf y se declara que el servicio de sendmail sea reiniciado, para tomar los cambios aplicados, una vez que el chef haya terminado de aplicar todas las recetas.</p>
+
+<p>El comando <code>create_sendmailcf_file</code> no hace nada de manera predeterminada. Solo se ejecuta en caso de modificación del template del archivo de configuración del sendmail.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">osvaldo</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-19T14:02:00-03:00" pubdate data-updated="true">May 19<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/chef/'>chef</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.devops.com.ar/blog/2012/05/19/sendmail-cookbook/" data-via="devops_ar" data-counturl="http://www.devops.com.ar/blog/2012/05/19/sendmail-cookbook/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/04/10/configurando-vncserver-en-centos/" title="Previous Post: configurando vncserver en centos">&laquo; configurando vncserver en centos</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/06/14/configurando-jboss-6/" title="Next Post: configurando jboss 6">configurando jboss 6 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">definiendo un smarthost en mac os x</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">usando https detras de un proxy reverso</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">borrando viejos builds en jenkins</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/07/permisos-en-directorio-www/">permisos en directorio www</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/configurando-jboss-6/">configurando jboss 6</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("devops_ar", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/devops_ar" class="twitter-follow-button" data-show-count="false">Follow @devops_ar</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - osvaldo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'devops-ar';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.devops.com.ar/blog/2012/05/19/sendmail-cookbook/';
+        var disqus_url = 'http://www.devops.com.ar/blog/2012/05/19/sendmail-cookbook/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

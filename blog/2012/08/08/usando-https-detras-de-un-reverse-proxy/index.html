@@ -1,0 +1,424 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>usando https detras de un proxy reverso - devops-ar</title>
+  <meta name="author" content="osvaldo">
+
+  
+  <meta name="description" content="tl;dr Agregar en el archivo .conf del apache para el sitio sin ssl: 1
+2
+3
+RewriteEngine On
+RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+RewriteRule &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.devops.com.ar/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="devops-ar" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-5155520-9']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">devops-ar</a></h1>
+  
+    <h2>devops en castellano</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.devops.com.ar" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Usando Https Detras De Un Proxy Reverso</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-08T11:17:00-03:00" pubdate data-updated="true">Aug 8<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>tl;dr</h2>
+
+<p>Agregar en el archivo .conf del apache para el sitio sin ssl:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='apacheconf'><span class='line'><span class="nb">RewriteEngine</span> <span class="k">On</span>
+</span><span class='line'><span class="nb">RewriteCond</span> %{HTTP:X-Forwarded-Proto} !=https
+</span><span class='line'><span class="nb">RewriteRule</span> (.*) https://%{SERVER_NAME}/$1 [redirect=permanent,last]
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Con eso, deberia detectar que es http y hacer el redirect para el https. Ya el nginx le esta asignando esa variable (actuando como proxy reverso)</p>
+
+<!-- more -->
+
+
+<h2>En detalle</h2>
+
+<p>Un proxy reverso es útil cuando queremos publicar sitios internos (generalmente de desarrollo) en internet. Estos sitios internos pueden estar en servidores independientes, sin embargo, todos ellos son publicados a través de un único server (IP) en internet: el proxy reverso.</p>
+
+<p>Todo el tráfico web llega hasta el proxy reverso y de ahi se reenvía al servidor interno que le corresponda acorde al hostname de la URL.</p>
+
+<p>Este esquema funciona para http pero para https tenemos el mismo problema de los virtualhosts. Hay que hacer que el proxy reverso sea el https endpoint para que pueda determinar el hostname del request y de ahi a que server interno le corresponde el pedido.</p>
+
+<p>para tráfico http</p>
+
+<pre><code>cliente -&gt; http -&gt; proxy reverso -&gt; http -&gt; server interno
+</code></pre>
+
+<p>para tráfico https</p>
+
+<pre><code>cliente -&gt; https -&gt; proxy reverso -&gt; http -&gt; server interno
+</code></pre>
+
+<p>Eso funciona bien en la mayoria de los casos, pero que pasa si se quiere forzar el tráfico en un server para que sea solo https?
+Si el cliente hace el pedido con http, el server interno recibe http.</p>
+
+<pre><code>cliente -&gt; https -&gt; proxy reverso -&gt; http -&gt; server interno
+</code></pre>
+
+<p>El server interno detecta que no es https, y le responde al cliente con un rewrite de la url utilizando https. ¿Qué pasa entonces?</p>
+
+<pre><code>cliente -&gt; http -&gt; proxy reverso -&gt; http -&gt; server interno
+</code></pre>
+
+<p>El server interno vuelve a recibir http y se crea un lazo infinito.</p>
+
+<p>Pero no todos los servers necesitan que el tráfico sea solo https, algunos servers manejan servicios distintos por http y por https. Se necesita una solución que sea lo suficientemente genérica entonces.</p>
+
+<p>La variante implementada consta de dos partes, una en el proxy reverso y otra en el server interno.</p>
+
+<p>En el proxy reverso, cuando se recibe un request https, se setea una variable del HTTP header en el request que se le envia al servidor interno. Para los servidores que manejan por separado http y https, este header se ignora. En cambio, para los servidores que van a redireccionar todo el tráfico por https, en la sección de http del server web se comprueba la presencia de esta variable. Si esta, significa que el request llego via https y se procesa el request normalmente. Si no esta, se reenvia al cliente la URL redireccionada para usar https.</p>
+
+<pre><code>cliente -&gt; http -&gt; proxy reverso -&gt; http -&gt; server interno  (RewriteRule (.*) https://%{SERVER_NAME}/$1 [redirect=permanent,last])
+cliente -&gt; https -&gt; proxy reverso  -&gt; http (X-Forwarded-Proto https) -&gt; server interno
+</code></pre>
+
+<p>El proxy reverso utilizado es nginx y en el archivo de configuración (nginx.conf) se incluye lo siguiente:</p>
+
+<figure class='code'><figcaption><span>nginx.conf</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='apacheconf'><span class='line'><span class="nb">server</span> {
+</span><span class='line'>    <span class="nb">listen</span>       <span class="m">443</span>;
+</span><span class='line'>    <span class="nb">server_name</span> *.example.com;
+</span><span class='line'>
+</span><span class='line'>    <span class="nb">ssl</span>                  <span class="k">on</span>;
+</span><span class='line'>    <span class="nb">ssl_certificate</span>      ssl/proxyserver.crt;
+</span><span class='line'>    <span class="nb">ssl_certificate_key</span>  ssl/proxyserver.example.com.pem;
+</span><span class='line'>
+</span><span class='line'>    <span class="nb">ssl_session_timeout</span>  <span class="m">5</span>m;
+</span><span class='line'>
+</span><span class='line'>    <span class="nb">ssl_protocols</span>  SSLv2 SSLv3 TLSv1;
+</span><span class='line'>    <span class="nb">ssl_ciphers</span>  <span class="k">ALL</span>:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv1:+EXP;
+</span><span class='line'>    <span class="nb">ssl_prefer_server_ciphers</span>   <span class="k">on</span>;
+</span><span class='line'>
+</span><span class='line'>    <span class="nb">access_log</span>  logs/ssl-access.log main;
+</span><span class='line'>    <span class="nb">error_log</span> logs/ssl-error.log <span class="k">warn</span>;
+</span><span class='line'>
+</span><span class='line'>    <span class="nb">location</span> / {
+</span><span class='line'>        <span class="nb">resolver</span> <span class="m">127.0.0.1</span>;
+</span><span class='line'>        <span class="nb">include</span> conf.d/proxy.conf;
+</span><span class='line'>        <span class="nb">proxy_pass</span> http://$host$request_uri;
+</span><span class='line'>    <span class="err">}</span>
+</span><span class='line'><span class="err">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>El contenido del archivo proxy.conf es:</p>
+
+<figure class='code'><figcaption><span>proxy.conf</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='apacheconf'><span class='line'><span class="nb">proxy_redirect</span>          <span class="k">off</span>;
+</span><span class='line'><span class="nb">proxy_set_header</span>        Host            $host;
+</span><span class='line'><span class="nb">proxy_set_header</span>        X-Real-IP       $remote_addr;
+</span><span class='line'><span class="nb">proxy_set_header</span>        X-Forwarded-For $proxy_add_x_forwarded_for;
+</span><span class='line'><span class="nb">client_max_body_size</span>    <span class="m">10</span>m;
+</span><span class='line'><span class="nb">client_body_buffer_size</span> <span class="m">512</span>k;
+</span><span class='line'><span class="c">#proxy_connect_timeout   75; #Default is 60</span>
+</span><span class='line'><span class="nb">proxy_send_timeout</span>      <span class="m">90</span>;
+</span><span class='line'><span class="nb">proxy_read_timeout</span>      <span class="m">90</span>;
+</span><span class='line'><span class="nb">proxy_buffers</span>           <span class="m">64</span> <span class="m">4</span>k;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>El contenido del archivo ssl.conf es:</p>
+
+<figure class='code'><figcaption><span>ssl.conf</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='apacheconf'><span class='line'><span class="nb">proxy_set_header</span>  X-Forwarded-Proto https;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Y en el server interno, agregar en el archivo .conf del apache para el sitio sin ssl:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='apacheconf'><span class='line'><span class="nb">RewriteEngine</span> <span class="k">On</span>
+</span><span class='line'><span class="nb">RewriteCond</span> %{HTTP:X-Forwarded-Proto} !=https
+</span><span class='line'><span class="nb">RewriteRule</span> (.*) https://%{SERVER_NAME}/$1 [redirect=permanent,last]
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Para referencia sobre los headers de http:
+http://en.wikipedia.org/wiki/List_of_HTTP_header_fields</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">osvaldo</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-08T11:17:00-03:00" pubdate data-updated="true">Aug 8<span>th</span>, 2012</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.devops.com.ar/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/" data-via="devops_ar" data-counturl="http://www.devops.com.ar/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/" title="Previous Post: borrando viejos builds en jenkins">&laquo; borrando viejos builds en jenkins</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/" title="Next Post: definiendo un smarthost en mac os x">definiendo un smarthost en mac os x &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">definiendo un smarthost en mac os x</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">usando https detras de un proxy reverso</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">borrando viejos builds en jenkins</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/07/permisos-en-directorio-www/">permisos en directorio www</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/configurando-jboss-6/">configurando jboss 6</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("devops_ar", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/devops_ar" class="twitter-follow-button" data-show-count="false">Follow @devops_ar</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - osvaldo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'devops-ar';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.devops.com.ar/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/';
+        var disqus_url = 'http://www.devops.com.ar/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

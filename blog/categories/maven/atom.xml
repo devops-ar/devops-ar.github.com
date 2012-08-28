@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: maven | devops-ar]]></title>
+  <link href="http://www.devops.com.ar/blog/categories/maven/atom.xml" rel="self"/>
+  <link href="http://www.devops.com.ar/"/>
+  <updated>2012-08-27T23:02:40-03:00</updated>
+  <id>http://www.devops.com.ar/</id>
+  <author>
+    <name><![CDATA[osvaldo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[instalacion de un server de ci]]></title>
+    <link href="http://www.devops.com.ar/blog/2011/11/30/instalacion-de-un-server-de-ci/"/>
+    <updated>2011-11-30T14:26:00-03:00</updated>
+    <id>http://www.devops.com.ar/blog/2011/11/30/instalacion-de-un-server-de-ci</id>
+    <content type="html"><![CDATA[<p>CI - Continuous Integration.</p>
+
+<p>Este post describe la instalación de un servidor de integración continua. El mismo estará integrado por jenkins, maven y sonar.</p>
+
+<h1>jenkins</h1>
+
+<h2>Instalacion de jenkins</h2>
+
+<p>Esta instalacion describe la instalacion de jenkins en un container tomcat ya existente y utilizando al apache (via mod_proxy_ajp) como frontend.</p>
+
+<p>jenkins es un fork de hudson.</p>
+
+<p>La instalacion se realiza sobre un server estandar con tomcat instalado.</p>
+
+<p>Los pasos a realizar serian los siguientes:
+* Descargar la ultima version del war de jenkins (el ejemplo es para el caso de server).
+* Configurar el apache.
+* Reiniciar el apache y el tomcat.</p>
+
+<h2>Descargar el jenkins.</h2>
+
+<p><code>sh
+wget -P /opt/thirdparty/tomcat/webapps/ http://updates.jenkins-ci.org/download/war/1.438/jenkins.war
+</code></p>
+
+<h2>Configurar el apache</h2>
+
+<p>Primero revisar que el modulo este activado. En el archivo /etc/httpd/conf.d/proxy_ajp.conf la siguiente linea este descomentareada.</p>
+
+<p>LoadModule proxy_ajp_module modules/mod_proxy_ajp.so</p>
+
+<p>Nota: Asegurarse de que el modulo mod_jk no este habilitado (usualmente el archivo mod_jk.conf en el mismo directorio).</p>
+
+<p>Luego se crea un archivo de virtualhost para el server.</p>
+
+<p>``` apache /etc/httpd/vhost.d/server.conf
+ProxyRequests Off
+ProxyPreserveHost On
+<VirtualHost *:80></p>
+
+<pre><code>ServerAdmin unixadmin@example.com
+ServerName server.example.com
+ProxyPass /sonar ajp://localhost:9009/sonar
+#ProxyPass /nexus http://localhost:8081/nexus
+#ProxyPassReverse /nexus http://localhost:8081/nexus
+ProxyPass / ajp://localhost:8009/
+ErrorLog logs/server.dev.corp-error_log
+CustomLog logs/server.dev.corp-access_log common
+</code></pre>
+
+<p></VirtualHost>
+```</p>
+
+<p>Nota, las lineas para el sonar y el nexus solo se requieren si estos servicios van a ser instalados, si no, se dejan comentadas.</p>
+
+<p>Se habilita el puerto 8009 para el protocolo AJP en el tomcat (por defecto solo habilita el 8080: protocolo HTTP).</p>
+
+<p>``` xml /opt/thirdparty/tomcat/conf/server.xml</p>
+
+<pre><code>&lt;!-- Define an AJP 1.3 Connector on port 8009 --&gt;
+&lt;Connector port="8009" protocol="AJP/1.3" redirectPort="8443" URIEncoding="UTF-8" /&gt;
+</code></pre>
+
+<p>```</p>
+
+<p>Y se reinician el apache y el tomcat</p>
+
+<p><code>sh
+/etc/init.d/httpd restart
+/etc/init.d/tomcat stop
+/etc/init.d/tomcat start
+</code></p>
+
+<p>El jenkins deberia estar accesible en: http://server.example.com/jenkins</p>
+
+<p>Se sugiere crear una pagina de inicio por si alguien teclea la url http://server.example.com/ directamente.
+Esta pagina se crea en
+$CATALINA_HOME/webapps/ROOT/index.html</p>
+
+<p>Por ejemplo:</p>
+
+<p>``` html /opt/thirdparty/tomcat/webapps/ROOT/index.html
+<html>
+<head><title>server </title> </head>
+<body>
+server<p /></p>
+
+<ul>
+<li><a href="http://www.devops.com.ar/jenkins">jenkins</a></li>
+<li><a href="http://www.devops.com.ar/sonar">sonar</a></li>
+<li><a href="http://www.devops.com.ar/nexus">nexus</a></li>
+</ul>
+
+
+<p></body>
+</html>
+```</p>
+
+<h1>Maven</h1>
+
+<p>Descargar y descompactar el maven.</p>
+
+<p><code>sh
+wget -P /opt/thirdparty http://apache.dattatec.com//maven/binaries/apache-maven-3.0.3-bin.tar.gz
+cd /opt/thirdparty
+tar zxf apache-maven-3.0.3-bin.tar.gz
+rm apache-maven-3.0.3-bin.tar.gz
+ln -s apache-maven-3.0.3 maven
+</code></p>
+
+<p>Adicionar al final del archivo /etc/bashrc las siguientes lineas</p>
+
+<p><code>sh /etc/bashrc
+export JAVA_HOME=/opt/thirdparty/java
+export M2_HOME=/opt/thirdparty/maven
+export PATH=${M2_HOME}/bin:${PATH}
+</code></p>
+
+<p>Si nuestro server utiliza un proxy para conectarse a la web, deberemos configurar el maven para hacer uso de este proxy.  Esto se hace en el archivo de configuracion del maven: /opt/thirdparty/maven/conf/settings.xml donde la seccion de proxies deberá quedar de la siguiente manera:</p>
+
+<p>``` xml /opt/thirdparty/maven/conf/settings.xml
+  <proxies>
+   <proxy></p>
+
+<pre><code>  &lt;active&gt;true&lt;/active&gt;
+  &lt;protocol&gt;http&lt;/protocol&gt;
+  &lt;host&gt;proxy.example.com&lt;/host&gt;
+  &lt;port&gt;3128&lt;/port&gt;
+&lt;/proxy&gt;
+</code></pre>
+
+<p>  </proxies>
+```</p>
+
+<h1>Sonar</h1>
+
+<p>Descargamos el sonar y lo descompactamos en un directorio.</p>
+
+<p><code>sh
+COMPANY=globant
+cd /opt/$COMPANY
+wget http://dist.sonar.codehaus.org/sonar-2.11.zip
+unzip sonar-2.11.zip
+ln -s sonar-2.11 sonar
+rm -f sonar-2.11.zip
+</code></p>
+
+<h2>Creamos la base de datos</h2>
+
+<p><code>sql
+CREATE DATABASE sonar CHARACTER SET utf8 COLLATE utf8\_general_ci;
+grant all privileges on sonar.* to 'sonar'@'localhost' identified by 'Ht4uS1cNwbxeI';
+flush privileges;
+</code>
+Se declara la base de datos en el archivo de propiedades del sonar: /opt/thirdparty/sonar/conf/sonar.properties</p>
+
+<p>``` properties /opt/thirdparty/sonar/conf/sonar.properties
+sonar.web.host:                           0.0.0.0
+sonar.web.port:                           9000
+sonar.web.context:                        /sonar</p>
+
+<h1>sonar.web.context:                        /</h1>
+
+<p>sonar.ajp13.port: 9009</p>
+
+<p>sonar.jdbc.username:                       sonar
+sonar.jdbc.password:                       *********</p>
+
+<h1>Comment the following lines to deactivate the default embedded database.</h1>
+
+<h1>sonar.jdbc.url:                            jdbc:derby://localhost:1527/sonar;create=true</h1>
+
+<h1>sonar.jdbc.driverClassName:                org.apache.derby.jdbc.ClientDriver</h1>
+
+<h1>sonar.jdbc.validationQuery:                values(1)</h1>
+
+<p>sonar.jdbc.url: jdbc:mysql://localhost:3306/sonar?useUnicode=true&amp;characterEncoding=utf8
+sonar.jdbc.driverClassName: com.mysql.jdbc.Driver
+sonar.jdbc.validationQuery: select 1
+```</p>
+
+<p>Podemos iniciar el sonar manualmente.</p>
+
+<p><code>sh
+$SONAR_HOME/bin/linux-x86-32/sonar.sh start
+</code></p>
+
+<p>Y comprobar que funciona accediendo al puerto 9000 del server: <a href="http://server.example.com:9000/">http://server.example.com:9000/</a></p>
+
+<p>Adicionamos una instalacion de sonar al jenkins</p>
+
+<p>Si el server soporta la instalación de plugins via web.
+<a href="http://server.example.com/jenkins/pluginManager/available">http://server.example.com/jenkins/pluginManager/available</a></p>
+
+<p>Instalando el plugin de sonar manualmente.
+<a href="http://updates.jenkins-ci.org/download/plugins/">http://updates.jenkins-ci.org/download/plugins/</a></p>
+
+<p>Descargamos el archivo *.hpi para el directorio $JENKINS_HOME/plugins directory. Algunos contenedores podrian requerir reiniciar Jenkins para que muestre el nuevo plugin.</p>
+
+<p><code>sh
+cd $TOMCAT_HOME/webapps/jenkins/WEB-INF/plugins
+wget http://updates.jenkins-ci.org/latest/sonar.hpi
+chown tomcat:tomcat sonar.hpi
+</code></p>
+
+<p>Configuramos jenkins para que utilice el sonar: <a href="http://server.example.com:8080/jenkins/configure">http://server.example.com:8080/jenkins/configure</a></p>
+
+<p><code>properties
+Name    sonar
+Server URL  http://server.example.com/sonar
+Database URL        jdbc:mysql://localhost:3306/sonar?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=utf8
+Database login  sonar
+Database password   &lt;el mismo que utilizamos para la creacion del usuario mysql&gt;
+Database driver com.mysql.jdbc.Driver
+</code></p>
+
+<h1>Referencias</h1>
+
+<h2>Jenkins</h2>
+
+<ul>
+<li><a href="https://wiki.jenkins-ci.org/display/JENKINS/Plugins">https://wiki.jenkins-ci.org/display/JENKINS/Plugins</a></li>
+</ul>
+
+
+<h2>Sonar</h2>
+
+<ul>
+<li><a href="http://docs.codehaus.org/display/SONAR/Configure+Sonar+plugin">http://docs.codehaus.org/display/SONAR/Configure+Sonar+plugin</a></li>
+<li><a href="http://www.wakaleo.com/component/content/article/187">http://www.wakaleo.com/component/content/article/187</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

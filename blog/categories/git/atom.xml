@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: git | devops-ar]]></title>
+  <link href="http://www.devops.com.ar/blog/categories/git/atom.xml" rel="self"/>
+  <link href="http://www.devops.com.ar/"/>
+  <updated>2012-08-27T23:02:40-03:00</updated>
+  <id>http://www.devops.com.ar/</id>
+  <author>
+    <name><![CDATA[osvaldo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[usando gitolite]]></title>
+    <link href="http://www.devops.com.ar/blog/2012/03/25/usando-gitolite/"/>
+    <updated>2012-03-25T03:04:00-03:00</updated>
+    <id>http://www.devops.com.ar/blog/2012/03/25/usando-gitolite</id>
+    <content type="html"><![CDATA[<p>Una de las ventajas de git es el trabajo en equipos. Como compartir el codigo seria la pregunta. Existen varias alternativas. Hay servicios que ofrecen hospedaje de repositorios para git como el propio github. Entre las opciones si queremos hospedar el repositorio en un servidor propio destacan las siguientes:</p>
+
+<ul>
+<li><a href="http://gitorious.org/">gitorious</a>. Es una aplicación Rails para la gestión de proyectos. Permite un manejo via web de los repositorios git. Similar a github en algunos aspectos.</li>
+<li><a href="http://repo.or.cz/w/girocco.git/blob/HEAD:/README">girocco</a>. No tiene tantas funcionalidades como gitorious pero la instalación parece mas sencilla. Buena opción a considerar si se requiere una interface web para la administración del repositorio.</li>
+<li><a href="https://github.com/tv42/gitosis">gitosis</a>. Permite el acceso a repositorios git via ssh, garantizando control de accesos por repositorio y sin requerir cuentas locales (shell accounts) en el servidor. Esta implementado en Python pero la ultima actualizacion del codigo fue hace 3 años.</li>
+<li><a href="https://github.com/sitaramc/gitolite">gitolite</a>. Muy similar a gitosis, implementado en Perl. Se mantiene en desarrollo activo.</li>
+</ul>
+
+
+<p>Como una interface web para administrar usuarios y repositorios no era un requerimiento y gitosis no se mantiene activo, la elección fue gitolite.</p>
+
+<!-- more -->
+
+
+<p>La forma de trabajo de gitolite es sencilla pero con su propia lógica de funcionamiento. En el servidor donde se instala gitolite no se realiza ninguna configuración de usuarios y/o repositorios en absoluto. Cuando se termina la instalación de gitolite, se crea un repositorio llamado <code>gitolite-admin</code> (dos repositorios en realidad, el otro se llama <code>testing</code> y su objetivo es tal cual describe su nombre: pruebas).</p>
+
+<p>La instalación de gitolite comienza creando una cuenta de usuario en el servidor. Puede ser gitolite (predeterminado si se instala de paquete .deb o .rpm) o git (el username que utilizamos en esta instalación). El acceso a los repositorios será en este caso via ssh. Gitolite utiliza autenticación para el ssh por llaves (públicas/privadas), por lo cual, para acceder a los repositorios, vamos a necesitar las llaves públicas de aquellos usuarios que se conecten a los repositorios.</p>
+
+<p>Copiamos la llave pública de un primer usuario (osvaldo) y creamos el usuario de acceso a los repositorios. Como la instalación la realizamos en un server local, en vez del tradicional mecanismo para copiar llaves públicas que seria <code>ssh-copy-id</code>, logueados como root, se utiliza un simple <code>cp</code>.</p>
+
+<p><code>sh
+sudo su -
+adduser git
+cp /home/osvaldo/.ssh/id_rsa.pub /home/git/osvaldo.pub
+chown git /home/git/*
+</code></p>
+
+<p>Se procede a la instalación de gitolite.</p>
+
+<p><code>sh
+su - git
+git clone git://github.com/sitaramc/gitolite
+cat &gt;&gt;~/.bashrc&lt;&lt;'EOF'
+PATH=/home/git/bin:$PATH
+EOF
+. .bashrc
+gitolite/src/gl-system-install
+gl-setup -q ~/osvaldo.pub
+</code></p>
+
+<p>La instalación crea el repositorio donde se va a almacenar la configuración de gitolite. Hay dos subdirectorios de interes, <code>conf</code> donde se almacena el archivo de configuración: gitolite.conf y <code>keydir</code> donde se van a almacenar las llaves públicas de los usuarios que trabajen con los repositorios.</p>
+
+<p><code>sh
+git@vostro:~$ gitolite/src/gl-system-install
+using default values for EUID=1002:
+/home/git/bin, /home/git/share/gitolite/conf, /home/git/share/gitolite/hooks
+git@vostro:~$
+git@vostro:~$ gl-setup -q osvaldo.pub
+creating gitolite-admin...
+Initialized empty Git repository in /home/git/repositories/gitolite-admin.git/
+creating testing...
+Initialized empty Git repository in /home/git/repositories/testing.git/
+[master (root-commit) 6aedb93] gl-setup -q osvaldo.pub
+ 2 files changed, 8 insertions(+), 0 deletions(-)
+ create mode 100644 conf/gitolite.conf
+ create mode 100644 keydir/osvaldo.pub
+git@vostro:~$
+</code></p>
+
+<p>Los usuarios remotos no van a tener cuentas locales de shell. El acceso a los repositorios es a través del usuario bajo el cual se instalo gitolite (en este caso: git) y utilizando el comando git directamente. Sin embargo, existe un comando que se encuentra disponible a cualquier usuario: info. Este comando se ejecuta via ssh y permite conocer las versiones de gitolite y de git que se encuentran instaladas en el servidor asi como los repositorios  a los cuales el usuario tiene acceso. La lista de repositorios resulta especialmente útil cuando se tienen dudas sobre el nombre exacto con el que fue creado.</p>
+
+<p>```sh
+osvaldo@vostro:~$ ssh git@vostro info
+hello osvaldo, this is gitolite v2.3-33-g233a33d running on git 1.7.2.5
+the gitolite config gives you the following access:</p>
+
+<pre><code> R   W  gitolite-admin
+@R_ @W_ testing
+</code></pre>
+
+<p>osvaldo@vostro:~$
+```</p>
+
+<p>Para comenzar a trabajar, clonamos el repositorio de administración.</p>
+
+<p><code>sh
+osvaldo@vostro:~/src/gitolite/vostro$ git clone git@vostro:gitolite-admin
+Cloning into gitolite-admin...
+remote: Counting objects: 6, done.
+remote: Compressing objects: 100% (4/4), done.
+remote: Total 6 (delta 0), reused 0 (delta 0)
+Receiving objects: 100% (6/6), done.
+osvaldo@vostro:~/src/gitolite/vostro$
+</code></p>
+
+<h2>Creando usuarios</h2>
+
+<p>Para crear un usuario, adicionamos su llave pública al directorio keyring y comiteamos el repo.</p>
+
+<p><code>sh
+cp fernando.pub gitolite-admin/keyring
+git add .
+git commit -m "adding fernando's pub key"
+git push
+</code>
+En la consola aparecería algo así.</p>
+
+<p><code>sh
+osvaldo@vostro:~/src/gitolite/vostro/gitolite-admin$ git commit -m "adding fernando's pub key"
+[master dc4dfed] adding fernando's pub key
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+ create mode 100644 keydir/fernando.pub
+osvaldo@vostro:~/src/gitolite/vostro/gitolite-admin$ git push
+Counting objects: 6, done.
+Delta compression using up to 2 threads.
+Compressing objects: 100% (4/4), done.
+Writing objects: 100% (4/4), 860 bytes, done.
+Total 4 (delta 0), reused 0 (delta 0)
+remote:
+remote:         ***** WARNING *****
+remote:         the following users (pubkey files in parens) do not appear in any access rules:
+remote: fernando(fernando.pub)
+To git@vostro:gitolite-admin
+   6aedb93..dc4dfed  master -&gt; master
+osvaldo@vostro:~/src/gitolite/vostro/gitolite-admin$
+</code></p>
+
+<h2>Creando repos</h2>
+
+<p>Para crear un repositorio se define en el archivo de configuración: conf/gitolite.conf y se le asignan permisos a los usuarios que corresponda. Al comitear el repo de administración, gitolite se encarga de crear el repositorio y luego queda clonarlo y comenzar a trabajar con el mismo.</p>
+
+<p>A manera de ejemplo se van a crear dos repositorios. Uno llamado "publico" donde tengan acceso los dos desarrolladores y otro que se llamará "privado"  donde solo un desarrollador tendrá acceso.</p>
+
+<p>```aconf
+conf/gitolite.conf</p>
+
+<p>repo    gitolite-admin</p>
+
+<pre><code>    RW+     =   osvaldo
+</code></pre>
+
+<p>repo    testing</p>
+
+<pre><code>    RW+     =   @all
+</code></pre>
+
+<p>repo    publico</p>
+
+<pre><code>    RW+     =   osvaldo
+    RW+     =   fernando
+</code></pre>
+
+<p>repo    privado</p>
+
+<pre><code>    RW+     =   osvaldo
+</code></pre>
+
+<p>```</p>
+
+<p><code>sh
+vi conf/gitolite.conf
+git add conf/gitolite.conf
+git commit -m "probando visibilidad de repos"
+git push
+</code></p>
+
+<p>En la consola se pueden ver las operaciones que realiza el gitolite.</p>
+
+<p><code>sh
+osvaldo@vostro:~/src/gitolite/vostro/gitolite-admin$ git push
+Counting objects: 7, done.
+Delta compression using up to 2 threads.
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (4/4), 429 bytes, done.
+Total 4 (delta 0), reused 0 (delta 0)
+remote: creating privado...
+remote: Initialized empty Git repository in /home/git/repositories/privado.git/
+remote: creating publico...
+remote: Initialized empty Git repository in /home/git/repositories/publico.git/
+To git@vostro:gitolite-admin
+   dc4dfed..ade026e  master -&gt; master
+osvaldo@vostro:~/src/gitolite/vostro/gitolite-admin$
+</code></p>
+
+<p>Ahora, ambos desarrolladores pueden ejecutar el comando info, pero el resultado va a ser distinto en cada caso. El usuario Osvaldo puede tener acceso a todos los repositorios.</p>
+
+<p>```sh Repositorios disponibles para Osvaldo
+osvaldo@vostro:~/src/gitolite/vostro/gitolite-admin$ ssh git@vostro info
+hello osvaldo, this is gitolite v2.3-33-g233a33d running on git 1.7.2.5
+the gitolite config gives you the following access:</p>
+
+<pre><code> R   W  gitolite-admin
+ R   W  privado
+ R   W  publico
+@R_ @W_ testing
+</code></pre>
+
+<p>```</p>
+
+<p>Se nota la ausencia del repositorio "privado" para el usuario Fernando.</p>
+
+<p>```sh Repositorios disponibles para Fernando
+fernando@vostro:~$ ssh git@vostro info
+hello fernando, this is gitolite v2.3-33-g233a33d running on git 1.7.2.5
+the gitolite config gives you the following access:</p>
+
+<pre><code> R   W  publico
+@R_ @W_ testing
+</code></pre>
+
+<p>fernando@vostro:~$
+```</p>
+
+<h2>Trabajando con los repos</h2>
+
+<p>El trabajo con los repositorios es similar a cualquier otro. Lo primero es clonar el repo, se trabaja sobre el mismo y al final, se comitean los cambios al server (push)</p>
+
+<p><code>sh
+fernando@vostro:~/src$ git clone git@vostro:publico
+Cloning into publico...
+warning: You appear to have cloned an empty repository.
+fernando@vostro:~/src$
+</code></p>
+
+<p>Es probable que el siguiente error aparezca la primera vez que se hace un <code>git push</code>:</p>
+
+<p><code>
+osvaldo@vostro:~/src/gitolite/vostro/publico$ git push
+No refs in common and none specified; doing nothing.
+Perhaps you should specify a branch such as 'master'.
+fatal: The remote end hung up unexpectedly
+error: failed to push some refs to 'git@vostro:publico'
+</code></p>
+
+<p>Tanto en la <a href="http://sitaramc.github.com/gitolite/nagp.html">wiki de gitolite</a> como en <a href="http://stackoverflow.com/questions/6529136/gitolite-default-remotes-for-new-repository">stackoverflow</a> se encuentra la respuesta. No es un problema de gitolite sino de git. El primer <code>git push</code> siempre requiere especificar la "branch" a la que le queremos hacer el commit (push), por esta razón, se debe ejecutar de la siguiente manera: <code>git push origin master</code>. La próxima vez, ya bastará con con <code>git push</code>.</p>
+
+<p>La rutina normal seria crear un archivo, hacerle el commit y luego el push al repo.</p>
+
+<p><code>sh
+osvaldo@vostro:~/src/gitolite/vostro/publico$ vi README.md
+osvaldo@vostro:~/src/gitolite/vostro/publico$ git add .
+osvaldo@vostro:~/src/gitolite/vostro/publico$ git commit -m "adding readme file"
+[master (root-commit) db7e57b] adding readme file
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+ create mode 100644 README.md
+osvaldo@vostro:~/src/gitolite/vostro/publico$ git push origin master
+Counting objects: 3, done.
+Writing objects: 100% (3/3), 241 bytes, done.
+Total 3 (delta 0), reused 0 (delta 0)
+To git@vostro:publico
+ * [new branch]      master -&gt; master
+osvaldo@vostro:~/src/gitolite/vostro/publico$
+</code></p>
+
+<p>Y si un colega edita  el archivo.</p>
+
+<p>```
+fernando@vostro:~/src/publico$ git commit -a
+Aborting commit due to empty commit message.
+fernando@vostro:~/src/publico$ git commit -am "editing readme file"
+[master 535b69b] editing readme file
+ 1 files changed, 2 insertions(+), 0 deletions(-)
+fernando@vostro:~/src/publico$ git log
+commit 535b69b7b2ca9ab383e5b59eb0285a307056181c
+Author: Fernando <a href="&#x6d;&#x61;&#105;&#108;&#x74;&#111;&#58;&#x66;&#101;&#x72;&#110;&#x61;&#110;&#x64;&#x6f;&#64;&#100;&#114;&#117;&#112;&#98;&#x6c;&#117;&#x65;&#46;&#x63;&#x6f;&#109;">&#102;&#x65;&#x72;&#x6e;&#97;&#x6e;&#100;&#111;&#64;&#100;&#x72;&#117;&#x70;&#98;&#x6c;&#x75;&#x65;&#x2e;&#x63;&#x6f;&#x6d;</a>
+Date:   Sun Mar 25 02:54:03 2012 -0300</p>
+
+<pre><code>editing readme file
+</code></pre>
+
+<p>commit db7e57b4cf414ff6a493941e5915f106548981eb
+Author: Osvaldo T. Suarez <a href="&#109;&#x61;&#x69;&#x6c;&#x74;&#x6f;&#x3a;&#111;&#116;&#x73;&#x75;&#97;&#114;&#101;&#122;&#x40;&#103;&#109;&#x61;&#x69;&#108;&#x2e;&#99;&#111;&#x6d;">&#111;&#x74;&#115;&#x75;&#97;&#x72;&#x65;&#x7a;&#64;&#103;&#109;&#x61;&#x69;&#108;&#46;&#99;&#x6f;&#109;</a>
+Date:   Sun Mar 25 02:51:48 2012 -0300</p>
+
+<pre><code>adding readme file
+</code></pre>
+
+<p>fernando@vostro:~/src/publico$ git push
+Counting objects: 5, done.
+Writing objects: 100% (3/3), 278 bytes, done.
+Total 3 (delta 0), reused 0 (delta 0)
+To git@vostro:publico
+   db7e57b..535b69b  master -> master
+fernando@vostro:~/src/publico$
+```</p>
+
+<p>Con solo ejecutar un <code>git pull</code> vamos a mantener nuestro repositorio actualizado como debe ser.</p>
+
+<p>```sh
+osvaldo@vostro:~/src/gitolite/vostro/publico$ git  pull
+Updating db7e57b..535b69b
+Fast-forward
+ README.md |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
+osvaldo@vostro:~/src/gitolite/vostro/publico$ git log
+commit 535b69b7b2ca9ab383e5b59eb0285a307056181c
+Author: Fernando <a href="&#109;&#97;&#105;&#108;&#116;&#x6f;&#x3a;&#x66;&#x65;&#x72;&#110;&#x61;&#110;&#100;&#111;&#64;&#x64;&#114;&#x75;&#x70;&#x62;&#x6c;&#x75;&#x65;&#x2e;&#x63;&#x6f;&#x6d;">&#x66;&#x65;&#x72;&#110;&#x61;&#x6e;&#100;&#x6f;&#64;&#x64;&#x72;&#x75;&#112;&#x62;&#108;&#117;&#x65;&#46;&#99;&#111;&#109;</a>
+Date:   Sun Mar 25 02:54:03 2012 -0300</p>
+
+<pre><code>editing readme file
+</code></pre>
+
+<p>commit db7e57b4cf414ff6a493941e5915f106548981eb
+Author: Osvaldo T. Suarez <a href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#111;&#58;&#111;&#116;&#x73;&#x75;&#x61;&#114;&#x65;&#122;&#x40;&#x67;&#x6d;&#97;&#x69;&#108;&#x2e;&#x63;&#x6f;&#109;">&#111;&#116;&#115;&#117;&#x61;&#x72;&#101;&#122;&#64;&#x67;&#x6d;&#x61;&#x69;&#x6c;&#x2e;&#99;&#x6f;&#109;</a>
+Date:   Sun Mar 25 02:51:48 2012 -0300</p>
+
+<pre><code>adding readme file
+</code></pre>
+
+<p>osvaldo@vostro:~/src/gitolite/vostro/publico$
+```</p>
+
+<p>Por último, pero no menos importante, agradecemos este <a href="http://blacka.com/david/2010/09/28/hosting-your-own-git-repositories/">post de David Blacka</a> sirvio como punto de partida para este articulo.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[guia rapida de git para equipos]]></title>
+    <link href="http://www.devops.com.ar/blog/2012/02/03/guia-rapida-de-git-para-equipos/"/>
+    <updated>2012-02-03T01:54:00-03:00</updated>
+    <id>http://www.devops.com.ar/blog/2012/02/03/guia-rapida-de-git-para-equipos</id>
+    <content type="html"><![CDATA[<h2>¿Quien soy?</h2>
+
+<p>Si se ejecuta <code>git config -l</code> deberia obtenerse algo asi.</p>
+
+<p><code>sh
+$ git config -l
+user.name=Osvaldo
+user.email=osvaldo@example.com
+</code></p>
+
+<p>Si no hemos configurado aun git, empecemos por ahi.</p>
+
+<p><code>sh
+git config --global user.email "osvaldo@example.com"
+git config --global user.name "Osvaldo"
+</code></p>
+
+<h2>Crear un repo</h2>
+
+<p>Se puede crear un repositorio nuevo</p>
+
+<p><code>sh
+git init
+</code></p>
+
+<p>o se puede clonar un ya existente</p>
+
+<p><code>
+git clone ssh://192.168.20.52/home/osvaldo/chef-repo .
+</code></p>
+
+<h2>Branches</h2>
+
+<p>Una branch puede ser creado por un próposito definido (arreglar un bug, <a href="http://nvie.com/posts/a-successful-git-branching-model/">introducir una nueva funcionalidad</a>. También puede ser por usuario. De esta manera, cada uno tiene su branch, donde puede realizar las modificaciones sin afectar el trabajo que estén haciendo otros. Una vez el código esta listo para producción, se hace el merge a la branch master (<a href="http://kentnguyen.com/development/visualized-git-practices-for-team/">haciendo primero un <code>git pull -rebase</code></a>).</p>
+
+<h2>Flujo de trabajo</h2>
+
+<p>El flujo de trabajo con las branches seria</p>
+
+<ul>
+<li>configurar git</li>
+<li>clonar el repo <code>git fetch</code></li>
+<li>crear/moverme a la branch personal <code>git checkout -b otsuarez</code></li>
+<li>editar <code>git -m -a ".. cambios .."</code> (nota. en la branch personal: "otsuarez").</li>
+<li>cambiar a la branch principal y copiar los cambios para ahi <code>git checkout master</code> y despues <code>git merge otsuarez</code></li>
+<li>actualizar el repo central. <code>git push origin master</code></li>
+<li>opcionalmente podemos borrar la rama creada <code>git branch -D otsuarez</code></li>
+</ul>
+
+
+<h3>Referencias</h3>
+
+<ul>
+<li><a href="http://www.spheredev.org/wiki/Git_for_the_lazy">http://www.spheredev.org/wiki/Git_for_the_lazy</a></li>
+<li><a href="http://help.github.com/git-cheat-sheets/">http://help.github.com/git-cheat-sheets/</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

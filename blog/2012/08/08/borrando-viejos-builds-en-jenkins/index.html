@@ -1,0 +1,390 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>borrando viejos builds en jenkins - devops-ar</title>
+  <meta name="author" content="osvaldo">
+
+  
+  <meta name="description" content="Algunos jobs crean builds grandes y con el tiempo, empiezan a ocupar espacio hasta llenar el disco duro. Para solucionar este problema, se pueden &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://www.devops.com.ar/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="devops-ar" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-5155520-9']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">devops-ar</a></h1>
+  
+    <h2>devops en castellano</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:www.devops.com.ar" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Borrando Viejos Builds en Jenkins</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-08T11:17:00-03:00" pubdate data-updated="true">Aug 8<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Algunos jobs crean builds grandes y con el tiempo, empiezan a ocupar espacio hasta llenar el disco duro.</p>
+
+<p>Para solucionar este problema, se pueden borrar periodicamente los builds mas viejos. El siguiente comando va a eliminar los builds de mas de 10 dias:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="k">for </span>i in <span class="sb">`</span>find /var/lib/jenkins/jobs -name builds<span class="sb">`</span> ; <span class="k">do </span>find <span class="nv">$i</span>  -mtime +10 -delete ; <span class="k">done</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<!-- more -->
+
+
+<p>Un ejemplo práctico:</p>
+
+<p>El filesystem estaba sin espacio libre</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@ci-server builds<span class="o">]</span><span class="c"># df -h</span>
+</span><span class='line'>Filesystem            Size  Used Avail Use% Mounted on
+</span><span class='line'>/dev/mapper/VolGroup00-LogVol00
+</span><span class='line'>                       18G   17G     0 100% /
+</span><span class='line'>/dev/sda1              99M   19M   76M  20% /boot
+</span><span class='line'>tmpfs                 506M     0  506M   0% /dev/shm
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Habia una carpeta de builds ocupando 11G:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@ci-server MyProject<span class="o">]</span><span class="c"># for i in `find /var/lib/jenkins/jobs -name builds` ; do du -ksh $i ; done</span>
+</span><span class='line'>27M /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$MyProject</span>/builds
+</span><span class='line'>112M  /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$MyProject</span>-datastore/builds
+</span><span class='line'>7.9M  /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$MyProject</span>-tools/builds
+</span><span class='line'>59M /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$MyProject</span>-user/builds
+</span><span class='line'>144K  /var/lib/jenkins/jobs/MyProject/modules/com.globant.query<span class="nv">$query</span>-xhtml/builds
+</span><span class='line'>54M /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$query</span>-xhtml/builds
+</span><span class='line'>15M /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$MyProject</span>-jquery/builds
+</span><span class='line'>27M /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$dev</span>/builds
+</span><span class='line'>26M /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$MyProject</span>-login/builds
+</span><span class='line'>1.6G  /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$MyProject</span>-style/builds
+</span><span class='line'>19M /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$MyProject</span>-media/builds
+</span><span class='line'>72M /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$MyProject</span>-local-login/builds
+</span><span class='line'>11G /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$MyProject</span>-web/builds
+</span><span class='line'>11M /var/lib/jenkins/jobs/MyProject/builds
+</span><span class='line'><span class="o">[</span>root@ci-server MyProject<span class="o">]</span><span class="c"># </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Eliminando los builds viejos</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@ci-server MyProject<span class="o">]</span><span class="c"># for i in `find /var/lib/jenkins/jobs -name builds` ; do find $i  -mtime +10 -delete ; done</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Y ahora queda mejor.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@ci-server MyProject<span class="o">]</span><span class="c"># for i in `find /var/lib/jenkins/jobs -name builds` ; do du -ksh $i ; done</span>
+</span><span class='line'>3.7M  /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$MyProject</span>/builds
+</span><span class='line'>18M /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$MyProject</span>-datastore/builds
+</span><span class='line'>7.1M  /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$MyProject</span>-tools/builds
+</span><span class='line'>23M /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$MyProject</span>-user/builds
+</span><span class='line'>8.7M  /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$query</span>-xhtml/builds
+</span><span class='line'>12M /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$MyProject</span>-jquery/builds
+</span><span class='line'>4.1M  /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$dev</span>/builds
+</span><span class='line'>13M /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$MyProject</span>-login/builds
+</span><span class='line'>239M  /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$MyProject</span>-style/builds
+</span><span class='line'>6.9M  /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$MyProject</span>-media/builds
+</span><span class='line'>12M /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$MyProject</span>-local-login/builds
+</span><span class='line'>3.4G  /var/lib/jenkins/jobs/MyProject/modules/com.acme.MyProject<span class="nv">$MyProject</span>-web/builds
+</span><span class='line'>11M /var/lib/jenkins/jobs/MyProject/builds
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>El espacio en disco volvio a la normalidad.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@ci-server MyProject<span class="o">]</span><span class="c"># df -h</span>
+</span><span class='line'>Filesystem            Size  Used Avail Use% Mounted on
+</span><span class='line'>/dev/mapper/VolGroup00-LogVol00
+</span><span class='line'>                   18G  7.0G  9.5G  43% /
+</span><span class='line'>/dev/sda1              99M   19M   76M  20% /boot
+</span><span class='line'>tmpfs                 506M     0  506M   0% /dev/shm
+</span><span class='line'><span class="o">[</span>root@ci-server MyProject<span class="o">]</span><span class="c"># </span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">osvaldo</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-08T11:17:00-03:00" pubdate data-updated="true">Aug 8<span>th</span>, 2012</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.devops.com.ar/blog/2012/08/08/borrando-viejos-builds-en-jenkins/" data-via="devops_ar" data-counturl="http://www.devops.com.ar/blog/2012/08/08/borrando-viejos-builds-en-jenkins/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/08/07/permisos-en-directorio-www/" title="Previous Post: permisos en directorio www">&laquo; permisos en directorio www</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/" title="Next Post: usando https detras de un proxy reverso">usando https detras de un proxy reverso &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">definiendo un smarthost en mac os x</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">usando https detras de un proxy reverso</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">borrando viejos builds en jenkins</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/07/permisos-en-directorio-www/">permisos en directorio www</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/14/configurando-jboss-6/">configurando jboss 6</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("devops_ar", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/devops_ar" class="twitter-follow-button" data-show-count="false">Follow @devops_ar</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - osvaldo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'devops-ar';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.devops.com.ar/blog/2012/08/08/borrando-viejos-builds-en-jenkins/';
+        var disqus_url = 'http://www.devops.com.ar/blog/2012/08/08/borrando-viejos-builds-en-jenkins/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: graylog2 | devops-ar]]></title>
+  <link href="http://www.devops.com.ar/blog/categories/graylog2/atom.xml" rel="self"/>
+  <link href="http://www.devops.com.ar/"/>
+  <updated>2012-08-27T23:02:40-03:00</updated>
+  <id>http://www.devops.com.ar/</id>
+  <author>
+    <name><![CDATA[osvaldo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[instalando graylog2]]></title>
+    <link href="http://www.devops.com.ar/blog/2012/01/02/manejando-trazas/"/>
+    <updated>2012-01-02T15:43:00-03:00</updated>
+    <id>http://www.devops.com.ar/blog/2012/01/02/manejando-trazas</id>
+    <content type="html"><![CDATA[<h2>Elasticsearch</h2>
+
+<p>Primero necesitamos instalar elasticsearch.</p>
+
+<p>```bash
+cd /opt</p>
+
+<h1>Elasticsearch :</h1>
+
+<p>ES_PACKAGE=elasticsearch-0.18.6.zip # Latest release as of publishing.
+ES_DIR=${ES_PACKAGE%%.zip}
+SITE=http://github.com/downloads/elasticsearch/elasticsearch
+if [ ! -d "$ES_DIR" ] ; then
+  wget --no-check-certificate $SITE/$ES_PACKAGE
+  unzip $ES_PACKAGE
+fi
+ln -s  $ES_DIR elasticsearch
+cd elasticsearch</p>
+
+<h1>se puede utilizar -f para mantener en foreground</h1>
+
+<p>./bin/elasticsearch
+```</p>
+
+<h2>Graylog2</h2>
+
+<h3>requerimientos</h3>
+
+<p>Sobre CentOS necesitamos adicionar el repo</p>
+
+<p><code>ini /etc/yum.repos.d/10gen.repo
+[10gen]
+name=10gen Repository
+baseurl=http://downloads-distro.mongodb.org/repo/redhat/os/i686
+gpgcheck=0
+</code></p>
+
+<p>Instalamos el paquete.</p>
+
+<p><code>bash
+yum install mongo-10gen-server
+</code></p>
+
+<p>Los siguientes pasos serian:
+- Editar el archivo de configuración
+- Iniciar el servicio
+- Crear un usuario
+- Reiniciar el servicio</p>
+
+<p>La configuración del servicio de mongodb.</p>
+
+<p><code>ini /etc/mongod.conf
+port = 27017
+auth = true
+nohttpinterface = false
+</code></p>
+
+<p>Iniciar el servicio.</p>
+
+<p><code>bash
+/etc/init.d/mongod start
+</code></p>
+
+<p>Crear las credenciales.</p>
+
+<p><code>bash
+sudo mongo
+use graylog2
+db.addUser("perez", "justsomepAss")
+exit
+</code></p>
+
+<p>Reiniciar el servicio para activar las credenciales declaradas.</p>
+
+<p><code>bash
+/etc/init.d/mongod restart
+</code></p>
+
+<p>El servidor de Graylog2 requiere que se instale openjdk.</p>
+
+<p>```bash
+yum install java-1.6.0-openjdk apr-devel apr-util-devel httpd-devel  curl-devel  zlib-devel gcc-c++</p>
+
+<h1>make autoconf openssl-devel readline-devel expat-devel gettext-devel gcc</h1>
+
+<p>```</p>
+
+<h2>graylog2 server</h2>
+
+<p>Primero probamos con 0.9.5 ....</p>
+
+<p><code>sh
+GSF="graylog2-server-0.9.5p1.tar.gz"
+GSD=${GSF%%.tar.gz}
+wget https://github.com/downloads/Graylog2/graylog2-server/$GSF --no-check-certificate -P /tmp
+cd /opt/
+rm -f graylog2-server
+tar zxf /tmp/$GSF
+ln -s $GSD graylog2-server
+rm -f /tmp/$GSF
+cp graylog2-server/graylog2.conf.example /etc/graylog2.conf
+</code></p>
+
+<p>```</p>
+
+<h1>download graylog2 from https://github.com/Graylog2/graylog2-server/downloads</h1>
+
+<p>cd /tmp
+wget https://github.com/downloads/Graylog2/graylog2-server/graylog2-server-0.9.6-beta.tar.gz --no-check-certificate
+cd /opt/
+tar zxf /tmp/graylog2-server-0.9.6-beta.tar.gz
+ln -s graylog2-server-0.9.6-beta graylog2-server
+cp graylog2-server/graylog2.conf.example /etc/graylog2.conf</p>
+
+<p>/etc/graylog2.conf
+mongodb_user = perez
+mongodb_password = justsomepAss</p>
+
+<h1>por ahora no toco el syslog udp port</h1>
+
+<p>sed -i 's/mongodb_user = grayloguser/mongodb_user = perez/' /etc/graylog2.conf
+sed -i 's/mongodb_password = 123/mongodb_password = justsomepAss/' /etc/graylog2.conf</p>
+
+<p>cd /opt/graylog2-server/bin/</p>
+
+<h1>java -Djava.net.preferIPv4Stack=true -jar /opt/graylog2-server/graylog2-server.jar</h1>
+
+<p>sed -i 's/java -jar/java  -Djava.net.preferIPv4Stack=true -jar/' graylog2ctl
+./graylog2ctl start
+```</p>
+
+<h2>graylog2-web-interface</h2>
+
+<p>```bash
+adduser -m graylog
+wget https://github.com/downloads/Graylog2/graylog2-web-interface/graylog2-web-interface-0.9.5p2.tar.gz  --no-check-certificate -P /tmp
+cd /opt
+tar zxf /tmp/graylog2-web-interface-0.9.5p2.tar.gz
+rm -f  graylog2-web-interface
+ln -s graylog2-web-interface-0.9.5p2 graylog2-web-interface
+chown -R graylog /opt/graylog2-web-interface-0.9.5p2
+cd /opt/graylog2-web-interface</p>
+
+<p>gem install bundler
+bundle install</p>
+
+<p>vi /opt/graylog2-web-interface/config/{email.yml,general.yml,mongoid.yml}</p>
+
+<p>/opt/graylog2-web-interface/config/email.yml
+sed -i 's/host: smtp.example.org/host: localhost/' /opt/graylog2-web-interface/config/email.yml</p>
+
+<h1>sed -i 's///'</h1>
+
+<p>sed -i 's/enable_starttls_auto: true/enable_starttls_auto: false/' /opt/graylog2-web-interface/config/email.yml
+$HOSTNAME=<code>hostname -f</code>
+sed -i 's/external_hostname: "your-graylog2.example.org"/external_hostname: "${HOSTNAME}"/' /opt/graylog2-web-interface/config/general.yml</p>
+
+<h1>manually edited mongoid.yml</h1>
+
+<p>sed -i '1,6s/<sup>/#/'</sup> /opt/graylog2-web-interface/config/mongoid.yml
+sed -i '8,$ s/<sup>#//'</sup> /opt/graylog2-web-interface/config/mongoid.yml</p>
+
+<p>cd /opt/graylog2-web-interface
+mkdir tmp log
+chmod -R 777 tmp log</p>
+
+<p>gem install passenger</p>
+
+<p>```
+Una vez que haya terminado la instalación, se muestra un mensaje similar al siguiente.</p>
+
+<p>```
+The Apache 2 module was successfully installed.</p>
+
+<p>Please edit your Apache configuration file, and add these lines:</p>
+
+<p>   LoadModule passenger_module /usr/local/rvm/gems/ruby-1.9.2-p290/gems/passenger-3.0.11/ext/apache2/mod_passenger.so
+   PassengerRoot /usr/local/rvm/gems/ruby-1.9.2-p290/gems/passenger-3.0.11
+   PassengerRuby /usr/local/rvm/wrappers/ruby-1.9.2-p290/ruby</p>
+
+<p>After you restart Apache, you are ready to deploy any number of Ruby on Rails
+applications on Apache, without any further Ruby on Rails-specific
+configuration!</p>
+
+<p>Press ENTER to continue.
+```</p>
+
+<p>Configuramos apache. Primero el módulo.</p>
+
+<p><code>sh
+cat &gt; /etc/httpd/conf.d/passenger.conf &lt;&lt;'EOF'
+LoadModule passenger_module /usr/local/rvm/gems/ruby-1.9.2-p290/gems/passenger-3.0.11/ext/apache2/mod_passenger.so
+PassengerRoot /usr/local/rvm/gems/ruby-1.9.2-p290/gems/passenger-3.0.11
+PassengerRuby /usr/local/rvm/wrappers/ruby-1.9.2-p290/ruby
+EOF
+</code>
+Despues creamos la declaración para el host virtual.</p>
+
+<p>```sh
+HOSTNAME=unixtools.example.com
+cat > /etc/httpd/vhost.d/unixtools.conf &lt;<EOF
+<VirtualHost *:80>
+  ServerName ${HOSTNAME}
+  DocumentRoot /opt/graylog2-web-interface/public
+  <Directory /opt/graylog2-web-interface/public></p>
+
+<pre><code> AllowOverride all
+ Options -MultiViews
+</code></pre>
+
+<p>  </Directory>
+</VirtualHost>
+EOF
+```</p>
+
+<p><code>sh sending a test message
+echo '{
+  "host":"192.168.0.3",
+  "version":"1.0",
+  "facility":"testing",
+  "short_message":"testing gelf message"
+}' | gzip -f - | nc -u localhost 12201
+</code></p>
+
+<p>Si este error aparece.</p>
+
+<p><code>sh
+FATAL: org.graylog2.Main - Could not start syslog server core thread. Do you have permissions to listen on port 514?
+</code></p>
+
+<p>El problema puede ser que no este escuchando el graylog2 server en ese puerto, pues ya estaba escuchando el syslog.</p>
+
+<p><code>sh
+[root@unixtools bin]# netstat -ntapul | grep 514
+udp        0      0 0.0.0.0:514                 0.0.0.0:*                               2670/syslogd        
+[root@unixtools bin]#
+</code>
+La solución es cambiar el syslog para otro puerto. Algo poco intuitivo pues la única forma de cambiar el puerto por el que escucha el syslogd (en CentOS al menos) es cambiando la definición del puerto utilizado por syslog en el archivo /etc/services <a href="http://community.zenoss.org/docs/DOC-4553">http://community.zenoss.org/docs/DOC-4553</a>.
+Se sugiere comentarear la línea original y adicionar otra con la nueva definición.</p>
+
+<p>```sh</p>
+
+<h1>syslog     514/udp                   # original syslog setting</h1>
+
+<p>syslog      10514/udp                 # setting to accomodate zenoss
+```</p>
+
+<p>Comprobar que el syslog esta escuchando en el nuevo puerto.</p>
+
+<p><code>
+[root@unixtools bin]# netstat -ntapul | grep 514
+udp        0      0 0.0.0.0:10514               0.0.0.0:*                               32276/syslogd       
+[root@unixtools bin]#
+</code></p>
+
+<p>Ya se puede lanzar el proceso de graylog2.</p>
+
+<h3>Centralized logging</h3>
+
+<p>Probando logstash  ...</p>
+
+<p>http://logstash.net/docs/1.0.17/getting-started-centralized</p>
+
+<p>http://semicomplete.com/files/logstash/logstash-1.0.17-monolithic.jar</p>
+
+<p>```js
+input {
+  file {</p>
+
+<pre><code>type =&gt; "syslog"
+
+# Wildcards work here :)
+path =&gt; [ "/var/log/messages", "/var/log/syslog", "/var/log/*.log" ]
+</code></pre>
+
+<p>  }</p>
+
+<p>  file {</p>
+
+<pre><code>type =&gt; "apache-access"
+path =&gt; "/var/log/apache2/access.log"
+</code></pre>
+
+<p>  }</p>
+
+<p>  file {</p>
+
+<pre><code>type =&gt; "apache-error"
+path =&gt; "/var/log/apache2/error.log"
+</code></pre>
+
+<p>  }
+}</p>
+
+<p>output {
+  # Output events to stdout for debugging. Feel free to remove
+  # this output if you don't need it.
+  stdout { }</p>
+
+<p>}
+```</p>
+
+<p>Se puede utilizar.</p>
+
+<ul>
+<li>gelf://yourgraylog2server:port   # ship logs to the graylog2 server <a href="http://weboperations.blogspot.com/2011/04/fwd-non-intrusive-way-to-send-messages.html">http://weboperations.blogspot.com/2011/04/fwd-non-intrusive-way-to-send-messages.html</a>.</li>
+</ul>
+
+
+<p>```
+java -jar logstash-1.0.17-monolithic.jar agent -f stash.conf</p>
+
+<p>Exception in thread "main" java.lang.UnsupportedClassVersionError: Bad version number in .class file</p>
+
+<p>```</p>
+
+<p>Este error aparece cuando se compila un archivo .java con una version de JDK y se ejecuta el archivo .class con una versión diferente de JVM.</p>
+
+<p>Confundido? Pudiera pensar, la misma versión no es necesaria para compilar y para ejecutar.</p>
+
+<p>Correcto, esta en lo cierto. Pero no puede ejecutar archivos .class que fueron compilados con una versión mas actual que la JVM que esta utilizando.</p>
+
+<p>En este caso, la versión de openjdk que instaló el CentOS era anterior a la versión de JDK con que fue compilado el jar del logstash. <a href="https://github.com/logstash/logstash/wiki/Building-and-running-logstash-from-source">https://github.com/logstash/logstash/wiki/Building-and-running-logstash-from-source</a></p>
+
+<p><code>
+Prerequisites
+Sun Java 6 JDK (don't try this with openjdk)
+JRuby version that matches what logstash uses (You can get this from the top of the Makefile)
+</code>
+not a good choice for legacy servers ....</p>
+
+<h3>syslog using ruby</h3>
+
+<p>```rb hi.rb
+require 'syslog'</p>
+
+<p>def log(message)
+  # $0 is the current script name
+  Syslog.open($0, Syslog::LOG_PID | Syslog::LOG_CONS) { |s| s.warning message }
+end</p>
+
+<p>log('hello world')
+```</p>
+
+<h3>Comprobando que funciona</h3>
+
+<p>A GELF message is a GZIP'd or ZLIB'd JSON string with the following fields: ...
+Un mensaje GELF es una cadena JSON compactada con GZIP o ZLIB ...
+<a href="https://github.com/Graylog2/graylog2-docs/wiki/GELF">https://github.com/Graylog2/graylog2-docs/wiki/GELF</a></p>
+
+<p>Esa la razón por la cual se utiliza el gzip en el comando:</p>
+
+<p><code>sh
+echo '{
+  "host":"192.168.0.3",
+  "version":"1.0",
+  "facility":"testing",
+  "short_message":"testing gelf message"
+}' | gzip -f - | nc -u localhost 12201
+</code></p>
+
+<p>deberiamos ver esto:</p>
+
+<p><code>sh /var/log/messages
+2011-12-22 16:56:01,186 DEBUG: org.graylog2.messagehandlers.gelf.GELFClientHandlerThread - Received message is not chunked. Handling now.
+2011-12-22 16:56:01,189 DEBUG: org.graylog2.messagehandlers.gelf.SimpleGELFClientHandler - Handling GZIP compressed SimpleGELFClient
+2011-12-22 16:56:01,326 DEBUG: org.graylog2.messagehandlers.gelf.SimpleGELFClientHandler - Got GELF message: shortMessage: testing gelf message | fullMessage: null | level: 1 | host: 192.168.0.3 | file: null | line: -1 | facility: testing | version: 1.0 | additional: 0
+2011-12-22 16:56:01,410 INFO : org.graylog2.periodical.BulkIndexerThread - About to index max 4000 messages. You have a total of 1 messages in the queue. [freq:1s]
+2011-12-22 16:56:01,411 DEBUG: org.graylog2.messagequeue.MessageQueue - Read 1 messages from queue.
+2011-12-22 16:56:01,411 INFO : org.graylog2.periodical.BulkIndexerThread - ... indexing 1 messages.
+</code></p>
+
+<h3>Referencias</h3>
+]]></content>
+  </entry>
+  
+</feed>
