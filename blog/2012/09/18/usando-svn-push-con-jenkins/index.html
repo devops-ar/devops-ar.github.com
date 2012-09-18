@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>ORA-01882: timezone region  not found - devops-ar</title>
+  <title>usando svn push con jenkins - devops-ar</title>
   <meta name="author" content="osvaldo">
 
   
-  <meta name="description" content="Una aplicación corriendo en un tomcat, no se conectaba con la base de datos en Oracle. El siguiente error aparecía en el archivo de trazas (${ &hellip;">
+  <meta name="description" content="El jenkins puede ser configurado para que periodicamente chequee el repositorio (svn) y de haber algun nuevo commit lance un build. Otra forma es que &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://devops-ar.github.com/blog/2011/11/16/ora-01882-timezone-region-not-found/">
+  <link rel="canonical" href="http://devops-ar.github.com/blog/2012/09/18/usando-svn-push-con-jenkins/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -79,7 +79,7 @@
   
   <header>
     
-      <h1 class="entry-title">ORA-01882: Timezone Region Not Found</h1>
+      <h1 class="entry-title">Usando Svn Push Con Jenkins</h1>
     
     
       <p class="meta">
@@ -95,7 +95,7 @@
   
 
 
-<time datetime="2011-11-16T01:01:00-03:00" pubdate data-updated="true">Nov 16<span>th</span>, 2011</time>
+<time datetime="2012-09-18T12:23:00-03:00" pubdate data-updated="true">Sep 18<span>th</span>, 2012</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -104,24 +104,54 @@
   </header>
 
 
-<div class="entry-content"><p>Una aplicación corriendo en un tomcat, no se conectaba con la base de datos en Oracle. El siguiente error aparecía en el archivo de trazas (${CATALINA_HOME}/logs/catalina.out)</p>
+<div class="entry-content"><p>El jenkins puede ser configurado para que periodicamente chequee el repositorio (svn) y de haber algun nuevo commit lance un build.</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p>Otra forma es que sea el subversion el que notifique al jenkins cuando se hizo un commit.</p>
+
+<p>Para esto se modifica el hook post-commit del repositorio en svn.</p>
+
+<figure class='code'><figcaption><span>/opt/svn/myproject/hooks/post-commit</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>(2011-10-05 15:57:45,511) DEBUG com.apache.example.async.ThreadPoolAsynchronousRunner$PoolThread-#0 com.apache.example.resourcepool.BasicResourcePool - An exception occurred while acquiring a poolable resource. Will retry.
-</span><span class='line'>java.sql.SQLException: ORA-00604: error occurred at recursive SQL level 1
-</span><span class='line'>ORA-01882: timezone region  not found</span></code></pre></td></tr></table></div></figure>
-
-
-<p>La solución era sencilla (kudos to A.A.), al archivo de inicio del tomcat (${CATALINA_HOME}/bin/catalina.sh) adicionarle esta línea:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">JAVA_OPTS</span><span class="o">=</span><span class="s2">&quot;$JAVA_OPTS -Duser.timezone=&#39;+03:00&#39; &quot;</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">REPOS</span><span class="o">=</span><span class="s2">&quot;$1&quot;</span>
+</span><span class='line'><span class="nv">REV</span><span class="o">=</span><span class="s2">&quot;$2&quot;</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">PYTHON_EGG_CACHE</span><span class="o">=</span>/opt/trac/.egg-cache
+</span><span class='line'>
+</span><span class='line'>/usr/bin/python /opt/svn/bin/svnhooks/trac-post-commit-hook -p <span class="s2">&quot;/opt/trac/myproject&quot;</span> -r <span class="s2">&quot;$REV&quot;</span>
+</span><span class='line'>
+</span><span class='line'>/usr/bin/svnnotify --max-sub-length 72 --max-diff-length 16384 --repos-path <span class="s2">&quot;$REPOS&quot;</span> --revision <span class="s2">&quot;$REV&quot;</span> --svnlook /usr/bin/svnlook --to myproject --with-diff --subject-cx --handler HTML::ColorDiff --subject-prefix <span class="s2">&quot;&quot;</span> --from myproject
+</span><span class='line'>
+</span><span class='line'><span class="nv">UUID</span><span class="o">=</span><span class="sb">`</span>/usr/bin/svnlook uuid <span class="nv">$REPOS</span><span class="sb">`</span>
+</span><span class='line'><span class="nv">CISERVER</span><span class="o">=</span><span class="s2">&quot;http://jenkins.example.com/&quot;</span>
+</span><span class='line'>
+</span><span class='line'>/usr/bin/wget <span class="se">\</span>
+</span><span class='line'>  --header <span class="s2">&quot;Content-Type:text/plain;charset=UTF-8&quot;</span> <span class="se">\</span>
+</span><span class='line'>  --post-data <span class="s2">&quot;`svnlook changed --revision $REV $REPOS`&quot;</span> <span class="se">\</span>
+</span><span class='line'>  --output-document <span class="s2">&quot;-&quot;</span> <span class="se">\</span>
+</span><span class='line'>  --timeout<span class="o">=</span>2 <span class="se">\</span>
+</span><span class='line'>  <span class="k">${</span><span class="nv">CISERVER</span><span class="p">=</span><span class="k">}</span>/subversion/<span class="k">${</span><span class="nv">UUID</span><span class="k">}</span>/notifyCommit?rev<span class="o">=</span><span class="nv">$REV</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Este valor deberá ser ajustado al timezone que corresponda en cada caso.</p>
+<p>Las primeras 9 lineas son las que crea el subversion de manera predeterminada. A partir de ahi estan las que realizan la notificacion al jenkins. En el <a href="http://jenkins-ci.org/content/subversion-repository-change-notification-push-vs-pull">sitio de jenkins sugieren este método</a> siempre que sea posible</p>
 </div>
 
 
@@ -144,12 +174,12 @@
   
 
 
-<time datetime="2011-11-16T01:01:00-03:00" pubdate data-updated="true">Nov 16<span>th</span>, 2011</time>
+<time datetime="2012-09-18T12:23:00-03:00" pubdate data-updated="true">Sep 18<span>th</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/oracle/'>oracle</a>, <a class='category' href='/blog/categories/tomcat/'>tomcat</a>
+    <a class='category' href='/blog/categories/ci/'>ci</a>, <a class='category' href='/blog/categories/jenkins/'>jenkins</a>, <a class='category' href='/blog/categories/svn/'>svn</a>
   
 </span>
 
@@ -158,7 +188,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://devops-ar.github.com/blog/2011/11/16/ora-01882-timezone-region-not-found/" data-via="devops_ar" data-counturl="http://devops-ar.github.com/blog/2011/11/16/ora-01882-timezone-region-not-found/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://devops-ar.github.com/blog/2012/09/18/usando-svn-push-con-jenkins/" data-via="devops_ar" data-counturl="http://devops-ar.github.com/blog/2012/09/18/usando-svn-push-con-jenkins/" >Tweet</a>
   
   
   
@@ -167,8 +197,8 @@
     
     <p class="meta">
       
+        <a class="basic-alignment left" href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/" title="Previous Post: definiendo un smarthost en mac os x">&laquo; definiendo un smarthost en mac os x</a>
       
-        <a class="basic-alignment right" href="/blog/2011/11/26/usando-python-con-virtualenv/" title="Next Post: Usando python con virtualenv ">Usando python con virtualenv  &raquo;</a>
       
     </p>
   </footer>
@@ -251,8 +281,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://devops-ar.github.com/blog/2011/11/16/ora-01882-timezone-region-not-found/';
-        var disqus_url = 'http://devops-ar.github.com/blog/2011/11/16/ora-01882-timezone-region-not-found/';
+        var disqus_identifier = 'http://devops-ar.github.com/blog/2012/09/18/usando-svn-push-con-jenkins/';
+        var disqus_url = 'http://devops-ar.github.com/blog/2012/09/18/usando-svn-push-con-jenkins/';
         var disqus_script = 'embed.js';
       
     (function () {

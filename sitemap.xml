@@ -91,8 +91,12 @@
         <lastmod>2012-08-27T13:03:32-03:00</lastmod>
     </url>
     <url>
+        <loc>http://devops-ar.github.com/blog/2012/09/18/usando-svn-push-con-jenkins/</loc>
+        <lastmod>2012-09-18T12:31:10-03:00</lastmod>
+    </url>
+    <url>
         <loc>http://devops-ar.github.com/blog/archives/</loc>
-        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
+        <lastmod>2012-09-18T12:31:10-03:00</lastmod>
     </url>
     <url>
         <loc>http://devops-ar.github.com/contacto/</loc>
@@ -100,6 +104,6 @@
     </url>
     <url>
         <loc>http://devops-ar.github.com/</loc>
-        <lastmod>2012-08-27T13:03:32-03:00</lastmod>
+        <lastmod>2012-09-18T12:31:10-03:00</lastmod>
     </url>
 </urlset>

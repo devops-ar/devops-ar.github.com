@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: git - devops-ar</title>
+  <title>devops-ar</title>
   <meta name="author" content="osvaldo">
 
   
-  <meta name="description" content="Category: git">
+  <meta name="description" content="Una aplicación corriendo en un tomcat, no se conectaba con la base de datos en Oracle. El siguiente error aparecía en el archivo de trazas (${ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://devops-ar.github.comblog/categories/git/">
+  <link rel="canonical" href="http://devops-ar.github.com/blog/page/5/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -74,54 +74,72 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div>
-<article role="article">
+      <div class="blog-index">
   
+  
+  
+    <article>
+      
   <header>
-    <h1 class="entry-title">Category: Git</h1>
+    
+      <h1 class="entry-title"><a href="/blog/2011/11/16/ora-01882-timezone-region-not-found/">ORA-01882: Timezone Region Not Found</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-11-16T01:01:00-03:00" pubdate data-updated="true">Nov 16<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/11/16/ora-01882-timezone-region-not-found/#disqus_thread">Comments</a>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="category">
 
 
+  <div class="entry-content"><p>Una aplicación corriendo en un tomcat, no se conectaba con la base de datos en Oracle. El siguiente error aparecía en el archivo de trazas (${CATALINA_HOME}/logs/catalina.out)</p>
 
-  
-  <h2>2012</h2>
-
-<article>
-  
-<h1><a href="/blog/2012/03/25/usando-gitolite/">usando gitolite</a></h1>
-<time datetime="2012-03-25T03:04:00-03:00" pubdate><span class='month'>Mar</span> <span class='day'>25</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/git/'>git</a></span>
-</footer>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>(2011-10-05 15:57:45,511) DEBUG com.apache.example.async.ThreadPoolAsynchronousRunner$PoolThread-#0 com.apache.example.resourcepool.BasicResourcePool - An exception occurred while acquiring a poolable resource. Will retry.
+</span><span class='line'>java.sql.SQLException: ORA-00604: error occurred at recursive SQL level 1
+</span><span class='line'>ORA-01882: timezone region  not found</span></code></pre></td></tr></table></div></figure>
 
 
-</article>
+<p>La solución era sencilla (kudos to A.A.), al archivo de inicio del tomcat (${CATALINA_HOME}/bin/catalina.sh) adicionarle esta línea:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">JAVA_OPTS</span><span class="o">=</span><span class="s2">&quot;$JAVA_OPTS -Duser.timezone=&#39;+03:00&#39; &quot;</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
-
-<article>
-  
-<h1><a href="/blog/2012/02/03/guia-rapida-de-git-para-equipos/">guia rapida de git para equipos</a></h1>
-<time datetime="2012-02-03T01:54:00-03:00" pubdate><span class='month'>Feb</span> <span class='day'>03</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/git/'>git</a></span>
-</footer>
-
-
-</article>
-
+<p>Este valor deberá ser ajustado al timezone que corresponda en cada caso.</p>
 </div>
-
   
-</article>
+  
 
+
+    </article>
+  
+  <div class="pagination">
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/blog/page/4/">Newer &rarr;</a>
+    
+  </div>
 </div>
-
 <aside class="sidebar">
   
     <section>
@@ -155,7 +173,7 @@
 <section>
   <h1>Latest Tweets</h1>
   <ul id="tweets">
-    <li class="loading">Status updating...</li>
+    <li class="loading">Status updating&#8230;</li>
   </ul>
   <script type="text/javascript">
     $.domReady(function(){
@@ -174,7 +192,6 @@
 
   
 </aside>
-
 
     </div>
   </div>

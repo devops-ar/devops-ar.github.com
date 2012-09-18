@@ -9,7 +9,7 @@
   <meta name="author" content="osvaldo">
 
   
-  <meta name="description" content="Es común tener un smarthost o relay de correo en las intranet. Si tenemos un equipo con Mac OS X y necesitamos configurarle que todos los correos que &hellip;">
+  <meta name="description" content="El jenkins puede ser configurado para que periodicamente chequee el repositorio (svn) y de haber algun nuevo commit lance un build. Otra forma es que &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +76,91 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/09/18/usando-svn-push-con-jenkins/">Usando Svn Push Con Jenkins</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-09-18T12:23:00-03:00" pubdate data-updated="true">Sep 18<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/09/18/usando-svn-push-con-jenkins/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>El jenkins puede ser configurado para que periodicamente chequee el repositorio (svn) y de haber algun nuevo commit lance un build.</p>
+
+<p>Otra forma es que sea el subversion el que notifique al jenkins cuando se hizo un commit.</p>
+
+<p>Para esto se modifica el hook post-commit del repositorio en svn.</p>
+
+<figure class='code'><figcaption><span>/opt/svn/myproject/hooks/post-commit</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">REPOS</span><span class="o">=</span><span class="s2">&quot;$1&quot;</span>
+</span><span class='line'><span class="nv">REV</span><span class="o">=</span><span class="s2">&quot;$2&quot;</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">PYTHON_EGG_CACHE</span><span class="o">=</span>/opt/trac/.egg-cache
+</span><span class='line'>
+</span><span class='line'>/usr/bin/python /opt/svn/bin/svnhooks/trac-post-commit-hook -p <span class="s2">&quot;/opt/trac/myproject&quot;</span> -r <span class="s2">&quot;$REV&quot;</span>
+</span><span class='line'>
+</span><span class='line'>/usr/bin/svnnotify --max-sub-length 72 --max-diff-length 16384 --repos-path <span class="s2">&quot;$REPOS&quot;</span> --revision <span class="s2">&quot;$REV&quot;</span> --svnlook /usr/bin/svnlook --to myproject --with-diff --subject-cx --handler HTML::ColorDiff --subject-prefix <span class="s2">&quot;&quot;</span> --from myproject
+</span><span class='line'>
+</span><span class='line'><span class="nv">UUID</span><span class="o">=</span><span class="sb">`</span>/usr/bin/svnlook uuid <span class="nv">$REPOS</span><span class="sb">`</span>
+</span><span class='line'><span class="nv">CISERVER</span><span class="o">=</span><span class="s2">&quot;http://jenkins.example.com/&quot;</span>
+</span><span class='line'>
+</span><span class='line'>/usr/bin/wget <span class="se">\</span>
+</span><span class='line'>  --header <span class="s2">&quot;Content-Type:text/plain;charset=UTF-8&quot;</span> <span class="se">\</span>
+</span><span class='line'>  --post-data <span class="s2">&quot;`svnlook changed --revision $REV $REPOS`&quot;</span> <span class="se">\</span>
+</span><span class='line'>  --output-document <span class="s2">&quot;-&quot;</span> <span class="se">\</span>
+</span><span class='line'>  --timeout<span class="o">=</span>2 <span class="se">\</span>
+</span><span class='line'>  <span class="k">${</span><span class="nv">CISERVER</span><span class="p">=</span><span class="k">}</span>/subversion/<span class="k">${</span><span class="nv">UUID</span><span class="k">}</span>/notifyCommit?rev<span class="o">=</span><span class="nv">$REV</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Las primeras 9 lineas son las que crea el subversion de manera predeterminada. A partir de ahi estan las que realizan la notificacion al jenkins. En el <a href="http://jenkins-ci.org/content/subversion-repository-change-notification-push-vs-pull">sitio de jenkins sugieren este método</a> siempre que sea posible</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -309,95 +394,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/06/14/configurando-jboss-6/">Configurando Jboss 6</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-06-14T12:55:00-03:00" pubdate data-updated="true">Jun 14<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/06/14/configurando-jboss-6/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Para configurar jboss 6 de manera que funcione con puertos no estandards (porque en el mismo server se esta ejecutando otra aplicacion que ya usa esos puertos, digamos, jenkins) se requieren dos cambios. El primero en el script que inicia el jboss. El segundo, al script que lo detiene, pues de lo contrario, no podria funcionar.</p>
-
-<p>Primero se le adiciona la linea <code>JAVA_OPTS="$JAVA_OPTS -Djboss.service.binding.set=\"ports-01\""</code> al script que inicia el jboss.</p>
-
-<figure class='code'><figcaption><span>JBOSS_HOME/bin/run.sh</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># Setup JBoss specific properties</span>
-</span><span class='line'><span class="nv">JAVA_OPTS</span><span class="o">=</span><span class="s2">&quot;$JAVA_OPTS -Djboss.service.binding.set=\&quot;ports-01\&quot;&quot;</span>
-</span><span class='line'><span class="nv">JAVA_OPTS</span><span class="o">=</span><span class="s2">&quot;${JAVA_OPTS:+$JAVA_OPTS -Dprogram.name=$PROGNAME}&quot;</span>
-</span><span class='line'><span class="nv">JAVA_OPTS</span><span class="o">=</span><span class="s2">&quot;${JAVA_OPTS:--Dprogram.name=$PROGNAME}&quot;</span>
-</span><span class='line'><span class="nv">JAVA_OPTS</span><span class="o">=</span><span class="s2">&quot;${JAVA_OPTS:+$JAVA_OPTS -Dlogging.configuration=file:${DIRNAME}/logging.properties}&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Luego, se define el puerto (RMI) en el script que detiene la aplicación. En este caso, el propio script que trae el jboss. Para el caso de un CentOS seria una copia de jboss_init_redhat.sh.</p>
-
-<figure class='code'><figcaption><span>/etc/rc.d/init.d/jboss</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#JBOSS_CMD_STOP=${JBOSS_CMD_STOP:-&quot;java -classpath $JBOSSCP org.jboss.Shutdown --shutdown&quot;}</span>
-</span><span class='line'><span class="nv">JBOSS_CMD_STOP</span><span class="o">=</span><span class="k">${</span><span class="nv">JBOSSSTOP</span><span class="k">:-</span><span class="s2">&quot;$JBOSS_HOME/bin/shutdown.sh --host localhost --port=1190&quot;</span><span class="k">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Aca vemos en acción los cambios realizados.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@example.com ~<span class="o">]</span><span class="c"># ps aux | grep jboss | egrep -v &#39;tail|grep&#39;</span>
-</span><span class='line'><span class="o">[</span>root@example.com ~<span class="o">]</span><span class="c"># </span>
-</span><span class='line'><span class="o">[</span>root@example.com ~<span class="o">]</span><span class="c"># service jboss start</span>
-</span><span class='line'><span class="o">[</span>root@example.com ~<span class="o">]</span><span class="c"># ps aux | grep jboss | egrep -v &#39;tail|grep&#39;</span>
-</span><span class='line'>jboss    23962  0.0  0.0  63856  1168 ?        S    10:39   0:00 /bin/sh /opt/jboss/bin/run.sh -c default
-</span><span class='line'>jboss    24014 97.7  5.0 1037244 205740 ?      Sl   10:39   0:23 java -server -Xms128m -Xmx512m -XX:MaxPermSize<span class="o">=</span>256m -Dorg.jboss.resolver.warning<span class="o">=</span><span class="nb">true</span> -Dsun.rmi.dgc.client.gcInterval<span class="o">=</span>3600000 -Dsun.rmi.dgc.server.gcInterval<span class="o">=</span>3600000 -Djava.net.preferIPv4Stack<span class="o">=</span><span class="nb">true</span> -Djboss.service.binding.set<span class="o">=</span>ports-01 -Dprogram.name<span class="o">=</span>run.sh -Dlogging.configuration<span class="o">=</span>file:/opt/jboss/bin/logging.properties -Djava.library.path<span class="o">=</span>/opt/jboss/bin/native/lib64 -Djava.endorsed.dirs<span class="o">=</span>/opt/jboss/lib/endorsed -classpath /opt/jboss/bin/run.jar org.jboss.Main -c default
-</span><span class='line'><span class="o">[</span>root@example.com ~<span class="o">]</span><span class="c"># service jboss stop</span>
-</span><span class='line'>Shutdown message has been posted to the server.
-</span><span class='line'>Server shutdown may take a <span class="k">while</span> - check logfiles <span class="k">for </span>completion
-</span><span class='line'><span class="o">[</span>root@example.com ~<span class="o">]</span><span class="c"># ps aux | grep jboss | egrep -v &#39;tail|grep&#39;</span>
-</span><span class='line'><span class="o">[</span>root@example.com ~<span class="o">]</span><span class="c"># </span>
-</span></code></pre></td></tr></table></div></figure>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -413,6 +409,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/09/18/usando-svn-push-con-jenkins/">usando svn push con jenkins</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">definiendo un smarthost en mac os x</a>
       </li>
     
@@ -426,10 +426,6 @@
     
       <li class="post">
         <a href="/blog/2012/08/07/permisos-en-directorio-www/">permisos en directorio www</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/14/configurando-jboss-6/">configurando jboss 6</a>
       </li>
     
   </ul>

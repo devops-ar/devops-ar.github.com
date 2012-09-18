@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ci | devops-ar]]></title>
   <link href="http://devops-ar.github.com/blog/categories/ci/atom.xml" rel="self"/>
   <link href="http://devops-ar.github.com/"/>
-  <updated>2012-08-27T23:24:25-03:00</updated>
+  <updated>2012-09-18T20:45:03-03:00</updated>
   <id>http://devops-ar.github.com/</id>
   <author>
     <name><![CDATA[osvaldo]]></name>
@@ -12,6 +12,44 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[usando svn push con jenkins]]></title>
+    <link href="http://devops-ar.github.com/blog/2012/09/18/usando-svn-push-con-jenkins/"/>
+    <updated>2012-09-18T12:23:00-03:00</updated>
+    <id>http://devops-ar.github.com/blog/2012/09/18/usando-svn-push-con-jenkins</id>
+    <content type="html"><![CDATA[<p>El jenkins puede ser configurado para que periodicamente chequee el repositorio (svn) y de haber algun nuevo commit lance un build.</p>
+
+<p>Otra forma es que sea el subversion el que notifique al jenkins cuando se hizo un commit.</p>
+
+<p>Para esto se modifica el hook post-commit del repositorio en svn.</p>
+
+<p>```sh /opt/svn/myproject/hooks/post-commit</p>
+
+<h1>!/bin/sh</h1>
+
+<p>REPOS="$1"
+REV="$2"
+export PYTHON_EGG_CACHE=/opt/trac/.egg-cache</p>
+
+<p>/usr/bin/python /opt/svn/bin/svnhooks/trac-post-commit-hook -p "/opt/trac/myproject" -r "$REV"</p>
+
+<p>/usr/bin/svnnotify --max-sub-length 72 --max-diff-length 16384 --repos-path "$REPOS" --revision "$REV" --svnlook /usr/bin/svnlook --to myproject --with-diff --subject-cx --handler HTML::ColorDiff --subject-prefix "" --from myproject</p>
+
+<p>UUID=<code>/usr/bin/svnlook uuid $REPOS</code>
+CISERVER="http://jenkins.example.com/"</p>
+
+<p>/usr/bin/wget \
+  --header "Content-Type:text/plain;charset=UTF-8" \
+  --post-data "<code>svnlook changed --revision $REV $REPOS</code>" \
+  --output-document "-" \
+  --timeout=2 \
+  ${CISERVER=}/subversion/${UUID}/notifyCommit?rev=$REV
+```</p>
+
+<p>Las primeras 9 lineas son las que crea el subversion de manera predeterminada. A partir de ahi estan las que realizan la notificacion al jenkins. En el <a href="http://jenkins-ci.org/content/subversion-repository-change-notification-push-vs-pull">sitio de jenkins sugieren este método</a> siempre que sea posible</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[instalacion de un server de ci]]></title>
