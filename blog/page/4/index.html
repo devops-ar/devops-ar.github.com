@@ -9,7 +9,22 @@
   <meta name="author" content="osvaldo">
 
   
-  <meta name="description" content="disclaimer: this is only for creating an rpm for installing a set of files, no compiling, just a bunch of file being copied into a server. Starting &hellip;">
+  <meta name="description" content="Elasticsearch Primero necesitamos instalar elasticsearch. 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+cd /opt
+# Elasticsearch :
+ES_PACKAGE=elasticsearch-0.18.6.zip &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +91,585 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/01/02/manejando-trazas/">Instalando Graylog2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-01-02T15:43:00-03:00" pubdate data-updated="true">Jan 2<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/01/02/manejando-trazas/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>Elasticsearch</h2>
+
+<p>Primero necesitamos instalar elasticsearch.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">cd</span> /opt
+</span><span class='line'><span class="c"># Elasticsearch :</span>
+</span><span class='line'><span class="nv">ES_PACKAGE</span><span class="o">=</span>elasticsearch-0.18.6.zip <span class="c"># Latest release as of publishing.</span>
+</span><span class='line'><span class="nv">ES_DIR</span><span class="o">=</span><span class="k">${</span><span class="nv">ES_PACKAGE</span><span class="p">%%.zip</span><span class="k">}</span>
+</span><span class='line'><span class="nv">SITE</span><span class="o">=</span>http://github.com/downloads/elasticsearch/elasticsearch
+</span><span class='line'><span class="k">if</span> <span class="o">[</span> ! -d <span class="s2">&quot;$ES_DIR&quot;</span> <span class="o">]</span> ; <span class="k">then</span>
+</span><span class='line'><span class="k">  </span>wget --no-check-certificate <span class="nv">$SITE</span>/<span class="nv">$ES_PACKAGE</span>
+</span><span class='line'>  unzip <span class="nv">$ES_PACKAGE</span>
+</span><span class='line'><span class="k">fi</span>
+</span><span class='line'>ln -s  <span class="nv">$ES_DIR</span> elasticsearch
+</span><span class='line'><span class="nb">cd </span>elasticsearch
+</span><span class='line'><span class="c"># se puede utilizar -f para mantener en foreground</span>
+</span><span class='line'>./bin/elasticsearch
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Graylog2</h2>
+
+<h3>requerimientos</h3>
+
+<p>Sobre CentOS necesitamos adicionar el repo</p>
+
+<figure class='code'><figcaption><span>/etc/yum.repos.d/10gen.repo</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ini'><span class='line'><span class="k">[10gen]</span>
+</span><span class='line'><span class="na">name</span><span class="o">=</span><span class="s">10gen Repository</span>
+</span><span class='line'><span class="na">baseurl</span><span class="o">=</span><span class="s">http://downloads-distro.mongodb.org/repo/redhat/os/i686</span>
+</span><span class='line'><span class="na">gpgcheck</span><span class="o">=</span><span class="s">0</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Instalamos el paquete.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>yum install mongo-10gen-server
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Los siguientes pasos serian:
+- Editar el archivo de configuración
+- Iniciar el servicio
+- Crear un usuario
+- Reiniciar el servicio</p>
+
+<p>La configuración del servicio de mongodb.</p>
+
+<figure class='code'><figcaption><span>/etc/mongod.conf</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ini'><span class='line'><span class="na">port</span> <span class="o">=</span> <span class="s">27017</span>
+</span><span class='line'><span class="na">auth</span> <span class="o">=</span> <span class="s">true</span>
+</span><span class='line'><span class="na">nohttpinterface</span> <span class="o">=</span> <span class="s">false</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Iniciar el servicio.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>/etc/init.d/mongod start
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Crear las credenciales.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo mongo
+</span><span class='line'>use graylog2
+</span><span class='line'>db.addUser<span class="o">(</span><span class="s2">&quot;perez&quot;</span>, <span class="s2">&quot;justsomepAss&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="nb">exit</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Reiniciar el servicio para activar las credenciales declaradas.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>/etc/init.d/mongod restart
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>El servidor de Graylog2 requiere que se instale openjdk.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>yum install java-1.6.0-openjdk apr-devel apr-util-devel httpd-devel  curl-devel  zlib-devel gcc-c++
+</span><span class='line'><span class="c"># make autoconf openssl-devel readline-devel expat-devel gettext-devel gcc </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>graylog2 server</h2>
+
+<p>Primero probamos con 0.9.5 &#8230;.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">GSF</span><span class="o">=</span><span class="s2">&quot;graylog2-server-0.9.5p1.tar.gz&quot;</span>
+</span><span class='line'><span class="nv">GSD</span><span class="o">=</span><span class="k">${</span><span class="nv">GSF</span><span class="p">%%.tar.gz</span><span class="k">}</span>
+</span><span class='line'>wget https://github.com/downloads/Graylog2/graylog2-server/<span class="nv">$GSF</span> --no-check-certificate -P /tmp
+</span><span class='line'><span class="nb">cd</span> /opt/
+</span><span class='line'>rm -f graylog2-server
+</span><span class='line'>tar zxf /tmp/<span class="nv">$GSF</span>
+</span><span class='line'>ln -s <span class="nv">$GSD</span> graylog2-server
+</span><span class='line'>rm -f /tmp/<span class="nv">$GSF</span>
+</span><span class='line'>cp graylog2-server/graylog2.conf.example /etc/graylog2.conf
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># download graylog2 from https://github.com/Graylog2/graylog2-server/downloads</span>
+</span><span class='line'><span class="nb">cd</span> /tmp
+</span><span class='line'>wget https://github.com/downloads/Graylog2/graylog2-server/graylog2-server-0.9.6-beta.tar.gz --no-check-certificate
+</span><span class='line'><span class="nb">cd</span> /opt/
+</span><span class='line'>tar zxf /tmp/graylog2-server-0.9.6-beta.tar.gz
+</span><span class='line'>ln -s graylog2-server-0.9.6-beta graylog2-server
+</span><span class='line'>cp graylog2-server/graylog2.conf.example /etc/graylog2.conf
+</span><span class='line'>
+</span><span class='line'>/etc/graylog2.conf
+</span><span class='line'><span class="nv">mongodb_user</span> <span class="o">=</span> perez
+</span><span class='line'><span class="nv">mongodb_password</span> <span class="o">=</span> justsomepAss
+</span><span class='line'><span class="c"># por ahora no toco el syslog udp port </span>
+</span><span class='line'>
+</span><span class='line'>sed -i <span class="s1">&#39;s/mongodb_user = grayloguser/mongodb_user = perez/&#39;</span> /etc/graylog2.conf
+</span><span class='line'>sed -i <span class="s1">&#39;s/mongodb_password = 123/mongodb_password = justsomepAss/&#39;</span> /etc/graylog2.conf
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="nb">cd</span> /opt/graylog2-server/bin/
+</span><span class='line'><span class="c">#java -Djava.net.preferIPv4Stack=true -jar /opt/graylog2-server/graylog2-server.jar </span>
+</span><span class='line'>sed -i <span class="s1">&#39;s/java -jar/java  -Djava.net.preferIPv4Stack=true -jar/&#39;</span> graylog2ctl
+</span><span class='line'>./graylog2ctl start
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>graylog2-web-interface</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>adduser -m graylog
+</span><span class='line'>wget https://github.com/downloads/Graylog2/graylog2-web-interface/graylog2-web-interface-0.9.5p2.tar.gz  --no-check-certificate -P /tmp
+</span><span class='line'><span class="nb">cd</span> /opt
+</span><span class='line'>tar zxf /tmp/graylog2-web-interface-0.9.5p2.tar.gz
+</span><span class='line'>rm -f  graylog2-web-interface
+</span><span class='line'>ln -s graylog2-web-interface-0.9.5p2 graylog2-web-interface
+</span><span class='line'>chown -R graylog /opt/graylog2-web-interface-0.9.5p2
+</span><span class='line'><span class="nb">cd</span> /opt/graylog2-web-interface
+</span><span class='line'>
+</span><span class='line'>gem install bundler
+</span><span class='line'>bundle install
+</span><span class='line'>
+</span><span class='line'>vi /opt/graylog2-web-interface/config/<span class="o">{</span>email.yml,general.yml,mongoid.yml<span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>/opt/graylog2-web-interface/config/email.yml
+</span><span class='line'>sed -i <span class="s1">&#39;s/host: smtp.example.org/host: localhost/&#39;</span> /opt/graylog2-web-interface/config/email.yml
+</span><span class='line'><span class="c">#sed -i &#39;s///&#39;</span>
+</span><span class='line'>sed -i <span class="s1">&#39;s/enable_starttls_auto: true/enable_starttls_auto: false/&#39;</span> /opt/graylog2-web-interface/config/email.yml
+</span><span class='line'><span class="nv">$HOSTNAME</span><span class="o">=</span><span class="sb">`</span>hostname -f<span class="sb">`</span>
+</span><span class='line'>sed -i <span class="s1">&#39;s/external_hostname: &quot;your-graylog2.example.org&quot;/external_hostname: &quot;${HOSTNAME}&quot;/&#39;</span> /opt/graylog2-web-interface/config/general.yml
+</span><span class='line'><span class="c"># manually edited mongoid.yml</span>
+</span><span class='line'>sed -i <span class="s1">&#39;1,6s/^/#/&#39;</span> /opt/graylog2-web-interface/config/mongoid.yml
+</span><span class='line'>sed -i <span class="s1">&#39;8,$ s/^#//&#39;</span> /opt/graylog2-web-interface/config/mongoid.yml
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="nb">cd</span> /opt/graylog2-web-interface
+</span><span class='line'>mkdir tmp log
+</span><span class='line'>chmod -R 777 tmp log
+</span><span class='line'>
+</span><span class='line'>gem install passenger
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Una vez que haya terminado la instalación, se muestra un mensaje similar al siguiente.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>The Apache 2 module was successfully installed.
+</span><span class='line'>
+</span><span class='line'>Please edit your Apache configuration file, and add these lines:
+</span><span class='line'>
+</span><span class='line'>   LoadModule passenger_module /usr/local/rvm/gems/ruby-1.9.2-p290/gems/passenger-3.0.11/ext/apache2/mod_passenger.so
+</span><span class='line'>   PassengerRoot /usr/local/rvm/gems/ruby-1.9.2-p290/gems/passenger-3.0.11
+</span><span class='line'>   PassengerRuby /usr/local/rvm/wrappers/ruby-1.9.2-p290/ruby
+</span><span class='line'>
+</span><span class='line'>After you restart Apache, you are ready to deploy any number of Ruby on Rails
+</span><span class='line'>applications on Apache, without any further Ruby on Rails-specific
+</span><span class='line'>configuration!
+</span><span class='line'>
+</span><span class='line'>Press ENTER to <span class="k">continue</span>.
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Configuramos apache. Primero el módulo.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cat &gt; /etc/httpd/conf.d/passenger.conf <span class="s">&lt;&lt;&#39;EOF&#39;</span>
+</span><span class='line'><span class="s">LoadModule passenger_module /usr/local/rvm/gems/ruby-1.9.2-p290/gems/passenger-3.0.11/ext/apache2/mod_passenger.so</span>
+</span><span class='line'><span class="s">PassengerRoot /usr/local/rvm/gems/ruby-1.9.2-p290/gems/passenger-3.0.11</span>
+</span><span class='line'><span class="s">PassengerRuby /usr/local/rvm/wrappers/ruby-1.9.2-p290/ruby</span>
+</span><span class='line'><span class="s">EOF</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Despues creamos la declaración para el host virtual.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">HOSTNAME</span><span class="o">=</span>unixtools.example.com
+</span><span class='line'>cat &gt; /etc/httpd/vhost.d/unixtools.conf <span class="s">&lt;&lt;EOF</span>
+</span><span class='line'><span class="s">&lt;VirtualHost *:80&gt;</span>
+</span><span class='line'><span class="s">  ServerName ${HOSTNAME}</span>
+</span><span class='line'><span class="s">  DocumentRoot /opt/graylog2-web-interface/public</span>
+</span><span class='line'><span class="s">  &lt;Directory /opt/graylog2-web-interface/public&gt;</span>
+</span><span class='line'><span class="s">     AllowOverride all</span>
+</span><span class='line'><span class="s">     Options -MultiViews</span>
+</span><span class='line'><span class="s">  &lt;/Directory&gt;</span>
+</span><span class='line'><span class="s">&lt;/VirtualHost&gt;</span>
+</span><span class='line'><span class="s">EOF</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>sending a test message</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">echo</span> <span class="s1">&#39;{</span>
+</span><span class='line'><span class="s1">  &quot;host&quot;:&quot;192.168.0.3&quot;,</span>
+</span><span class='line'><span class="s1">  &quot;version&quot;:&quot;1.0&quot;,</span>
+</span><span class='line'><span class="s1">  &quot;facility&quot;:&quot;testing&quot;,</span>
+</span><span class='line'><span class="s1">  &quot;short_message&quot;:&quot;testing gelf message&quot;</span>
+</span><span class='line'><span class="s1">}&#39;</span> | gzip -f - | nc -u localhost 12201
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Si este error aparece.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>FATAL: org.graylog2.Main - Could not start syslog server core thread. Do you have permissions to listen on port 514?
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>El problema puede ser que no este escuchando el graylog2 server en ese puerto, pues ya estaba escuchando el syslog.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@unixtools bin<span class="o">]</span><span class="c"># netstat -ntapul | grep 514</span>
+</span><span class='line'>udp        0      0 0.0.0.0:514                 0.0.0.0:*                               2670/syslogd
+</span><span class='line'><span class="o">[</span>root@unixtools bin<span class="o">]</span><span class="c"># </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>La solución es cambiar el syslog para otro puerto. Algo poco intuitivo pues la única forma de cambiar el puerto por el que escucha el syslogd (en CentOS al menos) es cambiando la definición del puerto utilizado por syslog en el archivo /etc/services <a href="http://community.zenoss.org/docs/DOC-4553">http://community.zenoss.org/docs/DOC-4553</a>.
+Se sugiere comentarear la línea original y adicionar otra con la nueva definición.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#syslog     514/udp                   # original syslog setting</span>
+</span><span class='line'>syslog      10514/udp                 <span class="c"># setting to accomodate zenoss</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Comprobar que el syslog esta escuchando en el nuevo puerto.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@unixtools bin<span class="o">]</span><span class="c"># netstat -ntapul | grep 514</span>
+</span><span class='line'>udp        0      0 0.0.0.0:10514               0.0.0.0:*                               32276/syslogd
+</span><span class='line'><span class="o">[</span>root@unixtools bin<span class="o">]</span><span class="c"># </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Ya se puede lanzar el proceso de graylog2.</p>
+
+<h3>Centralized logging</h3>
+
+<p>Probando logstash  &#8230;</p>
+
+<p>http://logstash.net/docs/1.0.17/getting-started-centralized</p>
+
+<p>http://semicomplete.com/files/logstash/logstash-1.0.17-monolithic.jar</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">input</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">file</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">type</span> <span class="o">=&gt;</span> <span class="s2">&quot;syslog&quot;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="err">#</span> <span class="nx">Wildcards</span> <span class="nx">work</span> <span class="nx">here</span> <span class="o">:</span><span class="p">)</span>
+</span><span class='line'>    <span class="nx">path</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="s2">&quot;/var/log/messages&quot;</span><span class="p">,</span> <span class="s2">&quot;/var/log/syslog&quot;</span><span class="p">,</span> <span class="s2">&quot;/var/log/*.log&quot;</span> <span class="p">]</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">file</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">type</span> <span class="o">=&gt;</span> <span class="s2">&quot;apache-access&quot;</span>
+</span><span class='line'>    <span class="nx">path</span> <span class="o">=&gt;</span> <span class="s2">&quot;/var/log/apache2/access.log&quot;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">file</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">type</span> <span class="o">=&gt;</span> <span class="s2">&quot;apache-error&quot;</span>
+</span><span class='line'>    <span class="nx">path</span> <span class="o">=&gt;</span> <span class="s2">&quot;/var/log/apache2/error.log&quot;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">output</span> <span class="p">{</span>
+</span><span class='line'>  <span class="err">#</span> <span class="nx">Output</span> <span class="nx">events</span> <span class="nx">to</span> <span class="nx">stdout</span> <span class="k">for</span> <span class="nx">debugging</span><span class="p">.</span> <span class="nx">Feel</span> <span class="nx">free</span> <span class="nx">to</span> <span class="nx">remove</span>
+</span><span class='line'>  <span class="err">#</span> <span class="k">this</span> <span class="nx">output</span> <span class="k">if</span> <span class="nx">you</span> <span class="nx">don</span><span class="err">&#39;</span><span class="nx">t</span> <span class="nx">need</span> <span class="nx">it</span><span class="p">.</span>
+</span><span class='line'>  <span class="nx">stdout</span> <span class="p">{</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Se puede utilizar.</p>
+
+<ul>
+<li>gelf://yourgraylog2server:port   # ship logs to the graylog2 server <a href="http://weboperations.blogspot.com/2011/04/fwd-non-intrusive-way-to-send-messages.html">http://weboperations.blogspot.com/2011/04/fwd-non-intrusive-way-to-send-messages.html</a>.</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">java</span> <span class="o">-</span><span class="nx">jar</span> <span class="nx">logstash</span><span class="o">-</span><span class="mf">1.0</span><span class="p">.</span><span class="mi">17</span><span class="o">-</span><span class="nx">monolithic</span><span class="p">.</span><span class="nx">jar</span> <span class="nx">agent</span> <span class="o">-</span><span class="nx">f</span> <span class="nx">stash</span><span class="p">.</span><span class="nx">conf</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Exception</span> <span class="k">in</span> <span class="nx">thread</span> <span class="s2">&quot;main&quot;</span> <span class="nx">java</span><span class="p">.</span><span class="nx">lang</span><span class="p">.</span><span class="nx">UnsupportedClassVersionError</span><span class="o">:</span> <span class="nx">Bad</span> <span class="nx">version</span> <span class="nx">number</span> <span class="k">in</span> <span class="p">.</span><span class="kr">class</span> <span class="nx">file</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Este error aparece cuando se compila un archivo .java con una version de JDK y se ejecuta el archivo .class con una versión diferente de JVM.</p>
+
+<p>Confundido? Pudiera pensar, la misma versión no es necesaria para compilar y para ejecutar.</p>
+
+<p>Correcto, esta en lo cierto. Pero no puede ejecutar archivos .class que fueron compilados con una versión mas actual que la JVM que esta utilizando.</p>
+
+<p>En este caso, la versión de openjdk que instaló el CentOS era anterior a la versión de JDK con que fue compilado el jar del logstash. <a href="https://github.com/logstash/logstash/wiki/Building-and-running-logstash-from-source">https://github.com/logstash/logstash/wiki/Building-and-running-logstash-from-source</a></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">Prerequisites</span>
+</span><span class='line'><span class="nx">Sun</span> <span class="nx">Java</span> <span class="mi">6</span> <span class="nx">JDK</span> <span class="p">(</span><span class="nx">don</span><span class="err">&#39;</span><span class="nx">t</span> <span class="k">try</span> <span class="k">this</span> <span class="kd">with</span> <span class="nx">openjdk</span><span class="p">)</span>
+</span><span class='line'><span class="nx">JRuby</span> <span class="nx">version</span> <span class="nx">that</span> <span class="nx">matches</span> <span class="nx">what</span> <span class="nx">logstash</span> <span class="nx">uses</span> <span class="p">(</span><span class="nx">You</span> <span class="nx">can</span> <span class="nx">get</span> <span class="k">this</span> <span class="nx">from</span> <span class="nx">the</span> <span class="nx">top</span> <span class="nx">of</span> <span class="nx">the</span> <span class="nx">Makefile</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>not a good choice for legacy servers &#8230;.</p>
+
+<h3>syslog using ruby</h3>
+
+<figure class='code'><figcaption><span>hi.rb </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="nb">require</span> <span class="s1">&#39;syslog&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</span><span class='line'>  <span class="c1"># $0 is the current script name</span>
+</span><span class='line'>  <span class="no">Syslog</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="vg">$0</span><span class="p">,</span> <span class="no">Syslog</span><span class="o">::</span><span class="no">LOG_PID</span> <span class="o">|</span> <span class="no">Syslog</span><span class="o">::</span><span class="no">LOG_CONS</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">s</span><span class="o">|</span> <span class="n">s</span><span class="o">.</span><span class="n">warning</span> <span class="n">message</span> <span class="p">}</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="n">log</span><span class="p">(</span><span class="s1">&#39;hello world&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Comprobando que funciona</h3>
+
+<p>A GELF message is a GZIP&#8217;d or ZLIB&#8217;d JSON string with the following fields: &#8230;
+Un mensaje GELF es una cadena JSON compactada con GZIP o ZLIB &#8230;
+<a href="https://github.com/Graylog2/graylog2-docs/wiki/GELF">https://github.com/Graylog2/graylog2-docs/wiki/GELF</a></p>
+
+<p>Esa la razón por la cual se utiliza el gzip en el comando:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">echo</span> <span class="s1">&#39;{</span>
+</span><span class='line'><span class="s1">  &quot;host&quot;:&quot;192.168.0.3&quot;,</span>
+</span><span class='line'><span class="s1">  &quot;version&quot;:&quot;1.0&quot;,</span>
+</span><span class='line'><span class="s1">  &quot;facility&quot;:&quot;testing&quot;,</span>
+</span><span class='line'><span class="s1">  &quot;short_message&quot;:&quot;testing gelf message&quot;</span>
+</span><span class='line'><span class="s1">}&#39;</span> | gzip -f - | nc -u localhost 12201
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>deberiamos ver esto:</p>
+
+<figure class='code'><figcaption><span>/var/log/messages</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>2011-12-22 16:56:01,186 DEBUG: org.graylog2.messagehandlers.gelf.GELFClientHandlerThread - Received message is not chunked. Handling now.
+</span><span class='line'>2011-12-22 16:56:01,189 DEBUG: org.graylog2.messagehandlers.gelf.SimpleGELFClientHandler - Handling GZIP compressed SimpleGELFClient
+</span><span class='line'>2011-12-22 16:56:01,326 DEBUG: org.graylog2.messagehandlers.gelf.SimpleGELFClientHandler - Got GELF message: shortMessage: testing gelf message | fullMessage: null | level: 1 | host: 192.168.0.3 | file: null | line: -1 | facility: testing | version: 1.0 | additional: 0
+</span><span class='line'>2011-12-22 16:56:01,410 INFO : org.graylog2.periodical.BulkIndexerThread - About to index max 4000 messages. You have a total of 1 messages in the queue. <span class="o">[</span>freq:1s<span class="o">]</span>
+</span><span class='line'>2011-12-22 16:56:01,411 DEBUG: org.graylog2.messagequeue.MessageQueue - Read 1 messages from queue.
+</span><span class='line'>2011-12-22 16:56:01,411 INFO : org.graylog2.periodical.BulkIndexerThread - ... indexing 1 messages.
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Referencias</h3>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1606,173 +2200,6 @@ $CATALINA_HOME/webapps/ROOT/index.html</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/11/26/usando-python-con-virtualenv/">Usando Python Con Virtualenv</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-11-26T00:08:00-03:00" pubdate data-updated="true">Nov 26<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/11/26/usando-python-con-virtualenv/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Una buena introducción se puede encontrar aca en los siguientes posts, uno en <a href="http://www.saltycrane.com/blog/2009/05/notes-using-pip-and-virtualenv-django/">inglés</a> y otro en <a href="http://elweb.co/uncategorized/django-deployment-3-virtualenv-virtualenvwrapper-pip/">castellano</a>.</p>
-
-<p>Sistemas Operativos como CentOS o Gentoo hacen uso de python para sus herramientas de gestión de paquetes, no es recomendable modificar manualmente la versión de python o jugar con las versiones de los módulos. Pero puede suceder que nos haga falta utilizar una versión superior de python o cierto módulo para un proyecto en el que estemos trabajando. En este caso, virtualenv es una solución.</p>
-
-<p>Virtualenv nos permite tener una instalacion de python aislada de la versión del sistema. Junto con esta versión de python, se pueden instalar los módulos que se necesiten sin que esto influya en absoluto en la instalación de python del sistema.</p>
-
-<p>El primer paso seria instalar algunos paquetes que vamos a necesitar. Como estamos trabajando sobre Debian 6 Squeeze, apt-get es nuestro amigo. Utilizamos sudo porque nunca trabajamos como root, correcto? :P</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get install python-setuptools python-dev build-essential
-</span><span class='line'># export http_proxy="http://proxy.example.com:3128/"
-</span><span class='line'>sudo easy_install -U pip
-</span><span class='line'>sudo pip install -U virtualenv
-</span><span class='line'>sudo easy_install -U virtualenvwrapper</span></code></pre></td></tr></table></div></figure>
-
-
-<p>El siguiente paso sería crear la carpeta donde vamos a guardar nuestro proyecto. Tambien nos aseguramos de que cada vez que creemos una sesion de trabajo, las variables de entorno requeridas sean creadas. Con el comando mkvirtualenv creamos el entorno que vamos a utilizar.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>mkdir -p ~/Sites/.virtualenvs/status.devops.com.ar
-</span><span class='line'>cat >> ~/.bashrc &lt;&lt;EOF
-</span><span class='line'>export WORKON_HOME=$HOME/Sites/.virtualenvs
-</span><span class='line'>source /usr/local/bin/virtualenvwrapper.sh
-</span><span class='line'>EOF
-</span><span class='line'>mkvirtualenv --no-site-packages --distribute  status.devops.com.ar</span></code></pre></td></tr></table></div></figure>
-
-
-<p>En la consola se obtendría algo similar a lo siguiente.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>osvaldo@vostro:~$ mkvirtualenv --no-site-packages  --distribute  status.devops.com.ar 
-</span><span class='line'>New python executable in status.devops.com.ar/bin/python
-</span><span class='line'>Installing distribute....................................................................................................................................................................................done.
-</span><span class='line'>Installing pip...............done.
-</span><span class='line'>virtualenvwrapper.user_scripts creating /home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/predeactivate
-</span><span class='line'>virtualenvwrapper.user_scripts creating /home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/postdeactivate
-</span><span class='line'>virtualenvwrapper.user_scripts creating /home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/preactivate
-</span><span class='line'>virtualenvwrapper.user_scripts creating /home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/postactivate
-</span><span class='line'>virtualenvwrapper.user_scripts creating /home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/get_env_details</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Para probar, utilizamos un interesante dashboard creado por la gente de discus.com utilizando Django: <a href="http://code.disqus.com/code/projects/overseer.html">overseer</a></p>
-
-<p>Se puede descargar overseer desde github o simplemente instalarlo utilizando pip.</p>
-
-<p>El comando (workon) nos permite acceder al entorno aislado recién creado. Una vez dentro del mismo, podemos trabajar sin relación con el python o los módulos del sistema, solo lo que haya dentro de ese entorno.</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>workon status.devops.com.ar
-</span><span class='line'>mkdir -p ~/Sites/status_devops/requirements/
-</span><span class='line'>cat &gt; ~/Sites/status_devops/requirements/requirements.txt <span class="s">&lt;&lt;EOF</span>
-</span><span class='line'><span class="s">django</span>
-</span><span class='line'><span class="s">EOF</span>
-</span><span class='line'>pip install -r ~/Sites/status_devops/requirements/requirements.txt
-</span><span class='line'>pip install overseer
-</span><span class='line'>python manage.py syncdb
-</span><span class='line'>./manage.py migrate overseer
-</span><span class='line'>python manage.py runserver
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Una vez dentro del entorno podemos comprobar que el binario de python que se esta utilizando es él que instalamos dentro de dicho entorno y no él del sistem.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>osvaldo@vostro:~$ workon status.devops.com.ar
-</span><span class='line'>(status.devops.com.ar)osvaldo@vostro:~$ 
-</span><span class='line'>(status.devops.com.ar)osvaldo@vostro:~$ which python
-</span><span class='line'>/home/osvaldo/Sites/.virtualenvs/status.devops.com.ar/bin/python
-</span><span class='line'>(status.devops.com.ar)osvaldo@vostro:~$ cd ~/Sites/status_devops/example_project
-</span><span class='line'>(status.devops.com.ar)osvaldo@vostro:~/Sites/status_devops/example_project$ python manage.py runserver
-</span><span class='line'>Validating models...
-</span><span class='line'>0 errors found
-</span><span class='line'>
-</span><span class='line'>Django version 1.2.4, using settings 'example_project.settings'
-</span><span class='line'>Running django-devserver 0.3.1
-</span><span class='line'>Threaded django server is running at http://127.0.0.1:8000/
-</span><span class='line'>Quit the server with CONTROL-C.</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Y el sitio se encuentra disponible para recibir consultas a traves de la url que recién se habilito.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>http://127.0.0.1:8000/</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Una vez terminado el trabajo en el entorno, lo desactivamos para regresar a nuestro entorno habitual con el siguiente comando.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>deactivate</span></code></pre></td></tr></table></div></figure>
-
-
-<p>et voila!</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; Older</a>
@@ -1790,6 +2217,10 @@ $CATALINA_HOME/webapps/ROOT/index.html</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/10/02/deploying-to-aws/">deploying to aws</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/09/18/usando-svn-push-con-jenkins/">usando svn push con jenkins</a>
       </li>
     
@@ -1803,10 +2234,6 @@ $CATALINA_HOME/webapps/ROOT/index.html</p>
     
       <li class="post">
         <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">borrando viejos builds en jenkins</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/07/permisos-en-directorio-www/">permisos en directorio www</a>
       </li>
     
   </ul>

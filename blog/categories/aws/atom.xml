@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: aws | devops-ar]]></title>
+  <link href="http://devops-ar.github.com/blog/categories/aws/atom.xml" rel="self"/>
+  <link href="http://devops-ar.github.com/"/>
+  <updated>2012-10-02T10:44:16-03:00</updated>
+  <id>http://devops-ar.github.com/</id>
+  <author>
+    <name><![CDATA[osvaldo]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[deploying to aws]]></title>
+    <link href="http://devops-ar.github.com/blog/2012/10/02/deploying-to-aws/"/>
+    <updated>2012-10-02T09:31:00-03:00</updated>
+    <id>http://devops-ar.github.com/blog/2012/10/02/deploying-to-aws</id>
+    <content type="html"><![CDATA[<p>Amazon had done a great job making the cloud accesible to anyone. Tools like Chef (kudos to Opscode) allow us to make deployments in a pretty easy way. The following post will show how to put them together. A flask (could had been a lamp or any other) application is deployed to Amazon EC2 using Chef. As an added bonus, local development using Vagrant is included.</p>
+
+<h2>tl;dr</h2>
+
+<p>For those in a hurry, just clone the <a href="https://github.com/otsuarez/flask-blog">sample flask app code</a> and the <a href="https://github.com/otsuarez/flask2aws">chef cookbooks</a> repositories and start from there.</p>
+
+<!-- more -->
+
+
+<h1>Objective</h1>
+
+<p>The original goal for this project was to deploy a group of servers in Amazon for a web based application (api rest interface). The architecture was designed with a load balancing web front end, an app server farm behind it and a third layer of database servers. This article only deals with a standalone server installation thus the cookbooks provide an extensible path for implementing the three-tiered application.</p>
+
+<h1>Components</h1>
+
+<h2>App code</h2>
+
+<p>As a sample app, a simple blog using flask: <a href="https://bitbucket.org/r0sk/flask-htmlblog">FlaskBlog</a>  was choosed. No point on developing a full api/rest interface at this point. Code for this app can be found on this <a href="https://github.com/otsuarez/flask-blog">github repo</a>.</p>
+
+<h2>Chef server</h2>
+
+<p>A chef server was installed (details are not included) on a another host but a Hosted Chef Server might had done the job as well.</p>
+
+<h2>Vagrant</h2>
+
+<p>For testing the custom cookbooks, Vagrant was used on a local environment (<a href="https://github.com/otsuarez/flask2aws/blob/master/Vagrantfile">Vagrantfile</a> available).. The whole architecture could be testing this way since Vagrant allows us to create what it is called: "Multi-VM Environments".</p>
+
+<p>Cookbooks from Opscode repository were used (no point in reinventing the wheel). For handling the deploying and configuration, custom cookbooks were written.</p>
+
+<h2>Opscode cookbooks (github.com/cookbooks/)</h2>
+
+<ul>
+<li>nginx</li>
+<li>database</li>
+<li>mysql (database cookbook dependency)</li>
+<li>openssl (mysql cookbook dependency)</li>
+</ul>
+
+
+<h2>Custom cookbooks</h2>
+
+<ul>
+<li>appstack (takes care of code deployment, from the code repository to the proper directory on the filesystem)</li>
+<li>webstack (handles all the configurations required for the app to work to be done across the whole app stack)</li>
+<li>uwsgi (webstack cookbook dependency)</li>
+</ul>
+
+
+<p>The uwsgi cookbook only installs the uwsgi package. Since this package could be used by other cookbooks, it was created as an standalone cookbook.</p>
+
+<h2>Deployment</h2>
+
+<p>The appstack cookbook handles the deployment of the code. It creates the required directories and downloads the code from the repository. Github is used but any other could be used. Included keys (deploy) are only added for information purposes, those are not working ones.</p>
+
+<p>Upon deployment, the webstack creates a database, importing the file "db/initial.sql" from the app code directory. The webstack cookbook creates the config.py file, which defines the database connection string for the app on the app code directory. It also creates the nginx virtual host file with the configuration for using the uwsgi service as the backend. The uwsgi.ini.erb template creates the corresponding uwsgi aplication file for the uwsgi service daemon to serve the app code.</p>
+
+<h1>Chef workstation</h1>
+
+<p>The whole setup requires 3 set of authentication credentials.</p>
+
+<ul>
+<li>github epo access</li>
+<li>chef server</li>
+<li>amazon aws</li>
+</ul>
+
+
+<h2>github</h2>
+
+<p>The application code is stored on a github repository. A new (not any personal one) ssh key pair was created. The public key was added as a deploy key to the repo on github. The private key was added to the application deployment cookbook (appstack).</p>
+
+<h2>chef server</h2>
+
+<p>Using the chef server requires a client pem certificate which can be obtained via the Web console, creating a new client. That will allows you to work with the chef server from a workstation, using the knife command. For bootstrapping nodes, another credential is required, the validation.pem certificate. This one can be found on the /etc/chef/ directory of the chef server host filesystem.</p>
+
+<h2>amazon ec2</h2>
+
+<p>There're two levels of access here. One is related to the ssh key used to log into the servers created on amazon. This key will be stored usually on the ~/.ssh directory of the workstation.</p>
+
+<p>Create your SSH key pair for EC2 (at https://console.aws.amazon.com/ec2/home?#) and save your identity file on the local workstation (will be asumming you named the downloaded file acmeec2.pem)</p>
+
+<p><code>sh
+cd ~/.ssh
+mv ~/Downloads/acmeec2.pem .
+chmod 400 acmeec2.pem
+ssh-add ~/.ssh/acmeec2.pem
+</code></p>
+
+<p>The other set of credentials are the ones used by the knife command for interacting with the AWS infrastructure. They are being used in the .chef/knife.rb file as env vars.
+You need to add them to your ~/.bashrc or ~/.zshrc file.</p>
+
+<p>```sh</p>
+
+<h1>EC2</h1>
+
+<p>export acme_aws_access_key_id="AZIAIGAI7VRAOZEBNAWA"
+export acme_aws_secret_access_key="ABJVqDRQm145Gmz+ee09MkqvINIuHs/wjEzaqdsN"
+```</p>
+
+<h2>Working with the knife command</h2>
+
+<p>creating the server</p>
+
+<p><code>sh
+knife ec2 server create "role[webstack]" -I ami-3962a950  -x ubuntu --region eu-west-1
+</code></p>
+
+<p>Checking the new server had been created and successfully added to the chef server.</p>
+
+<p><code>sh
+osvaldo@local:~/src/acme/flask2aws$ knife ec2 server list
+Instance ID      Public IP        Private IP       Flavor           Image            SSH Key          Security Groups  State          
+i-1f14ab82       174.129.142.100  10.28.59.8    m1.small         ami-3962a950     acmeec2    default          running        
+osvaldo@local:~/src/acme/flask2aws$ knife node list
+  ip-10-28-59-8.ec2.internal
+  localhost
+osvaldo@local:~/src/acme/flask2aws$
+osvaldo@otoja-lm:~/src/acme/flask2aws$ knife node show ip-10-28-59-8.ec2.internal
+Node Name:   ip-10-28-59-8.ec2.internal
+Environment: _default
+FQDN:        ip-10-28-59-8.ec2.internal
+IP:          174.129.142.100
+Run List:    role[webstack]
+Roles:       webstack
+Recipes:     webstack
+Platform:    ubuntu 11.10
+osvaldo@otoja-lm:~/src/acme/flask2aws$
+</code>
+et voila!</p>
+
+<p>Testing ssh connection to the amazon server and sudo privileges.</p>
+
+<p>```sh
+osvaldo@local:~/src/acme/flask2aws$  ssh ubuntu@174.129.142.100 -i ~/.ssh/acmeec2.pem
+Welcome to Ubuntu 11.10 (GNU/Linux 3.0.0-13-virtual i686)</p>
+
+<ul>
+<li>Documentation:  https://help.ubuntu.com/</li>
+</ul>
+
+
+<p>  System information as of Fri May 11 20:36:35 UTC 2012</p>
+
+<p>  System load:  0.0              Processes:           53
+  Usage of /:   8.9% of 9.84GB   Users logged in:     0
+  Memory usage: 10%              IP address for eth0: 10.28.59.8
+  Swap usage:   0%</p>
+
+<p>  Graph this data and manage this system at https://landscape.canonical.com/
+New release '12.04 LTS' available.
+Run 'do-release-upgrade' to upgrade to it.</p>
+
+<p>Get cloud support with Ubuntu Advantage Cloud Guest
+  http://www.ubuntu.com/business/services/cloud
+ubuntu@ip-10-28-59-8:~$ sudo su -
+root@ip-10-28-59-8:~#
+```</p>
+]]></content>
+  </entry>
+  
+</feed>

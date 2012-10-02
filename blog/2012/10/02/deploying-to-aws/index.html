@@ -1,0 +1,466 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>deploying to aws - devops-ar</title>
+  <meta name="author" content="osvaldo">
+
+  
+  <meta name="description" content="Amazon had done a great job making the cloud accesible to anyone. Tools like Chef (kudos to Opscode) allow us to make deployments in a pretty easy &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://devops-ar.github.com/blog/2012/10/02/deploying-to-aws/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="devops-ar" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-5155520-9']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">devops-ar</a></h1>
+  
+    <h2>devops en castellano</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:devops-ar.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Deploying to Aws</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-02T09:31:00-03:00" pubdate data-updated="true">Oct 2<span>nd</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Amazon had done a great job making the cloud accesible to anyone. Tools like Chef (kudos to Opscode) allow us to make deployments in a pretty easy way. The following post will show how to put them together. A flask (could had been a lamp or any other) application is deployed to Amazon EC2 using Chef. As an added bonus, local development using Vagrant is included.</p>
+
+<h2>tl;dr</h2>
+
+<p>For those in a hurry, just clone the <a href="https://github.com/otsuarez/flask-blog">sample flask app code</a> and the <a href="https://github.com/otsuarez/flask2aws">chef cookbooks</a> repositories and start from there.</p>
+
+<!-- more -->
+
+
+<h1>Objective</h1>
+
+<p>The original goal for this project was to deploy a group of servers in Amazon for a web based application (api rest interface). The architecture was designed with a load balancing web front end, an app server farm behind it and a third layer of database servers. This article only deals with a standalone server installation thus the cookbooks provide an extensible path for implementing the three-tiered application.</p>
+
+<h1>Components</h1>
+
+<h2>App code</h2>
+
+<p>As a sample app, a simple blog using flask: <a href="https://bitbucket.org/r0sk/flask-htmlblog">FlaskBlog</a>  was choosed. No point on developing a full api/rest interface at this point. Code for this app can be found on this <a href="https://github.com/otsuarez/flask-blog">github repo</a>.</p>
+
+<h2>Chef server</h2>
+
+<p>A chef server was installed (details are not included) on a another host but a Hosted Chef Server might had done the job as well.</p>
+
+<h2>Vagrant</h2>
+
+<p>For testing the custom cookbooks, Vagrant was used on a local environment (<a href="https://github.com/otsuarez/flask2aws/blob/master/Vagrantfile">Vagrantfile</a> available).. The whole architecture could be testing this way since Vagrant allows us to create what it is called: &#8220;Multi-VM Environments&#8221;.</p>
+
+<p>Cookbooks from Opscode repository were used (no point in reinventing the wheel). For handling the deploying and configuration, custom cookbooks were written.</p>
+
+<h2>Opscode cookbooks (github.com/cookbooks/)</h2>
+
+<ul>
+<li>nginx</li>
+<li>database</li>
+<li>mysql (database cookbook dependency)</li>
+<li>openssl (mysql cookbook dependency)</li>
+</ul>
+
+
+<h2>Custom cookbooks</h2>
+
+<ul>
+<li>appstack (takes care of code deployment, from the code repository to the proper directory on the filesystem)</li>
+<li>webstack (handles all the configurations required for the app to work to be done across the whole app stack)</li>
+<li>uwsgi (webstack cookbook dependency)</li>
+</ul>
+
+
+<p>The uwsgi cookbook only installs the uwsgi package. Since this package could be used by other cookbooks, it was created as an standalone cookbook.</p>
+
+<h2>Deployment</h2>
+
+<p>The appstack cookbook handles the deployment of the code. It creates the required directories and downloads the code from the repository. Github is used but any other could be used. Included keys (deploy) are only added for information purposes, those are not working ones.</p>
+
+<p>Upon deployment, the webstack creates a database, importing the file &#8220;db/initial.sql&#8221; from the app code directory. The webstack cookbook creates the config.py file, which defines the database connection string for the app on the app code directory. It also creates the nginx virtual host file with the configuration for using the uwsgi service as the backend. The uwsgi.ini.erb template creates the corresponding uwsgi aplication file for the uwsgi service daemon to serve the app code.</p>
+
+<h1>Chef workstation</h1>
+
+<p>The whole setup requires 3 set of authentication credentials.</p>
+
+<ul>
+<li>github epo access</li>
+<li>chef server</li>
+<li>amazon aws</li>
+</ul>
+
+
+<h2>github</h2>
+
+<p>The application code is stored on a github repository. A new (not any personal one) ssh key pair was created. The public key was added as a deploy key to the repo on github. The private key was added to the application deployment cookbook (appstack).</p>
+
+<h2>chef server</h2>
+
+<p>Using the chef server requires a client pem certificate which can be obtained via the Web console, creating a new client. That will allows you to work with the chef server from a workstation, using the knife command. For bootstrapping nodes, another credential is required, the validation.pem certificate. This one can be found on the /etc/chef/ directory of the chef server host filesystem.</p>
+
+<h2>amazon ec2</h2>
+
+<p>There&#8217;re two levels of access here. One is related to the ssh key used to log into the servers created on amazon. This key will be stored usually on the ~/.ssh directory of the workstation.</p>
+
+<p>Create your SSH key pair for EC2 (at https://console.aws.amazon.com/ec2/home?#) and save your identity file on the local workstation (will be asumming you named the downloaded file acmeec2.pem)</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">cd</span> ~/.ssh
+</span><span class='line'>mv ~/Downloads/acmeec2.pem .
+</span><span class='line'>chmod 400 acmeec2.pem
+</span><span class='line'>ssh-add ~/.ssh/acmeec2.pem
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The other set of credentials are the ones used by the knife command for interacting with the AWS infrastructure. They are being used in the .chef/knife.rb file as env vars.
+You need to add them to your ~/.bashrc or ~/.zshrc file.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># EC2</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">acme_aws_access_key_id</span><span class="o">=</span><span class="s2">&quot;AZIAIGAI7VRAOZEBNAWA&quot;</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">acme_aws_secret_access_key</span><span class="o">=</span><span class="s2">&quot;ABJVqDRQm145Gmz+ee09MkqvINIuHs/wjEzaqdsN&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Working with the knife command</h2>
+
+<p>creating the server</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>knife ec2 server create <span class="s2">&quot;role[webstack]&quot;</span> -I ami-3962a950  -x ubuntu --region eu-west-1
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Checking the new server had been created and successfully added to the chef server.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>osvaldo@local:~/src/acme/flask2aws<span class="nv">$ </span>knife ec2 server list
+</span><span class='line'>Instance ID      Public IP        Private IP       Flavor           Image            SSH Key          Security Groups  State
+</span><span class='line'>i-1f14ab82       174.129.142.100  10.28.59.8    m1.small         ami-3962a950     acmeec2    default          running
+</span><span class='line'>osvaldo@local:~/src/acme/flask2aws<span class="nv">$ </span>knife node list
+</span><span class='line'>  ip-10-28-59-8.ec2.internal
+</span><span class='line'>  localhost
+</span><span class='line'>osvaldo@local:~/src/acme/flask2aws<span class="nv">$ </span>
+</span><span class='line'>osvaldo@otoja-lm:~/src/acme/flask2aws<span class="nv">$ </span>knife node show ip-10-28-59-8.ec2.internal
+</span><span class='line'>Node Name:   ip-10-28-59-8.ec2.internal
+</span><span class='line'>Environment: _default
+</span><span class='line'>FQDN:        ip-10-28-59-8.ec2.internal
+</span><span class='line'>IP:          174.129.142.100
+</span><span class='line'>Run List:    role<span class="o">[</span>webstack<span class="o">]</span>
+</span><span class='line'>Roles:       webstack
+</span><span class='line'>Recipes:     webstack
+</span><span class='line'>Platform:    ubuntu 11.10
+</span><span class='line'>osvaldo@otoja-lm:~/src/acme/flask2aws<span class="nv">$ </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>et voila!</p>
+
+<p>Testing ssh connection to the amazon server and sudo privileges.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>osvaldo@local:~/src/acme/flask2aws<span class="nv">$ </span> ssh ubuntu@174.129.142.100 -i ~/.ssh/acmeec2.pem
+</span><span class='line'>Welcome to Ubuntu 11.10 <span class="o">(</span>GNU/Linux 3.0.0-13-virtual i686<span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'> * Documentation:  https://help.ubuntu.com/
+</span><span class='line'>
+</span><span class='line'>  System information as of Fri May 11 20:36:35 UTC 2012
+</span><span class='line'>
+</span><span class='line'>  System load:  0.0              Processes:           53
+</span><span class='line'>  Usage of /:   8.9% of 9.84GB   Users logged in:     0
+</span><span class='line'>  Memory usage: 10%              IP address <span class="k">for </span>eth0: 10.28.59.8
+</span><span class='line'>  Swap usage:   0%
+</span><span class='line'>
+</span><span class='line'>  Graph this data and manage this system at https://landscape.canonical.com/
+</span><span class='line'>New release <span class="s1">&#39;12.04 LTS&#39;</span> available.
+</span><span class='line'>Run <span class="s1">&#39;do-release-upgrade&#39;</span> to upgrade to it.
+</span><span class='line'>
+</span><span class='line'>Get cloud support with Ubuntu Advantage Cloud Guest
+</span><span class='line'>  http://www.ubuntu.com/business/services/cloud
+</span><span class='line'>ubuntu@ip-10-28-59-8:~<span class="nv">$ </span>sudo su -
+</span><span class='line'>root@ip-10-28-59-8:~#
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">osvaldo</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-02T09:31:00-03:00" pubdate data-updated="true">Oct 2<span>nd</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/aws/'>aws</a>, <a class='category' href='/blog/categories/chef/'>chef</a>, <a class='category' href='/blog/categories/flask/'>flask</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://devops-ar.github.com/blog/2012/10/02/deploying-to-aws/" data-via="devops_ar" data-counturl="http://devops-ar.github.com/blog/2012/10/02/deploying-to-aws/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/09/18/usando-svn-push-con-jenkins/" title="Previous Post: usando svn push con jenkins">&laquo; usando svn push con jenkins</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/10/02/deploying-to-aws/">deploying to aws</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/18/usando-svn-push-con-jenkins/">usando svn push con jenkins</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">definiendo un smarthost en mac os x</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">usando https detras de un proxy reverso</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">borrando viejos builds en jenkins</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("devops_ar", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/devops_ar" class="twitter-follow-button" data-show-count="false">Follow @devops_ar</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - osvaldo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'devops-ar';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://devops-ar.github.com/blog/2012/10/02/deploying-to-aws/';
+        var disqus_url = 'http://devops-ar.github.com/blog/2012/10/02/deploying-to-aws/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

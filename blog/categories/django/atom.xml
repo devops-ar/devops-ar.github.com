@@ -4,7 +4,7 @@
   <title><![CDATA[Category: django | devops-ar]]></title>
   <link href="http://devops-ar.github.com/blog/categories/django/atom.xml" rel="self"/>
   <link href="http://devops-ar.github.com/"/>
-  <updated>2012-09-22T15:24:49-03:00</updated>
+  <updated>2012-10-02T10:44:16-03:00</updated>
   <id>http://devops-ar.github.com/</id>
   <author>
     <name><![CDATA[osvaldo]]></name>
@@ -26,26 +26,35 @@
 
 <p>El primer paso seria instalar algunos paquetes que vamos a necesitar. Como estamos trabajando sobre Debian 6 Squeeze, apt-get es nuestro amigo. Utilizamos sudo porque nunca trabajamos como root, correcto? :P</p>
 
-<p>{% codeblock %}
-sudo apt-get install python-setuptools python-dev build-essential</p>
-
-<h1>export http_proxy="http://proxy.example.com:3128/"</h1>
-
-<p>sudo easy_install -U pip
-sudo pip install -U virtualenv
-sudo easy_install -U virtualenvwrapper
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get install python-setuptools python-dev build-essential&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;h1>export http_proxy="http://proxy.example.com:3128/"&lt;/h1>
+</span><span class='line'>
+</span><span class='line'>&lt;p>sudo easy_install -U pip
+</span><span class='line'>sudo pip install -U virtualenv
+</span><span class='line'>sudo easy_install -U virtualenvwrapper</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>El siguiente paso sería crear la carpeta donde vamos a guardar nuestro proyecto. Tambien nos aseguramos de que cada vez que creemos una sesion de trabajo, las variables de entorno requeridas sean creadas. Con el comando mkvirtualenv creamos el entorno que vamos a utilizar.</p>
 
-<p>{% codeblock %}
-mkdir -p ~/Sites/.virtualenvs/status.devops.com.ar
-cat >> ~/.bashrc &lt;&lt;EOF
-export WORKON_HOME=$HOME/Sites/.virtualenvs
-source /usr/local/bin/virtualenvwrapper.sh
-EOF
-mkvirtualenv --no-site-packages --distribute  status.devops.com.ar
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mkdir -p ~/Sites/.virtualenvs/status.devops.com.ar
+</span><span class='line'>cat >> ~/.bashrc &lt;&lt;EOF
+</span><span class='line'>export WORKON_HOME=$HOME/Sites/.virtualenvs
+</span><span class='line'>source /usr/local/bin/virtualenvwrapper.sh
+</span><span class='line'>EOF
+</span><span class='line'>mkvirtualenv --no-site-packages --distribute  status.devops.com.ar</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>En la consola se obtendría algo similar a lo siguiente.</p>
 
@@ -67,18 +76,27 @@ virtualenvwrapper.user_scripts creating /home/osvaldo/Sites/.virtualenvs/status.
 
 <p>El comando (workon) nos permite acceder al entorno aislado recién creado. Una vez dentro del mismo, podemos trabajar sin relación con el python o los módulos del sistema, solo lo que haya dentro de ese entorno.</p>
 
-<p>{% codeblock lang:sh %}
-workon status.devops.com.ar
-mkdir -p ~/Sites/status_devops/requirements/
-cat > ~/Sites/status_devops/requirements/requirements.txt &lt;&lt;EOF
-django
-EOF
-pip install -r ~/Sites/status_devops/requirements/requirements.txt
-pip install overseer
-python manage.py syncdb
-./manage.py migrate overseer
-python manage.py runserver
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>workon status.devops.com.ar
+</span><span class='line'>mkdir -p ~/Sites/status_devops/requirements/
+</span><span class='line'>cat &gt; ~/Sites/status_devops/requirements/requirements.txt &amp;lt;&amp;lt;EOF
+</span><span class='line'>django
+</span><span class='line'>EOF
+</span><span class='line'>pip install -r ~/Sites/status_devops/requirements/requirements.txt
+</span><span class='line'>pip install overseer
+</span><span class='line'>python manage.py syncdb
+</span><span class='line'>./manage.py migrate overseer
+</span><span class='line'>python manage.py runserver
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>Una vez dentro del entorno podemos comprobar que el binario de python que se esta utilizando es él que instalamos dentro de dicho entorno y no él del sistem.</p>
 
@@ -106,9 +124,8 @@ http://127.0.0.1:8000/
 
 <p>Una vez terminado el trabajo en el entorno, lo desactivamos para regresar a nuestro entorno habitual con el siguiente comando.</p>
 
-<p>{% codeblock %}
-deactivate
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>deactivate</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>et voila!</p>
 ]]></content>

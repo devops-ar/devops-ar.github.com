@@ -9,7 +9,10 @@
   <meta name="author" content="osvaldo">
 
   
-  <meta name="description" content="Para configurar jboss 6 de manera que funcione con puertos no estandards (porque en el mismo server se esta ejecutando otra aplicacion que ya usa &hellip;">
+  <meta name="description" content="tl;dr Suele suceder que un equipo de desarrolladores necesita trabajar de manera conjunta sobre un mismo directorio. La solución es sencilla. 1
+2
+3
+4 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +79,70 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/08/07/permisos-en-directorio-www/">Permisos en Directorio Www</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-07T18:18:00-03:00" pubdate data-updated="true">Aug 7<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/08/07/permisos-en-directorio-www/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>tl;dr</h2>
+
+<p>Suele suceder que un equipo de desarrolladores necesita trabajar de manera conjunta sobre un mismo directorio.</p>
+
+<p>La solución es sencilla.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>chown -R root /var/www/html/
+</span><span class='line'>chmod 775  /var/www/html/
+</span><span class='line'>chgrp -R dev  /var/www/html/
+</span><span class='line'>chmod g+s   /var/www/html/
+</span><span class='line'>setfacl -d -m g::rwx /var/www/html
+</span><span class='line'>setfacl -d -m o::rx /var/www/html
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/08/07/permisos-en-directorio-www/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -390,59 +457,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/03/25/usando-gitolite/">Usando Gitolite</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-03-25T03:04:00-03:00" pubdate data-updated="true">Mar 25<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/03/25/usando-gitolite/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Una de las ventajas de git es el trabajo en equipos. Como compartir el codigo seria la pregunta. Existen varias alternativas. Hay servicios que ofrecen hospedaje de repositorios para git como el propio github. Entre las opciones si queremos hospedar el repositorio en un servidor propio destacan las siguientes:</p>
-
-<ul>
-<li><a href="http://gitorious.org/">gitorious</a>. Es una aplicación Rails para la gestión de proyectos. Permite un manejo via web de los repositorios git. Similar a github en algunos aspectos.</li>
-<li><a href="http://repo.or.cz/w/girocco.git/blob/HEAD:/README">girocco</a>. No tiene tantas funcionalidades como gitorious pero la instalación parece mas sencilla. Buena opción a considerar si se requiere una interface web para la administración del repositorio.</li>
-<li><a href="https://github.com/tv42/gitosis">gitosis</a>. Permite el acceso a repositorios git via ssh, garantizando control de accesos por repositorio y sin requerir cuentas locales (shell accounts) en el servidor. Esta implementado en Python pero la ultima actualizacion del codigo fue hace 3 años.</li>
-<li><a href="https://github.com/sitaramc/gitolite">gitolite</a>. Muy similar a gitosis, implementado en Perl. Se mantiene en desarrollo activo.</li>
-</ul>
-
-
-<p>Como una interface web para administrar usuarios y repositorios no era un requerimiento y gitosis no se mantiene activo, la elección fue gitolite.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/03/25/usando-gitolite/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -460,6 +474,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/10/02/deploying-to-aws/">deploying to aws</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/09/18/usando-svn-push-con-jenkins/">usando svn push con jenkins</a>
       </li>
     
@@ -473,10 +491,6 @@
     
       <li class="post">
         <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">borrando viejos builds en jenkins</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/07/permisos-en-directorio-www/">permisos en directorio www</a>
       </li>
     
   </ul>

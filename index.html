@@ -9,7 +9,7 @@
   <meta name="author" content="osvaldo">
 
   
-  <meta name="description" content="El jenkins puede ser configurado para que periodicamente chequee el repositorio (svn) y de haber algun nuevo commit lance un build. Otra forma es que &hellip;">
+  <meta name="description" content="Amazon had done a great job making the cloud accesible to anyone. Tools like Chef (kudos to Opscode) allow us to make deployments in a pretty easy &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +76,53 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/10/02/deploying-to-aws/">Deploying to Aws</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-02T09:31:00-03:00" pubdate data-updated="true">Oct 2<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/10/02/deploying-to-aws/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Amazon had done a great job making the cloud accesible to anyone. Tools like Chef (kudos to Opscode) allow us to make deployments in a pretty easy way. The following post will show how to put them together. A flask (could had been a lamp or any other) application is deployed to Amazon EC2 using Chef. As an added bonus, local development using Vagrant is included.</p>
+
+<h2>tl;dr</h2>
+
+<p>For those in a hurry, just clone the <a href="https://github.com/otsuarez/flask-blog">sample flask app code</a> and the <a href="https://github.com/otsuarez/flask2aws">chef cookbooks</a> repositories and start from there.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/10/02/deploying-to-aws/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -330,70 +377,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/08/07/permisos-en-directorio-www/">Permisos en Directorio Www</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-08-07T18:18:00-03:00" pubdate data-updated="true">Aug 7<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/08/07/permisos-en-directorio-www/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>tl;dr</h2>
-
-<p>Suele suceder que un equipo de desarrolladores necesita trabajar de manera conjunta sobre un mismo directorio.</p>
-
-<p>La solución es sencilla.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>chown -R root /var/www/html/
-</span><span class='line'>chmod 775  /var/www/html/
-</span><span class='line'>chgrp -R dev  /var/www/html/
-</span><span class='line'>chmod g+s   /var/www/html/
-</span><span class='line'>setfacl -d -m g::rwx /var/www/html
-</span><span class='line'>setfacl -d -m o::rx /var/www/html
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/08/07/permisos-en-directorio-www/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -409,6 +392,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/10/02/deploying-to-aws/">deploying to aws</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/09/18/usando-svn-push-con-jenkins/">usando svn push con jenkins</a>
       </li>
     
@@ -422,10 +409,6 @@
     
       <li class="post">
         <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">borrando viejos builds en jenkins</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/07/permisos-en-directorio-www/">permisos en directorio www</a>
       </li>
     
   </ul>

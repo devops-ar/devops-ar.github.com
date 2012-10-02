@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>ORA-01882: timezone region  not found - devops-ar</title>
+  <title>Category: aws - devops-ar</title>
   <meta name="author" content="osvaldo">
 
   
-  <meta name="description" content="Una aplicación corriendo en un tomcat, no se conectaba con la base de datos en Oracle. El siguiente error aparecía en el archivo de trazas (${ &hellip;">
+  <meta name="description" content="Category: aws">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://devops-ar.github.com/blog/2011/11/16/ora-01882-timezone-region-not-found/">
+  <link rel="canonical" href="http://devops-ar.github.comblog/categories/aws/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -75,110 +75,36 @@
   <div id="main">
     <div id="content">
       <div>
-<article class="hentry" role="article">
+<article role="article">
   
   <header>
-    
-      <h1 class="entry-title">ORA-01882: Timezone Region Not Found</h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-11-16T01:01:00-03:00" pubdate data-updated="true">Nov 16<span>th</span>, 2011</time>
-        
-         | <a href="#disqus_thread">Comments</a>
-        
-      </p>
+    <h1 class="entry-title">Category: Aws</h1>
     
   </header>
-
-
-<div class="entry-content"><p>Una aplicación corriendo en un tomcat, no se conectaba con la base de datos en Oracle. El siguiente error aparecía en el archivo de trazas (${CATALINA_HOME}/logs/catalina.out)</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>(2011-10-05 15:57:45,511) DEBUG com.apache.example.async.ThreadPoolAsynchronousRunner$PoolThread-#0 com.apache.example.resourcepool.BasicResourcePool - An exception occurred while acquiring a poolable resource. Will retry.
-</span><span class='line'>java.sql.SQLException: ORA-00604: error occurred at recursive SQL level 1
-</span><span class='line'>ORA-01882: timezone region  not found</span></code></pre></td></tr></table></div></figure>
-
-
-<p>La solución era sencilla (kudos to A.A.), al archivo de inicio del tomcat (${CATALINA_HOME}/bin/catalina.sh) adicionarle esta línea:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">JAVA_OPTS</span><span class="o">=</span><span class="s2">&quot;$JAVA_OPTS -Duser.timezone=&#39;+03:00&#39; &quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Este valor deberá ser ajustado al timezone que corresponda en cada caso.</p>
-</div>
-
-
-  <footer>
-    <p class="meta">
-      
   
-
-<span class="byline author vcard">Posted by <span class="fn">osvaldo</span></span>
-
-      
-
-
-
-
-
+  <div id="blog-archives" class="category">
 
 
 
   
+  <h2>2012</h2>
+
+<article>
+  
+<h1><a href="/blog/2012/10/02/deploying-to-aws/">deploying to aws</a></h1>
+<time datetime="2012-10-02T09:31:00-03:00" pubdate><span class='month'>Oct</span> <span class='day'>02</span> <span class='year'>2012</span></time>
+
+<footer>
+  <span class="categories">posted in <a class='category' href='/blog/categories/aws/'>aws</a>, <a class='category' href='/blog/categories/chef/'>chef</a>, <a class='category' href='/blog/categories/flask/'>flask</a></span>
+</footer>
 
 
-<time datetime="2011-11-16T01:01:00-03:00" pubdate data-updated="true">Nov 16<span>th</span>, 2011</time>
-      
-
-<span class="categories">
-  
-    <a class='category' href='/blog/categories/oracle/'>oracle</a>, <a class='category' href='/blog/categories/tomcat/'>tomcat</a>
-  
-</span>
-
-
-    </p>
-    
-      <div class="sharing">
-  
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://devops-ar.github.com/blog/2011/11/16/ora-01882-timezone-region-not-found/" data-via="devops_ar" data-counturl="http://devops-ar.github.com/blog/2011/11/16/ora-01882-timezone-region-not-found/" >Tweet</a>
-  
-  
-  
-</div>
-
-    
-    <p class="meta">
-      
-      
-        <a class="basic-alignment right" href="/blog/2011/11/26/usando-python-con-virtualenv/" title="Next Post: Usando python con virtualenv ">Usando python con virtualenv  &raquo;</a>
-      
-    </p>
-  </footer>
 </article>
 
-  <section>
-    <h1>Comments</h1>
-    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </div>
-  </section>
+
+  
+</article>
 
 </div>
 
@@ -250,10 +176,7 @@
       var disqus_shortname = 'devops-ar';
       
         
-        // var disqus_developer = 1;
-        var disqus_identifier = 'http://devops-ar.github.com/blog/2011/11/16/ora-01882-timezone-region-not-found/';
-        var disqus_url = 'http://devops-ar.github.com/blog/2011/11/16/ora-01882-timezone-region-not-found/';
-        var disqus_script = 'embed.js';
+        var disqus_script = 'count.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
