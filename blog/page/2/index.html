@@ -9,10 +9,7 @@
   <meta name="author" content="osvaldo">
 
   
-  <meta name="description" content="tl;dr Suele suceder que un equipo de desarrolladores necesita trabajar de manera conjunta sobre un mismo directorio. La solución es sencilla. 1
-2
-3
-4 &hellip;">
+  <meta name="description" content="Algunos jobs crean builds grandes y con el tiempo, empiezan a ocupar espacio hasta llenar el disco duro. Para solucionar este problema, se pueden &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -79,6 +76,56 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">Borrando Viejos Builds en Jenkins</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-08T11:17:00-03:00" pubdate data-updated="true">Aug 8<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Algunos jobs crean builds grandes y con el tiempo, empiezan a ocupar espacio hasta llenar el disco duro.</p>
+
+<p>Para solucionar este problema, se pueden borrar periodicamente los builds mas viejos. El siguiente comando va a eliminar los builds de mas de 10 dias:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="k">for </span>i in <span class="sb">`</span>find /var/lib/jenkins/jobs -name builds<span class="sb">`</span> ; <span class="k">do </span>find <span class="nv">$i</span>  -mtime +10 -delete ; <span class="k">done</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -414,49 +461,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/04/09/instalando-el-proxy-de-perforce/">Instalando El Proxy De Perforce</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-04-09T23:29:00-03:00" pubdate data-updated="true">Apr 9<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/04/09/instalando-el-proxy-de-perforce/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>El proxy de perforce consta de dos procesos. Un script que se conecta al servidor remoto (se requieren credenciales para el mismo que el usuario debera proporcionar) y descarga los archivos para un directorio local de cache en el servidor. Y un demonio, el p4p, al que los clientes locales se conectan como si fuera el server de perforce y le sirve los fetch de los archivos del directorio de cache local mientras que le pasa al servidor real los commits que se hacen.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/04/09/instalando-el-proxy-de-perforce/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -474,6 +478,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/10/03/instalando-ldap-server/">instalando ldap server</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/10/02/deploying-to-aws/">deploying to aws</a>
       </li>
     
@@ -487,10 +495,6 @@
     
       <li class="post">
         <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">usando https detras de un proxy reverso</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">borrando viejos builds en jenkins</a>
       </li>
     
   </ul>

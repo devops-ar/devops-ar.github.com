@@ -9,7 +9,7 @@
   <meta name="author" content="osvaldo">
 
   
-  <meta name="description" content="Amazon had done a great job making the cloud accesible to anyone. Tools like Chef (kudos to Opscode) allow us to make deployments in a pretty easy &hellip;">
+  <meta name="description" content="A continuación se detalla la instalación de un directorio LDAP. Se siguen los pasos para la instalación del servidor ldap (openldap), la creación de &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +76,51 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/10/03/instalando-ldap-server/">Instalando Ldap Server</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-03T08:47:00-03:00" pubdate data-updated="true">Oct 3<span>rd</span>, 2012</time>
+        
+         | <a href="/blog/2012/10/03/instalando-ldap-server/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>A continuación se detalla la instalación de un directorio LDAP. Se siguen los pasos para la instalación del servidor ldap (openldap), la creación de la estructura inicial del directorio y por último, la instalación de una herramienta web para su administración.</p>
+
+<p>Los comandos para la instalación son especifícos para CentOS. La configuración seria la misma para cualquier otra plataforma que utilice las mismas aplicaciones.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/10/03/instalando-ldap-server/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -327,56 +372,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">Borrando Viejos Builds en Jenkins</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-08-08T11:17:00-03:00" pubdate data-updated="true">Aug 8<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Algunos jobs crean builds grandes y con el tiempo, empiezan a ocupar espacio hasta llenar el disco duro.</p>
-
-<p>Para solucionar este problema, se pueden borrar periodicamente los builds mas viejos. El siguiente comando va a eliminar los builds de mas de 10 dias:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="k">for </span>i in <span class="sb">`</span>find /var/lib/jenkins/jobs -name builds<span class="sb">`</span> ; <span class="k">do </span>find <span class="nv">$i</span>  -mtime +10 -delete ; <span class="k">done</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -392,6 +387,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/10/03/instalando-ldap-server/">instalando ldap server</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/10/02/deploying-to-aws/">deploying to aws</a>
       </li>
     
@@ -405,10 +404,6 @@
     
       <li class="post">
         <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">usando https detras de un proxy reverso</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">borrando viejos builds en jenkins</a>
       </li>
     
   </ul>

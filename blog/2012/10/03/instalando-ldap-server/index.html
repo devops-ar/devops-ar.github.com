@@ -1,0 +1,475 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>instalando ldap server - devops-ar</title>
+  <meta name="author" content="osvaldo">
+
+  
+  <meta name="description" content="A continuación se detalla la instalación de un directorio LDAP. Se siguen los pasos para la instalación del servidor ldap (openldap), la creación de &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://devops-ar.github.com/blog/2012/10/03/instalando-ldap-server/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="devops-ar" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-5155520-9']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">devops-ar</a></h1>
+  
+    <h2>devops en castellano</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:devops-ar.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Instalando Ldap Server</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-03T08:47:00-03:00" pubdate data-updated="true">Oct 3<span>rd</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>A continuación se detalla la instalación de un directorio LDAP. Se siguen los pasos para la instalación del servidor ldap (openldap), la creación de la estructura inicial del directorio y por último, la instalación de una herramienta web para su administración.</p>
+
+<p>Los comandos para la instalación son especifícos para CentOS. La configuración seria la misma para cualquier otra plataforma que utilice las mismas aplicaciones.</p>
+
+<!-- more -->
+
+
+<h1>LDAP</h1>
+
+<p>Primero se instala el ldap server, openldap en este caso.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>yum install openldap-servers
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>El primer paso seria configurar el servidor ldap. Para esto se edita el archivo <code>/etc/openldap/slapd.conf</code>. Lo mas importante es definir el sufijo que se va a utilizar para el directorio (lo que en DNS seria el dominio para el cual vamos a ser autoritativos). Además, las credenciales de la cuenta de administrador del directorio (para simplificar la instalación se declara la contraseña en texto claro, se debe utilizar un hash en un servidor de producción).</p>
+
+<figure class='code'><figcaption><span>/etc/openldap/slapd.conf</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='apacheconf'><span class='line'><span class="nb">suffix</span>          <span class="s2">&quot;dc=acme.example.com&quot;</span>
+</span><span class='line'><span class="nb">rootdn</span>          <span class="s2">&quot;cn=root,dc=acme.example.com&quot;</span>
+</span><span class='line'><span class="nb">rootpw</span>          <span class="m">9</span>pbK5kkp
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Se crea la estructura inicial del directorio (<a href="http://www.brennan.id.au/20-Shared_Address_Book_LDAP.html">referencia</a>).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>cat &gt;/etc/openldap/initial-schema.ldif<span class="s">&lt;&lt;&#39;EOF&#39;</span>
+</span><span class='line'><span class="s">dn: dc=acme.example.com</span>
+</span><span class='line'><span class="s">objectclass: dcObject</span>
+</span><span class='line'><span class="s">objectclass: organization</span>
+</span><span class='line'><span class="s">o: ACME LDAP Server</span>
+</span><span class='line'><span class="s">dc: acme.example.com</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">dn: cn=Manager,dc=acme.example.com</span>
+</span><span class='line'><span class="s">objectclass: organizationalRole</span>
+</span><span class='line'><span class="s">cn: Manager</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">dn: ou=users,dc=acme.example.com</span>
+</span><span class='line'><span class="s">ou: users</span>
+</span><span class='line'><span class="s">objectClass: top</span>
+</span><span class='line'><span class="s">objectClass: organizationalUnit</span>
+</span><span class='line'><span class="s">EOF</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>cargamos la estructura inicial del directorio con el comando
+<code>ldapadd -x -D 'cn=root,dc=acme.example.com' -W -f
+/etc/openldap/initial-schema.ldif</code></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@trinity phpldapadmin<span class="o">]</span><span class="c"># ldapadd -x -D</span>
+</span><span class='line'><span class="s1">&#39;cn=root,dc=acme.example.com&#39;</span> -W -f
+</span><span class='line'>/etc/openldap/initial-schema.ldif
+</span><span class='line'>Enter LDAP Password:
+</span><span class='line'>adding new entry <span class="s2">&quot;dc=acme.example.com&quot;</span>
+</span><span class='line'>
+</span><span class='line'>adding new entry <span class="s2">&quot;cn=Manager,dc=acme.example.com&quot;</span>
+</span><span class='line'>
+</span><span class='line'>adding new entry <span class="s2">&quot;ou=users,dc=acme.example.com&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>root@trinity phpldapadmin<span class="o">]</span><span class="c">#</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Para comprobar que en efecto el schema se cargo correctamente, se utiliza el siguiente comando <code>ldapsearch -x -b 'dc=acme.example.com' '(objectclass=*)'</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@trinity phpldapadmin<span class="o">]</span><span class="c"># ldapsearch -x -b</span>
+</span><span class='line'><span class="s1">&#39;dc=acme.example.com&#39;</span> <span class="s1">&#39;(objectclass=*)&#39;</span>
+</span><span class='line'><span class="c"># extended LDIF</span>
+</span><span class='line'><span class="c">#</span>
+</span><span class='line'><span class="c"># LDAPv3</span>
+</span><span class='line'><span class="c"># base &lt;dc=acme.example.com&gt; with scope subtree</span>
+</span><span class='line'><span class="c"># filter: (objectclass=*)</span>
+</span><span class='line'><span class="c"># requesting: ALL</span>
+</span><span class='line'><span class="c">#</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># acme.example.com</span>
+</span><span class='line'>dn: <span class="nv">dc</span><span class="o">=</span>acme.example.com
+</span><span class='line'>objectClass: dcObject
+</span><span class='line'>objectClass: organization
+</span><span class='line'>o: ACME LDAP Server
+</span><span class='line'>dc: acme.example.com
+</span><span class='line'>
+</span><span class='line'><span class="c"># Manager, acme.example.com</span>
+</span><span class='line'>dn: <span class="nv">cn</span><span class="o">=</span>Manager,dc<span class="o">=</span>acme.example.com
+</span><span class='line'>objectClass: organizationalRole
+</span><span class='line'>cn: Manager
+</span><span class='line'>
+</span><span class='line'><span class="c"># users, acme.example.com</span>
+</span><span class='line'>dn: <span class="nv">ou</span><span class="o">=</span>users,dc<span class="o">=</span>acme.example.com
+</span><span class='line'>ou: users
+</span><span class='line'>objectClass: top
+</span><span class='line'>objectClass: organizationalUnit
+</span><span class='line'>
+</span><span class='line'><span class="c"># search result</span>
+</span><span class='line'>search: 2
+</span><span class='line'>result: 0 Success
+</span><span class='line'>
+</span><span class='line'><span class="c"># numResponses: 4</span>
+</span><span class='line'><span class="c"># numEntries: 3</span>
+</span><span class='line'><span class="o">[</span>root@trinity phpldapadmin<span class="o">]</span><span class="c">#</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>phpldapadmin</h2>
+
+<p>Para administrar el directorio se utiliza el <a href="http://phpldapadmin.sourceforge.net/">phpldapadmin</a>. Una herramienta web, similar al phpmyadmin (como su nombre ya lo indica ;).</p>
+
+<p>No esta en los repositorios de CentOS. Como es una aplicación, sirve por igual si la tomamos de los repos de Fedora (<a href="http://dl.fedoraproject.org/pub/epel/5/i386/repoview/phpldapadmin.html">aca</a> y <a href="http://dl.fedoraproject.org/pub/epel/5/i386/phpldapadmin-1.0.2-1.el5.noarch.rpm">aca</a>).</p>
+
+<p>Se descarga y se instala.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>wget http://dl.fedoraproject.org/pub/epel/5/i386/phpldapadmin-1.0.2-1.el5.noarch.rpm
+</span><span class='line'>yum install php php-ldap
+</span><span class='line'>rpm -ivh   phpldapadmin-1.0.2-1.el5.noarch.rpm
+</span><span class='line'>yum install openldap-clients openldap-devel
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Para su configuración, editar el archivo /etc/phpldapadmin/config.php con los siguientes valores:</p>
+
+<figure class='code'><figcaption><span>/etc/phpldapadmin/config.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="x">$ldapservers-&gt;SetValue($i,&#39;server&#39;,&#39;name&#39;,&#39;Local LDAP Server&#39;);</span>
+</span><span class='line'><span class="x">$ldapservers-&gt;SetValue($i,&#39;server&#39;,&#39;host&#39;,&#39;127.0.0.1&#39;);</span>
+</span><span class='line'><span class="x">$ldapservers-&gt;SetValue($i,&#39;server&#39;,&#39;base&#39;,array(&#39;dc=acme.example.com&#39;));</span>
+</span><span class='line'><span class="x">$ldapservers-&gt;SetValue($i,&#39;server&#39;,&#39;auth_type&#39;,&#39;session&#39;);</span>
+</span><span class='line'><span class="x">$ldapservers-&gt;SetValue($i,&#39;login&#39;,&#39;dn&#39;,&#39;cn=root,dc=acme.example.com&#39;);</span>
+</span><span class='line'><span class="x">$ldapservers-&gt;SetValue($i,&#39;login&#39;,&#39;attr&#39;,&#39;dn&#39;);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Ya se puede administrar el directorio en la url: <a href="http://acme.example.com/ldapadmin-">http://acme.example.com/ldapadmin/</a>.</p>
+
+<p>Como referencia adicional se recomienda esta <a href="http://ihazem.wordpress.com/2011/11/29/installing-and-configuring-openldap-on-centos-5/">guia</a>.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">osvaldo</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-03T08:47:00-03:00" pubdate data-updated="true">Oct 3<span>rd</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/centos/'>centos</a>, <a class='category' href='/blog/categories/ldap/'>ldap</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://devops-ar.github.com/blog/2012/10/03/instalando-ldap-server/" data-via="devops_ar" data-counturl="http://devops-ar.github.com/blog/2012/10/03/instalando-ldap-server/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/10/02/deploying-to-aws/" title="Previous Post: deploying to aws">&laquo; deploying to aws</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/10/03/instalando-ldap-server/">instalando ldap server</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/02/deploying-to-aws/">deploying to aws</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/18/usando-svn-push-con-jenkins/">usando svn push con jenkins</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">definiendo un smarthost en mac os x</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">usando https detras de un proxy reverso</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("devops_ar", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/devops_ar" class="twitter-follow-button" data-show-count="false">Follow @devops_ar</a>
+  
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - osvaldo -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'devops-ar';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://devops-ar.github.com/blog/2012/10/03/instalando-ldap-server/';
+        var disqus_url = 'http://devops-ar.github.com/blog/2012/10/03/instalando-ldap-server/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

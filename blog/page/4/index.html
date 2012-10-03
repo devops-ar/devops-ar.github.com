@@ -9,22 +9,12 @@
   <meta name="author" content="osvaldo">
 
   
-  <meta name="description" content="Elasticsearch Primero necesitamos instalar elasticsearch. 1
+  <meta name="description" content="¿Quien soy? Si se ejecuta git config -l deberia obtenerse algo asi. 1
 2
 3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-cd /opt
-# Elasticsearch :
-ES_PACKAGE=elasticsearch-0.18.6.zip &hellip;">
+$ git config -l
+user.name=Osvaldo
+user.email=osvaldo@example.com Si no &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -91,6 +81,107 @@ ES_PACKAGE=elasticsearch-0.18.6.zip &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/02/03/guia-rapida-de-git-para-equipos/">Guia Rapida De Git Para Equipos</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-03T01:54:00-03:00" pubdate data-updated="true">Feb 3<span>rd</span>, 2012</time>
+        
+         | <a href="/blog/2012/02/03/guia-rapida-de-git-para-equipos/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>¿Quien soy?</h2>
+
+<p>Si se ejecuta <code>git config -l</code> deberia obtenerse algo asi.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>git config -l
+</span><span class='line'>user.name<span class="o">=</span>Osvaldo
+</span><span class='line'>user.email<span class="o">=</span>osvaldo@example.com
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Si no hemos configurado aun git, empecemos por ahi.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git config --global user.email <span class="s2">&quot;osvaldo@example.com&quot;</span>
+</span><span class='line'>git config --global user.name <span class="s2">&quot;Osvaldo&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Crear un repo</h2>
+
+<p>Se puede crear un repositorio nuevo</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git init
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>o se puede clonar un ya existente</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git clone ssh://192.168.20.52/home/osvaldo/chef-repo .
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Branches</h2>
+
+<p>Una branch puede ser creado por un próposito definido (arreglar un bug, <a href="http://nvie.com/posts/a-successful-git-branching-model/">introducir una nueva funcionalidad</a>. También puede ser por usuario. De esta manera, cada uno tiene su branch, donde puede realizar las modificaciones sin afectar el trabajo que estén haciendo otros. Una vez el código esta listo para producción, se hace el merge a la branch master (<a href="http://kentnguyen.com/development/visualized-git-practices-for-team/">haciendo primero un <code>git pull -rebase</code></a>).</p>
+
+<h2>Flujo de trabajo</h2>
+
+<p>El flujo de trabajo con las branches seria</p>
+
+<ul>
+<li>configurar git</li>
+<li>clonar el repo <code>git fetch</code></li>
+<li>crear/moverme a la branch personal <code>git checkout -b otsuarez</code></li>
+<li>editar <code>git -m -a ".. cambios .."</code> (nota. en la branch personal: &#8220;otsuarez&#8221;).</li>
+<li>cambiar a la branch principal y copiar los cambios para ahi <code>git checkout master</code> y despues <code>git merge otsuarez</code></li>
+<li>actualizar el repo central. <code>git push origin master</code></li>
+<li>opcionalmente podemos borrar la rama creada <code>git branch -D otsuarez</code></li>
+</ul>
+
+
+<h3>Referencias</h3>
+
+<ul>
+<li><a href="http://www.spheredev.org/wiki/Git_for_the_lazy">http://www.spheredev.org/wiki/Git_for_the_lazy</a></li>
+<li><a href="http://help.github.com/git-cheat-sheets/">http://help.github.com/git-cheat-sheets/</a></li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1866,340 +1957,6 @@ Es utilizada por los administradores para interactuar con la API del Servidor de
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/11/30/instalacion-de-un-server-de-ci/">Instalacion De Un Server De Ci</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-11-30T14:26:00-03:00" pubdate data-updated="true">Nov 30<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/11/30/instalacion-de-un-server-de-ci/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>CI - Continuous Integration.</p>
-
-<p>Este post describe la instalación de un servidor de integración continua. El mismo estará integrado por jenkins, maven y sonar.</p>
-
-<h1>jenkins</h1>
-
-<h2>Instalacion de jenkins</h2>
-
-<p>Esta instalacion describe la instalacion de jenkins en un container tomcat ya existente y utilizando al apache (via mod_proxy_ajp) como frontend.</p>
-
-<p>jenkins es un fork de hudson.</p>
-
-<p>La instalacion se realiza sobre un server estandar con tomcat instalado.</p>
-
-<p>Los pasos a realizar serian los siguientes:
-* Descargar la ultima version del war de jenkins (el ejemplo es para el caso de server).
-* Configurar el apache.
-* Reiniciar el apache y el tomcat.</p>
-
-<h2>Descargar el jenkins.</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>wget -P /opt/thirdparty/tomcat/webapps/ http://updates.jenkins-ci.org/download/war/1.438/jenkins.war
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Configurar el apache</h2>
-
-<p>Primero revisar que el modulo este activado. En el archivo /etc/httpd/conf.d/proxy_ajp.conf la siguiente linea este descomentareada.</p>
-
-<p>LoadModule proxy_ajp_module modules/mod_proxy_ajp.so</p>
-
-<p>Nota: Asegurarse de que el modulo mod_jk no este habilitado (usualmente el archivo mod_jk.conf en el mismo directorio).</p>
-
-<p>Luego se crea un archivo de virtualhost para el server.</p>
-
-<figure class='code'><figcaption><span>/etc/httpd/vhost.d/server.conf </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='apache'><span class='line'><span class="nb">ProxyRequests</span> <span class="k">Off</span>
-</span><span class='line'><span class="nb">ProxyPreserveHost</span> <span class="k">On</span>
-</span><span class='line'><span class="nt">&lt;VirtualHost</span> <span class="s">*:80</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nb">ServerAdmin</span> unixadmin@example.com
-</span><span class='line'>    <span class="nb">ServerName</span> server.example.com
-</span><span class='line'>    <span class="nb">ProxyPass</span> <span class="sx">/sonar</span> ajp://localhost:9009/sonar
-</span><span class='line'>    <span class="c">#ProxyPass /nexus http://localhost:8081/nexus</span>
-</span><span class='line'>    <span class="c">#ProxyPassReverse /nexus http://localhost:8081/nexus</span>
-</span><span class='line'>    <span class="nb">ProxyPass</span> /   ajp://localhost:8009/
-</span><span class='line'>    <span class="nb">ErrorLog</span> logs/server.dev.corp-error_log
-</span><span class='line'>    <span class="nb">CustomLog</span> logs/server.dev.corp-access_log common
-</span><span class='line'><span class="nt">&lt;/VirtualHost&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Nota, las lineas para el sonar y el nexus solo se requieren si estos servicios van a ser instalados, si no, se dejan comentadas.</p>
-
-<p>Se habilita el puerto 8009 para el protocolo AJP en el tomcat (por defecto solo habilita el 8080: protocolo HTTP).</p>
-
-<figure class='code'><figcaption><span>/opt/thirdparty/tomcat/conf/server.xml </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="c">&lt;!-- Define an AJP 1.3 Connector on port 8009 --&gt;</span>
-</span><span class='line'><span class="nt">&lt;Connector</span> <span class="na">port=</span><span class="s">&quot;8009&quot;</span> <span class="na">protocol=</span><span class="s">&quot;AJP/1.3&quot;</span> <span class="na">redirectPort=</span><span class="s">&quot;8443&quot;</span> <span class="na">URIEncoding=</span><span class="s">&quot;UTF-8&quot;</span> <span class="nt">/&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Y se reinician el apache y el tomcat</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>/etc/init.d/httpd restart
-</span><span class='line'>/etc/init.d/tomcat stop
-</span><span class='line'>/etc/init.d/tomcat start
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>El jenkins deberia estar accesible en: http://server.example.com/jenkins</p>
-
-<p>Se sugiere crear una pagina de inicio por si alguien teclea la url http://server.example.com/ directamente.
-Esta pagina se crea en
-$CATALINA_HOME/webapps/ROOT/index.html</p>
-
-<p>Por ejemplo:</p>
-
-<figure class='code'><figcaption><span>/opt/thirdparty/tomcat/webapps/ROOT/index.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;html&gt;</span>
-</span><span class='line'><span class="nt">&lt;head&gt;&lt;title&gt;</span>server <span class="nt">&lt;/title&gt;</span> <span class="nt">&lt;/head&gt;</span>
-</span><span class='line'><span class="nt">&lt;body&gt;</span>
-</span><span class='line'>server<span class="nt">&lt;p</span> <span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;ul&gt;</span>
-</span><span class='line'><span class="nt">&lt;li&gt;&lt;a</span> <span class="na">href=</span><span class="s">&quot;/jenkins&quot;</span><span class="nt">&gt;</span>jenkins<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>
-</span><span class='line'><span class="nt">&lt;li&gt;&lt;a</span> <span class="na">href=</span><span class="s">&quot;/sonar&quot;</span><span class="nt">&gt;</span>sonar<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>
-</span><span class='line'><span class="nt">&lt;li&gt;&lt;a</span> <span class="na">href=</span><span class="s">&quot;/nexus&quot;</span><span class="nt">&gt;</span>nexus<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>
-</span><span class='line'><span class="nt">&lt;/ul&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h1>Maven</h1>
-
-<p>Descargar y descompactar el maven.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>wget -P /opt/thirdparty http://apache.dattatec.com//maven/binaries/apache-maven-3.0.3-bin.tar.gz
-</span><span class='line'><span class="nb">cd</span> /opt/thirdparty
-</span><span class='line'>tar zxf apache-maven-3.0.3-bin.tar.gz
-</span><span class='line'>rm apache-maven-3.0.3-bin.tar.gz
-</span><span class='line'>ln -s apache-maven-3.0.3 maven
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Adicionar al final del archivo /etc/bashrc las siguientes lineas</p>
-
-<figure class='code'><figcaption><span>/etc/bashrc</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">export </span><span class="nv">JAVA_HOME</span><span class="o">=</span>/opt/thirdparty/java
-</span><span class='line'><span class="nb">export </span><span class="nv">M2_HOME</span><span class="o">=</span>/opt/thirdparty/maven
-</span><span class='line'><span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="k">${</span><span class="nv">M2_HOME</span><span class="k">}</span>/bin:<span class="k">${</span><span class="nv">PATH</span><span class="k">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Si nuestro server utiliza un proxy para conectarse a la web, deberemos configurar el maven para hacer uso de este proxy.  Esto se hace en el archivo de configuracion del maven: /opt/thirdparty/maven/conf/settings.xml donde la seccion de proxies deberá quedar de la siguiente manera:</p>
-
-<figure class='code'><figcaption><span>/opt/thirdparty/maven/conf/settings.xml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'>  <span class="nt">&lt;proxies&gt;</span>
-</span><span class='line'>   <span class="nt">&lt;proxy&gt;</span>
-</span><span class='line'>      <span class="nt">&lt;active&gt;</span>true<span class="nt">&lt;/active&gt;</span>
-</span><span class='line'>      <span class="nt">&lt;protocol&gt;</span>http<span class="nt">&lt;/protocol&gt;</span>
-</span><span class='line'>      <span class="nt">&lt;host&gt;</span>proxy.example.com<span class="nt">&lt;/host&gt;</span>
-</span><span class='line'>      <span class="nt">&lt;port&gt;</span>3128<span class="nt">&lt;/port&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/proxy&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/proxies&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h1>Sonar</h1>
-
-<p>Descargamos el sonar y lo descompactamos en un directorio.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">COMPANY</span><span class="o">=</span>globant
-</span><span class='line'><span class="nb">cd</span> /opt/<span class="nv">$COMPANY</span>
-</span><span class='line'>wget http://dist.sonar.codehaus.org/sonar-2.11.zip
-</span><span class='line'>unzip sonar-2.11.zip
-</span><span class='line'>ln -s sonar-2.11 sonar
-</span><span class='line'>rm -f sonar-2.11.zip
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Creamos la base de datos</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">CREATE</span> <span class="k">DATABASE</span> <span class="n">sonar</span> <span class="nb">CHARACTER</span> <span class="k">SET</span> <span class="n">utf8</span> <span class="k">COLLATE</span> <span class="n">utf8</span><span class="err">\</span><span class="n">_general_ci</span><span class="p">;</span>
-</span><span class='line'><span class="k">grant</span> <span class="k">all</span> <span class="k">privileges</span> <span class="k">on</span> <span class="n">sonar</span><span class="p">.</span><span class="o">*</span> <span class="k">to</span> <span class="s1">&#39;sonar&#39;</span><span class="o">@</span><span class="s1">&#39;localhost&#39;</span> <span class="n">identified</span> <span class="k">by</span> <span class="s1">&#39;Ht4uS1cNwbxeI&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="n">flush</span> <span class="k">privileges</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Se declara la base de datos en el archivo de propiedades del sonar: /opt/thirdparty/sonar/conf/sonar.properties</p>
-
-<figure class='code'><figcaption><span>/opt/thirdparty/sonar/conf/sonar.properties</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='properties'><span class='line'><span class="na">sonar.web.host</span><span class="o">:</span>                           <span class="s">0.0.0.0</span>
-</span><span class='line'><span class="na">sonar.web.port</span><span class="o">:</span>                           <span class="s">9000</span>
-</span><span class='line'><span class="na">sonar.web.context</span><span class="o">:</span>                        <span class="s">/sonar</span>
-</span><span class='line'><span class="c">#sonar.web.context:                        /</span>
-</span><span class='line'><span class="na">sonar.ajp13.port</span><span class="o">:</span> <span class="s">9009</span>
-</span><span class='line'>
-</span><span class='line'><span class="na">sonar.jdbc.username</span><span class="o">:</span>                       <span class="s">sonar</span>
-</span><span class='line'><span class="na">sonar.jdbc.password</span><span class="o">:</span>                       <span class="s">*********</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># Comment the following lines to deactivate the default embedded database.</span>
-</span><span class='line'><span class="c">#sonar.jdbc.url:                            jdbc:derby://localhost:1527/sonar;create=true</span>
-</span><span class='line'><span class="c">#sonar.jdbc.driverClassName:                org.apache.derby.jdbc.ClientDriver</span>
-</span><span class='line'><span class="c">#sonar.jdbc.validationQuery:                values(1)</span>
-</span><span class='line'>
-</span><span class='line'><span class="na">sonar.jdbc.url</span><span class="o">:</span> <span class="s">jdbc:mysql://localhost:3306/sonar?useUnicode=true&amp;characterEncoding=utf8</span>
-</span><span class='line'><span class="na">sonar.jdbc.driverClassName</span><span class="o">:</span> <span class="s">com.mysql.jdbc.Driver</span>
-</span><span class='line'><span class="na">sonar.jdbc.validationQuery</span><span class="o">:</span> <span class="s">select 1</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Podemos iniciar el sonar manualmente.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$SONAR_HOME</span>/bin/linux-x86-32/sonar.sh start
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Y comprobar que funciona accediendo al puerto 9000 del server: <a href="http://server.example.com:9000/">http://server.example.com:9000/</a></p>
-
-<p>Adicionamos una instalacion de sonar al jenkins</p>
-
-<p>Si el server soporta la instalación de plugins via web.
-<a href="http://server.example.com/jenkins/pluginManager/available">http://server.example.com/jenkins/pluginManager/available</a></p>
-
-<p>Instalando el plugin de sonar manualmente.
-<a href="http://updates.jenkins-ci.org/download/plugins/">http://updates.jenkins-ci.org/download/plugins/</a></p>
-
-<p>Descargamos el archivo *.hpi para el directorio $JENKINS_HOME/plugins directory. Algunos contenedores podrian requerir reiniciar Jenkins para que muestre el nuevo plugin.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">cd</span> <span class="nv">$TOMCAT_HOME</span>/webapps/jenkins/WEB-INF/plugins
-</span><span class='line'>wget http://updates.jenkins-ci.org/latest/sonar.hpi
-</span><span class='line'>chown tomcat:tomcat sonar.hpi
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Configuramos jenkins para que utilice el sonar: <a href="http://server.example.com:8080/jenkins/configure">http://server.example.com:8080/jenkins/configure</a></p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='properties'><span class='line'><span class="err">Name</span>  <span class="err">sonar</span>
-</span><span class='line'><span class="na">Server URL   http</span><span class="o">:</span><span class="s">//server.example.com/sonar</span>
-</span><span class='line'><span class="na">Database URL     jdbc</span><span class="o">:</span><span class="s">mysql://localhost:3306/sonar?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=utf8</span>
-</span><span class='line'><span class="err">Database</span> <span class="err">login</span>  <span class="err">sonar</span>
-</span><span class='line'><span class="err">Database</span> <span class="err">password</span>   <span class="err">&lt;el</span> <span class="err">mismo</span> <span class="err">que</span> <span class="err">utilizamos</span> <span class="err">para</span> <span class="err">la</span> <span class="err">creacion</span> <span class="err">del</span> <span class="err">usuario</span> <span class="err">mysql&gt;</span>
-</span><span class='line'><span class="err">Database</span> <span class="err">driver</span> <span class="err">com.mysql.jdbc.Driver</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h1>Referencias</h1>
-
-<h2>Jenkins</h2>
-
-<ul>
-<li><a href="https://wiki.jenkins-ci.org/display/JENKINS/Plugins">https://wiki.jenkins-ci.org/display/JENKINS/Plugins</a></li>
-</ul>
-
-
-<h2>Sonar</h2>
-
-<ul>
-<li><a href="http://docs.codehaus.org/display/SONAR/Configure+Sonar+plugin">http://docs.codehaus.org/display/SONAR/Configure+Sonar+plugin</a></li>
-<li><a href="http://www.wakaleo.com/component/content/article/187">http://www.wakaleo.com/component/content/article/187</a></li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; Older</a>
@@ -2217,6 +1974,10 @@ $CATALINA_HOME/webapps/ROOT/index.html</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/10/03/instalando-ldap-server/">instalando ldap server</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/10/02/deploying-to-aws/">deploying to aws</a>
       </li>
     
@@ -2230,10 +1991,6 @@ $CATALINA_HOME/webapps/ROOT/index.html</p>
     
       <li class="post">
         <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">usando https detras de un proxy reverso</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">borrando viejos builds en jenkins</a>
       </li>
     
   </ul>

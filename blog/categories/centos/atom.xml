@@ -4,7 +4,7 @@
   <title><![CDATA[Category: centos | devops-ar]]></title>
   <link href="http://devops-ar.github.com/blog/categories/centos/atom.xml" rel="self"/>
   <link href="http://devops-ar.github.com/"/>
-  <updated>2012-10-02T10:44:16-03:00</updated>
+  <updated>2012-10-03T09:29:42-03:00</updated>
   <id>http://devops-ar.github.com/</id>
   <author>
     <name><![CDATA[osvaldo]]></name>
@@ -12,6 +12,158 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[instalando ldap server]]></title>
+    <link href="http://devops-ar.github.com/blog/2012/10/03/instalando-ldap-server/"/>
+    <updated>2012-10-03T08:47:00-03:00</updated>
+    <id>http://devops-ar.github.com/blog/2012/10/03/instalando-ldap-server</id>
+    <content type="html"><![CDATA[<p>A continuación se detalla la instalación de un directorio LDAP. Se siguen los pasos para la instalación del servidor ldap (openldap), la creación de la estructura inicial del directorio y por último, la instalación de una herramienta web para su administración.</p>
+
+<p>Los comandos para la instalación son especifícos para CentOS. La configuración seria la misma para cualquier otra plataforma que utilice las mismas aplicaciones.</p>
+
+<!-- more -->
+
+
+<h1>LDAP</h1>
+
+<p>Primero se instala el ldap server, openldap en este caso.</p>
+
+<p><code>sh
+yum install openldap-servers
+</code></p>
+
+<p>El primer paso seria configurar el servidor ldap. Para esto se edita el archivo <code>/etc/openldap/slapd.conf</code>. Lo mas importante es definir el sufijo que se va a utilizar para el directorio (lo que en DNS seria el dominio para el cual vamos a ser autoritativos). Además, las credenciales de la cuenta de administrador del directorio (para simplificar la instalación se declara la contraseña en texto claro, se debe utilizar un hash en un servidor de producción).</p>
+
+<p><code>apacheconf /etc/openldap/slapd.conf
+suffix          "dc=acme.example.com"
+rootdn          "cn=root,dc=acme.example.com"
+rootpw          9pbK5kkp
+</code></p>
+
+<p>Se crea la estructura inicial del directorio (<a href="http://www.brennan.id.au/20-Shared_Address_Book_LDAP.html">referencia</a>).</p>
+
+<p>```sh
+cat >/etc/openldap/initial-schema.ldif&lt;&lt;'EOF'
+dn: dc=acme.example.com
+objectclass: dcObject
+objectclass: organization
+o: ACME LDAP Server
+dc: acme.example.com</p>
+
+<p>dn: cn=Manager,dc=acme.example.com
+objectclass: organizationalRole
+cn: Manager</p>
+
+<p>dn: ou=users,dc=acme.example.com
+ou: users
+objectClass: top
+objectClass: organizationalUnit
+EOF
+```</p>
+
+<p>cargamos la estructura inicial del directorio con el comando
+<code>ldapadd -x -D 'cn=root,dc=acme.example.com' -W -f
+/etc/openldap/initial-schema.ldif</code></p>
+
+<p>```sh
+[root@trinity phpldapadmin]# ldapadd -x -D
+'cn=root,dc=acme.example.com' -W -f
+/etc/openldap/initial-schema.ldif
+Enter LDAP Password:
+adding new entry "dc=acme.example.com"</p>
+
+<p>adding new entry "cn=Manager,dc=acme.example.com"</p>
+
+<p>adding new entry "ou=users,dc=acme.example.com"</p>
+
+<p>[root@trinity phpldapadmin]#
+```</p>
+
+<p>Para comprobar que en efecto el schema se cargo correctamente, se utiliza el siguiente comando <code>ldapsearch -x -b 'dc=acme.example.com' '(objectclass=*)'</code>.</p>
+
+<p>```sh
+[root@trinity phpldapadmin]# ldapsearch -x -b
+'dc=acme.example.com' '(objectclass=*)'</p>
+
+<h1>extended LDIF</h1>
+
+<p>#</p>
+
+<h1>LDAPv3</h1>
+
+<h1>base &lt;dc=acme.example.com> with scope subtree</h1>
+
+<h1>filter: (objectclass=*)</h1>
+
+<h1>requesting: ALL</h1>
+
+<p>#</p>
+
+<h1>acme.example.com</h1>
+
+<p>dn: dc=acme.example.com
+objectClass: dcObject
+objectClass: organization
+o: ACME LDAP Server
+dc: acme.example.com</p>
+
+<h1>Manager, acme.example.com</h1>
+
+<p>dn: cn=Manager,dc=acme.example.com
+objectClass: organizationalRole
+cn: Manager</p>
+
+<h1>users, acme.example.com</h1>
+
+<p>dn: ou=users,dc=acme.example.com
+ou: users
+objectClass: top
+objectClass: organizationalUnit</p>
+
+<h1>search result</h1>
+
+<p>search: 2
+result: 0 Success</p>
+
+<h1>numResponses: 4</h1>
+
+<h1>numEntries: 3</h1>
+
+<p>[root@trinity phpldapadmin]#
+```</p>
+
+<h2>phpldapadmin</h2>
+
+<p>Para administrar el directorio se utiliza el <a href="http://phpldapadmin.sourceforge.net/">phpldapadmin</a>. Una herramienta web, similar al phpmyadmin (como su nombre ya lo indica ;).</p>
+
+<p>No esta en los repositorios de CentOS. Como es una aplicación, sirve por igual si la tomamos de los repos de Fedora (<a href="http://dl.fedoraproject.org/pub/epel/5/i386/repoview/phpldapadmin.html">aca</a> y <a href="http://dl.fedoraproject.org/pub/epel/5/i386/phpldapadmin-1.0.2-1.el5.noarch.rpm">aca</a>).</p>
+
+<p>Se descarga y se instala.</p>
+
+<p><code>sh
+wget http://dl.fedoraproject.org/pub/epel/5/i386/phpldapadmin-1.0.2-1.el5.noarch.rpm
+yum install php php-ldap
+rpm -ivh   phpldapadmin-1.0.2-1.el5.noarch.rpm
+yum install openldap-clients openldap-devel
+</code></p>
+
+<p>Para su configuración, editar el archivo /etc/phpldapadmin/config.php con los siguientes valores:</p>
+
+<p><code>php /etc/phpldapadmin/config.php
+$ldapservers-&gt;SetValue($i,'server','name','Local LDAP Server');
+$ldapservers-&gt;SetValue($i,'server','host','127.0.0.1');
+$ldapservers-&gt;SetValue($i,'server','base',array('dc=acme.example.com'));
+$ldapservers-&gt;SetValue($i,'server','auth_type','session');
+$ldapservers-&gt;SetValue($i,'login','dn','cn=root,dc=acme.example.com');
+$ldapservers-&gt;SetValue($i,'login','attr','dn');
+</code></p>
+
+<p>Ya se puede administrar el directorio en la url: <a href="http://acme.example.com/ldapadmin-">http://acme.example.com/ldapadmin/</a>.</p>
+
+<p>Como referencia adicional se recomienda esta <a href="http://ihazem.wordpress.com/2011/11/29/installing-and-configuring-openldap-on-centos-5/">guia</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[creating an rpm package from on tgz file]]></title>

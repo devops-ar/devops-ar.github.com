@@ -99,8 +99,12 @@
         <lastmod>2012-10-02T10:44:16-03:00</lastmod>
     </url>
     <url>
+        <loc>http://devops-ar.github.com/blog/2012/10/03/instalando-ldap-server/</loc>
+        <lastmod>2012-10-03T09:28:25-03:00</lastmod>
+    </url>
+    <url>
         <loc>http://devops-ar.github.com/blog/archives/</loc>
-        <lastmod>2012-10-02T10:44:16-03:00</lastmod>
+        <lastmod>2012-10-03T09:28:25-03:00</lastmod>
     </url>
     <url>
         <loc>http://devops-ar.github.com/contacto/</loc>
@@ -108,6 +112,6 @@
     </url>
     <url>
         <loc>http://devops-ar.github.com/</loc>
-        <lastmod>2012-10-02T10:44:16-03:00</lastmod>
+        <lastmod>2012-10-03T09:28:25-03:00</lastmod>
     </url>
 </urlset>

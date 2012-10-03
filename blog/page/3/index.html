@@ -9,7 +9,7 @@
   <meta name="author" content="osvaldo">
 
   
-  <meta name="description" content="Una de las ventajas de git es el trabajo en equipos. Como compartir el codigo seria la pregunta. Existen varias alternativas. Hay servicios que &hellip;">
+  <meta name="description" content="El proxy de perforce consta de dos procesos. Un script que se conecta al servidor remoto (se requieren credenciales para el mismo que el usuario &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +76,49 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/04/09/instalando-el-proxy-de-perforce/">Instalando El Proxy De Perforce</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-09T23:29:00-03:00" pubdate data-updated="true">Apr 9<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/04/09/instalando-el-proxy-de-perforce/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>El proxy de perforce consta de dos procesos. Un script que se conecta al servidor remoto (se requieren credenciales para el mismo que el usuario debera proporcionar) y descarga los archivos para un directorio local de cache en el servidor. Y un demonio, el p4p, al que los clientes locales se conectan como si fuera el server de perforce y le sirve los fetch de los archivos del directorio de cache local mientras que le pasa al servidor real los commits que se hacen.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/04/09/instalando-el-proxy-de-perforce/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -478,107 +521,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/02/03/guia-rapida-de-git-para-equipos/">Guia Rapida De Git Para Equipos</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-02-03T01:54:00-03:00" pubdate data-updated="true">Feb 3<span>rd</span>, 2012</time>
-        
-         | <a href="/blog/2012/02/03/guia-rapida-de-git-para-equipos/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>¿Quien soy?</h2>
-
-<p>Si se ejecuta <code>git config -l</code> deberia obtenerse algo asi.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>git config -l
-</span><span class='line'>user.name<span class="o">=</span>Osvaldo
-</span><span class='line'>user.email<span class="o">=</span>osvaldo@example.com
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Si no hemos configurado aun git, empecemos por ahi.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>git config --global user.email <span class="s2">&quot;osvaldo@example.com&quot;</span>
-</span><span class='line'>git config --global user.name <span class="s2">&quot;Osvaldo&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Crear un repo</h2>
-
-<p>Se puede crear un repositorio nuevo</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>git init
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>o se puede clonar un ya existente</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>git clone ssh://192.168.20.52/home/osvaldo/chef-repo .
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Branches</h2>
-
-<p>Una branch puede ser creado por un próposito definido (arreglar un bug, <a href="http://nvie.com/posts/a-successful-git-branching-model/">introducir una nueva funcionalidad</a>. También puede ser por usuario. De esta manera, cada uno tiene su branch, donde puede realizar las modificaciones sin afectar el trabajo que estén haciendo otros. Una vez el código esta listo para producción, se hace el merge a la branch master (<a href="http://kentnguyen.com/development/visualized-git-practices-for-team/">haciendo primero un <code>git pull -rebase</code></a>).</p>
-
-<h2>Flujo de trabajo</h2>
-
-<p>El flujo de trabajo con las branches seria</p>
-
-<ul>
-<li>configurar git</li>
-<li>clonar el repo <code>git fetch</code></li>
-<li>crear/moverme a la branch personal <code>git checkout -b otsuarez</code></li>
-<li>editar <code>git -m -a ".. cambios .."</code> (nota. en la branch personal: &#8220;otsuarez&#8221;).</li>
-<li>cambiar a la branch principal y copiar los cambios para ahi <code>git checkout master</code> y despues <code>git merge otsuarez</code></li>
-<li>actualizar el repo central. <code>git push origin master</code></li>
-<li>opcionalmente podemos borrar la rama creada <code>git branch -D otsuarez</code></li>
-</ul>
-
-
-<h3>Referencias</h3>
-
-<ul>
-<li><a href="http://www.spheredev.org/wiki/Git_for_the_lazy">http://www.spheredev.org/wiki/Git_for_the_lazy</a></li>
-<li><a href="http://help.github.com/git-cheat-sheets/">http://help.github.com/git-cheat-sheets/</a></li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -596,6 +538,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/10/03/instalando-ldap-server/">instalando ldap server</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/10/02/deploying-to-aws/">deploying to aws</a>
       </li>
     
@@ -609,10 +555,6 @@
     
       <li class="post">
         <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">usando https detras de un proxy reverso</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/08/borrando-viejos-builds-en-jenkins/">borrando viejos builds en jenkins</a>
       </li>
     
   </ul>
