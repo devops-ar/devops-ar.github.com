@@ -4,7 +4,7 @@
   <title><![CDATA[devops-ar]]></title>
   <link href="http://devops-ar.github.com/atom.xml" rel="self"/>
   <link href="http://devops-ar.github.com/"/>
-  <updated>2012-11-20T11:14:06-03:00</updated>
+  <updated>2012-11-20T11:17:04-03:00</updated>
   <id>http://devops-ar.github.com/</id>
   <author>
     <name><![CDATA[osvaldo]]></name>
@@ -23,6 +23,9 @@
 <p>Empece a usar chef para deployar los servers (vm) de desarrollo. Partiendo de la forma estandar de uso de chef, llegue al workflow que presento a continuacion.<br/>
 Toda la informacion de un server se almacena en un archivo de texto. Configurar un server se reduce a editar el archivo correspondiente y comitear los cambios realizados. <br/>
 El workflow se encarga del resto: ejecutar los comandos necesarios, notificar por IRC del estado de la operacion y dejar una traza disponible de los comandos ejecutados para su revision posterior (y/o auditoria/debug/etc).</p>
+
+<!-- more -->
+
 
 <h2>componentes de chef</h2>
 
