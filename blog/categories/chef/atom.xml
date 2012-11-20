@@ -4,7 +4,7 @@
   <title><![CDATA[Category: chef | devops-ar]]></title>
   <link href="http://devops-ar.github.com/blog/categories/chef/atom.xml" rel="self"/>
   <link href="http://devops-ar.github.com/"/>
-  <updated>2012-10-03T09:29:42-03:00</updated>
+  <updated>2012-11-20T11:14:06-03:00</updated>
   <id>http://devops-ar.github.com/</id>
   <author>
     <name><![CDATA[osvaldo]]></name>
@@ -12,6 +12,199 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[instalando servidores con un commit]]></title>
+    <link href="http://devops-ar.github.com/blog/2012/11/20/instalando-servidores-con-un-commit/"/>
+    <updated>2012-11-20T07:50:00-03:00</updated>
+    <id>http://devops-ar.github.com/blog/2012/11/20/instalando-servidores-con-un-commit</id>
+    <content type="html"><![CDATA[<h1>Introducción (aka TL;DR)</h1>
+
+<p>Empece a usar chef para deployar los servers (vm) de desarrollo. Partiendo de la forma estandar de uso de chef, llegue al workflow que presento a continuacion.<br/>
+Toda la informacion de un server se almacena en un archivo de texto. Configurar un server se reduce a editar el archivo correspondiente y comitear los cambios realizados. <br/>
+El workflow se encarga del resto: ejecutar los comandos necesarios, notificar por IRC del estado de la operacion y dejar una traza disponible de los comandos ejecutados para su revision posterior (y/o auditoria/debug/etc).</p>
+
+<h2>componentes de chef</h2>
+
+<p>chef tiene tres componentes basicos:</p>
+
+<ul>
+<li>chef server</li>
+<li>chef workstation</li>
+<li>chef client</li>
+</ul>
+
+
+<p>El chef client (node) toma la configuracion del chef server y la aplica.<br/>
+La chef workstation es la que instala el chef en los clientes (nodes) y en nuestro caso, invoca la ejecucion del chef client.<br/>
+El chef server es donde esta toda la configuracion que se va a aplicar (los cookbooks con las recipes y las data bags). tambien se almacena la informacion de los nodes que son administrador por chef.</p>
+
+<h2>infrastructure as code</h2>
+
+<p>La configuracion que se aplica (cookbooks, databags) se puede guardar en un repositorio de codigo, se decidio utilizar git.  El chef server tiene una interface web, pero no se utiliza, toda la configuracion se hace en los archivos de repositorio y se importa al chef server (mediante el comando knife). De esta manera, todos los cambios estan versionados. Para servidor git se utiliza gitolite (como interface web se recomienda gitlab).</p>
+
+<h1>Workflow</h1>
+
+<p>Se armo un workflow siguiendo la filosofia unix, pequeños componentes que cumplen una tarea en especifico y que pueden ser concatenados para implementar una tarea compleja.<br/>
+El sysadmin clona el repo en la estacion de trabajo que vaya a utilizar. Solo se requiere git instalado, su llave ssh publica (para crear el usuario en gitolite) y acceso por ssh al server git.<br/>
+Trabaja con los archivos . Hace un commit para guardar los cambios realizados. Por ultimo, hace un push para actualizar el repositorio central.</p>
+
+<p>El repositorio central esta en un gitolite. El gitolite corre bajo un usuario (git) sin privilegios.  <br/>
+Se creo un hook <code>post-receive</code> que es el caballo de batalla de este workflow. Cada git push que se realiza contra el repositorio, ejecuta el script de ese hook. <br/>
+El script chequea que fue lo que se actualizo y en base a eso toma la accion que corresponde.<br/>
+El usuario git tiene configurado el comando knife para poder cargar cookbooks y databags en el chef server.<br/>
+Si se actualizo un cookbook, un databag (ver nota siguiente), un role o un environment, se sube (knife upload) al chef server.</p>
+
+<p>Para administrar los servidores se creo un databag: nodes, donde se crea un archivo json (<code>template.json</code>)  por cada servidor que se deployea.</p>
+
+<p><div><script src='https://gist.github.com/4075735.js?file='></script>
+<noscript><pre><code>#!/bin/sh
+
+#TODO
+# add error checking to knife operations
+
+IRC_URL=&quot;http://irc.example.com/irc.php&quot;
+RUNDECK_URL=&quot;https://rundeck.example.com/rundeck/&quot;
+template_msg=&quot;modified template:&quot;
+node_msg=&quot;modified node:&quot;
+envr_msg=&quot;modified environment:&quot;
+role_msg=&quot;modified role:&quot;
+cookbook_msg=&quot;modified cookbook:&quot;
+boot_msg=&quot;boot-node started in rundeck - progress: &quot;
+run_msg=&quot;run-client started in rundeck - progres: &quot;
+from=&quot;gitolite-chef-server&quot;
+
+
+# Safety check
+if [ -z &quot;$GIT_DIR&quot; ]; then
+    echo &quot;Don't run this script from the command line.&quot; &gt;&amp;2
+    exit 1
+fi
+
+tmpdir=/var/tmp/$$.$RANDOM
+mkdir $tmpdir
+
+read oldrev newrev refname
+BRANCH=${refname#refs/heads/} 
+files=`git diff-tree --stat --summary --find-copies-harder $oldrev..$newrev`
+for i in $files
+do
+  case &quot;$i&quot; in
+    data_bags/nodes/*)
+      k=`echo $i | cut -f&quot;3&quot; -d&quot;/&quot;`
+      j=`basename $k .json`
+      if [ $j = &quot;template&quot; ]; then
+                    curl  -X POST -d 'json={&quot;msg&quot;:&quot;'${template_msg}' '${j}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}'  ${IRC_URL}
+        exit 0
+      fi
+      git show HEAD:$i &gt; $tmpdir/$j.json
+      knife data bag from file nodes $tmpdir/$j.json
+      curl  -X POST -d 'json={&quot;msg&quot;:&quot;'${node_msg}' '${j}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}'  ${IRC_URL}
+      search=`knife node list | grep $j`
+      STATUS=$?
+      #STATUS=1
+      if [ $STATUS -ne 0 ]; then
+        # boostrap node
+        IP=`sed -n '/eth0/{n; s/^.*target&quot;:&quot;\(.*\)&quot;.*/\1/p}' $tmpdir/$j.json`
+        FQDN=`sed -n 's/^.*fqdn&quot;.*&quot;\(.*\)&quot;.*/\1/p' $tmpdir/$j.json`
+        ENVIRONMENT=`sed -n 's/^.*environment&quot;.*&quot;\(.*\)&quot;.*/\1/p' $tmpdir/$j.json`
+        #echo &quot;the ip: $IP and the env: $ENVIRONMENT&quot;
+        out=`ssh chef@rundeck.example.com run -j &quot;boot-node&quot; -p chef-workstation -- -ip ${IP} -fqdn ${FQDN} -env ${ENVIRONMENT}`
+        # the url changed from http://rundeck.example.com:4440/
+        # to https://rundeck.example.com/rundeck/
+        #url=`echo $out | sed 's/.*&lt;\(.*\)&gt;$/\1/'`
+        url=`echo $out | sed 's/.*4440\/\(.*\)&gt;$/\1/'`
+        url=$RUNDECK_URL$url
+        curl  -X POST -d 'json={&quot;msg&quot;:&quot;'${boot_msg}' '${url}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}'  ${IRC_URL}
+        # run-client
+        out=`ssh chef@rundeck.example.com run -j &quot;run-chef-client&quot; -p chef-workstation -- -fqdn ${FQDN}`
+        url=`echo $out | sed 's/.*4440\/\(.*\)&gt;$/\1/'`
+        url=$RUNDECK_URL$url
+        curl  -X POST -d 'json={&quot;msg&quot;:&quot;'${run_msg}' '${url}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}'  ${IRC_URL}
+      else
+        # run-client
+        fqdn=`echo ${search} | xargs knife node show | head -n 1 | awk '{print $3}'`
+        out=`ssh chef@rundeck.example.com run -j &quot;run-chef-client&quot; -p chef-workstation -- -fqdn $fqdn`
+        url=`echo $out | sed 's/.*4440\/\(.*\)&gt;$/\1/'`
+        url=$RUNDECK_URL$url
+        curl  -X POST -d 'json={&quot;msg&quot;:&quot;'${run_msg}' '${url}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}'  ${IRC_URL}
+      fi
+      ;;
+    roles/*)
+      k=`echo $i | cut -f&quot;2&quot; -d&quot;/&quot;`
+      #knife data bag from file nodes $tmpdir/$j.json
+      #curl  -X POST -d 'json={&quot;msg&quot;:&quot;se modifico el node: '${j}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}'  http://rundeck.example.com/irc.php
+      #echo &quot;from roles!&quot;
+      j=`basename $k .rb`
+      git show HEAD:$i &gt; $tmpdir/$k
+      knife role from file $tmpdir/$k
+      curl  -X POST -d 'json={&quot;msg&quot;:&quot;'${role_msg}' '${j}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}'  ${IRC_URL}
+      ;;
+    environments/*)
+      k=`echo $i | cut -f&quot;2&quot; -d&quot;/&quot;`
+      j=`basename $k .rb`
+      git show HEAD:$i &gt; $tmpdir/$k
+      knife environment from file $tmpdir/$k
+      curl  -X POST -d 'json={&quot;msg&quot;:&quot;'${envr_msg}' '${j}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}'  ${IRC_URL}
+      ;;
+    cookbooks/*)
+      k=`echo $i | cut -f&quot;2&quot; -d&quot;/&quot;`
+      #echo &quot;knife cookbook upload $k from $tmpdir&quot;
+      GIT_WORK_TREE=$tmpdir git checkout -f
+      cd $tmpdir
+      knife cookbook upload $k
+      curl  -X POST -d 'json={&quot;msg&quot;:&quot;'${cookbook_msg}' '${k}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}'  ${IRC_URL}
+      ;;
+    */files/*)
+      k=`echo $i | cut -f&quot;2&quot; -d&quot;/&quot;`
+      curl  -X POST -d 'json={&quot;msg&quot;:&quot;'${cookbook_msg}' '${k}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}' ${IRC_URL}
+      ;;
+    */templates/*)
+      k=`echo $i | cut -f&quot;2&quot; -d&quot;/&quot;`
+      curl  -X POST -d 'json={&quot;msg&quot;:&quot;'${cookbook_msg}' '${k}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}'  ${IRC_URL}
+      ;;
+    *)
+      # Anything else (is there anything else?)
+      #echo &quot;anything else ... $i&quot;
+      #exit 1
+      ;;
+  esac
+done
+rm -fr $tmpdir
+exit 0</code></pre></noscript></div>
+</p>
+
+<p>Si el hook detecta que se hizo el push de un node (ya sea porque se creo o porque se actualizo, hablamos del archivo json), se conecta al chef server y revisa si existe ese node.<br/>
+Si no existe, le hace un bootstrap al node primero, le asigna el environment y ejecuta el comando chef-client. Si ya existia, directamente invoca el chef-client en el node para aplicar cualquiera fuera la nueva configuracion que se realizo.<br/>
+Se crearon recipes que utilizan informacion de este archivo json para configurar el servidor.<br/>
+En el archivo json del node se definen items como los usuarios que van a tener acceso por ssh al server o el listado de software que va a tener instalado. <br/>
+Si se realizo la modificacion de un cookbook, el hook lo sube al chef-server. Idem para un role, environment u otro data bag que no sea nodes.  <br/>
+El hook no tiene ningun acceso a los servidores (nodes). Cuando se requiere ejecutar una accion, lanza un job en una instancia de rundeck. Esta instancia seria el equivalente a la chef workstation.</p>
+
+<h1>rundeck</h1>
+
+<p>En un server con acceso a todas las vm por ssh (jumphost) se creo una cuenta de usuario (chef) sin privilegios. Se configuro el comando knife y la llave ssh privada para acceder a las vm. <br/>
+Bajo esta cuenta se invoca una instancia de rundeck. En el rundeck se creo un proyecto con dos jobs: uno para el bootstraping de un node (instalar el cliente de chef) y otro para la ejecucion del chef-client. Se configuro el usuario git para que pudiera lanzar cualquiera de estos jobs por ssh con los argumentos necesarios.<br/>
+Cuando el hook necesita ejecutar un comando en un node, crea el job correspondiente en el rundeck, notifica la url del job (el rundeck se la devuelve cuando crea el job) y termina su ejecucion.<br/>
+El rundeck almacena las trazas de todo comando que ejecuta. Esto permite hacer un seguimiento en caso de ser necesario.</p>
+
+<h1>Seguridad</h1>
+
+<p>Toda modificación se hace via git, cada commit se guarda con las credenciales de la persona que lo realizó.<br/>
+El dev/sysadmin solo requiere tener git instalado y acceso por ssh al repositorio (y tener una cuenta de usuarios con permisos para comitear).<br/>
+El server de git no necesita ningun acceso a ningun server, solo la posibilidad de usar el knife para subir informaciones al chef server. Todo cambio queda registrado con el commit de quien lo hizo. El repo funciona bajo un usuario sin privilegios.<br/>
+El server de rundeck tambien se ejecuta bajo un usuario sin privilegios. Solo recibe jobs desde el hook del commit.</p>
+
+<h1>Auditoria</h1>
+
+<p>El git mantiene un registro de todos los commits realizados.<br/>
+El rundeck mantiene una traza de la ejecucion de todos los comandos realizados.</p>
+
+<h1>IRC</h1>
+
+<p>Para el irc se utiliza irccat como bot que mediante una pagina en php recibe el post y lo envia al irc server.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[deploying to aws]]></title>
@@ -484,353 +677,6 @@ nirvana.example.com ntpd is stopped
 [osvaldo@coldplay ~]$ knife exec -E "search(:node, 'languages_java_version:1.*'  ).each {|host|  puts host[:fqdn] + ' java version: ' + host[:languages][:java][:version] }"
 toja-lm java version: 1.6.0_18
 </code></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Introducción rápida a Chef]]></title>
-    <link href="http://devops-ar.github.com/blog/2011/12/17/introduccion-rapida-a-chef/"/>
-    <updated>2011-12-17T13:19:00-03:00</updated>
-    <id>http://devops-ar.github.com/blog/2011/12/17/introduccion-rapida-a-chef</id>
-    <content type="html"><![CDATA[<p>Este artículo se puede visualizar en formato de presentación <a href="/talks/chef/quick-intro.html">aquí</a>.</p>
-
-<h3>Definir problema</h3>
-
-<ul>
-<li>crecimiento de la granja de servidores</li>
-<li>configuración manual</li>
-<li>a mayor numero de servidores, mayor posibilidad de error cuando se utiliza la configuracion manual</li>
-<li>baja productividad = pérdida de tiempo</li>
-<li>El mantenimiento es reactivo en vez de ser proactivo</li>
-<li>Cambios de emergencia pueden comprometer un sistema</li>
-</ul>
-
-
-<h3>Objetivo a lograr</h3>
-
-<ul>
-<li>permitir crecimiento horizontal</li>
-<li>estar preparados para escalar sin mayores complicaciones</li>
-<li>evitar los puntos únicos de falla</li>
-<li>trabajo manual</li>
-<li>conocimiento compartimentado</li>
-<li>manejo sencillo de configuraciones complicadas</li>
-</ul>
-
-
-<h3>Beneficio de la solución</h3>
-
-<ul>
-<li>organización del trabajo</li>
-<li>obliga a una separación de los entornos de trabajo</li>
-<li>fuerza a evitar las excepciones</li>
-<li>incremento de la productividad</li>
-<li>documentación</li>
-</ul>
-
-
-<h3>Herramientas</h3>
-
-<ul>
-<li>opscode chef</li>
-<li>chef-client/chef-server</li>
-<li>hosted chef (propuesta comercial de opscode)</li>
-<li>chef-solo</li>
-<li>puppet</li>
-<li>cfengine</li>
-<li>otros ....</li>
-</ul>
-
-
-<h3>¿Cual es mejor?</h3>
-
-<ul>
-<li>puppet o chef</li>
-<li>vi o emacs</li>
-<li>ruby o python</li>
-<li>linux o windows</li>
-</ul>
-
-
-<p>Con Puppet, un Cron Type sería algo asi:</p>
-
-<p><code>rb Puppet Cron Type
-cron { command:
-  command =&gt; "/usr/local/sbin/command",
-  hour =&gt; 2,
-  minute =&gt; 0
-}
-</code></p>
-
-<p>Con Chef, declarar un Recurso equivalente seria:</p>
-
-<p><code>rb chef resource
-cron "describe your job" do
-  hour "2"
-  minute "0"
-  command "/usr/local/sbin/command"
-end
-</code></p>
-
-<h3>modos de trabajo</h3>
-
-<ul>
-<li>chef-solo</li>
-<li>chef-server</li>
-<li>hosted chef</li>
-</ul>
-
-
-<h3>instalación rapida en 3 pasos</h3>
-
-<ul>
-<li>instalar ruby</li>
-<li>depende del sistema operativo</li>
-<li>instalar chef: sudo gem install chef</li>
-<li>no hay tercer paso ;)</li>
-</ul>
-
-
-<h3>¿Qué es una receta?</h3>
-
-<ul>
-<li>con solo dos archivos ya armamos una receta</li>
-<li>en realidad con uno basta (se puede excluir la metadata)</li>
-</ul>
-
-
-<p><code>sh
-foo/recipes/default.rb
-foo/metadata.rb
-</code></p>
-
-<h3>ejemplo de una receta para PHP</h3>
-
-<p>```rb default.rb
-Chef::Log.debug("Running php recipe)</p>
-
-<p>package "php5-cgi"
-package "php5-cli"
-package "php5-mysql"
-package "php5-curl"
-package "php5-dev"</p>
-
-<p>include_recipe "php::pear"
-```</p>
-
-<h3>ejemplo de una receta para PHP</h3>
-
-<p>```rb pear.rb
-Chef::Log.debug("Running pear recipe")</p>
-
-<p>package "php-pear"</p>
-
-<p>execute "Update PEAR and all packages" do
-  command "pear upgrade-all"
-end</p>
-
-<p>execute "Install HTTP_Session2 &amp; Net_CheckIP2" do
-  command "pear install HTTP_Session2-beta Net_CheckIP-1.0.0RC3"
-  not_if "test -f /usr/share/php/pear/HTTP/Session2.php"
-end
-```</p>
-
-<h3>ejemplo de una receta para PHP</h3>
-
-<p>```rb metadata.rb
-maintainer        "Till Klampeckel"
-maintainer_email  "till@php.net"
-license           "BSD License"
-description       "Install PHP &amp; required dependencies."
-version           "0.1"
-recipe            "php::default", "Install and configure PHP"
-recipe            "php::pear", "Install PEAR and packages"</p>
-
-<p>supports 'ubuntu'
-```</p>
-
-<h3>ejemplo de una receta para PHP</h3>
-
-<p>Estructura del directorio</p>
-
-<p><code>sh
-/tmp/chef/cookbooks/php/
-/tmp/chef/cookbooks/php/metadata.rb
-/tmp/chef/cookbooks/php/recipes/default.rb
-/tmp/chef/cookbooks/php/recipes/pear.rb
-</code></p>
-
-<h3>ejemplo de una receta para PHP</h3>
-
-<p>Utilizando el modo de trabajo Chef-solo</p>
-
-<ul>
-<li>Necesitamos dos archivo de configuración</li>
-<li>/etc/chef/solo.rb</li>
-<li>node.json</li>
-<li>Un repositorio de cookbooks</li>
-</ul>
-
-
-<p><code>rb /etc/chef/solo.rb
-file_cache_path "/tmp/chef"
-cookbook_path "/tmp/chef/cookbooks"
-</code></p>
-
-<h3>ejemplo de una receta para PHP</h3>
-
-<p>node.json</p>
-
-<ul>
-<li>JSON qué? la mujer de quién?</li>
-<li>La lista de ejecución (run_list) define las recetas que van a ser utilizadas y el orden que son ejecutadas.</li>
-</ul>
-
-
-<p><code>js node.json
-{
-  "run_list": [ "recipe[php]" ]
-}
-</code></p>
-
-<h3>Ser flexibles</h3>
-
-<ul>
-<li>Mantener las recetas genéricas</li>
-<li>Configuración individual</li>
-<li>Utilizar variables en node.json</li>
-</ul>
-
-
-<h3>ejemplo de node.json</h3>
-
-<p><code>js node.json
-{
-  "php": { "memory":"18G", "tmp":"/tmp/php/data" },
-  "run_list": ...
-}
-</code></p>
-
-<p>uso de variables en foo.rb:</p>
-
-<p>```rb foo.rb
-memory = node[:php][:memory]
-tempdir = node[:php][:tmp]</p>
-
-<p>directory "#{tempdir}" do
-  owner "www-data"
-  group "www-data"
-  recursive :true
-  action :delete
-end
-```</p>
-
-<h3>Ejecución</h3>
-
-<p>Con el archivo node.json local en el servidor:</p>
-
-<p><code>bash
-chef-solo -j /tmp/node.json [-c /etc/chef/solo.rb]
-</code>
-El archivo node.json y las recetas se pueden descargar de un servidor remoto [master, Amazon S3,..]:</p>
-
-<p><code>sh
-chef-solo -j http://example.org/node.json -r http://example.org/recipes.tar.gz
-</code></p>
-
-<h2>Uso avanzado</h2>
-
-<h3>Archivos</h3>
-
-<ul>
-<li>distribución de archivos de configuración</li>
-<li>archivos estáticos - solo necesitan ser copiados tal cual</li>
-</ul>
-
-
-<p><code>rb openssh/files/default/banner
-Ud. está ingresando a una red informática de Acceso Restringido y que contiene información
-legalmente protegida, confidencial y/o de secreto profesional, cuyo uso indebido
-puede generar al usuario responsabilidad civil o configurar los
-delitos previstos en los arts. 153 a 157 del Código Penal.
-</code></p>
-
-<p>```rb openssh/recipes/default.rb</p>
-
-<h1>asume openssh/files/default/banner</h1>
-
-<p>template "banner" do
-  source  "banner"
-  owner   "root"
-  group   "root"
-  mode    "0644"
-end
-```</p>
-
-<h3>Atributos</h3>
-
-<ul>
-<li>los atributos de un node son generados por ohai</li>
-<li>pueden ser modificados ó adicionados en las recetas de los cookbooks, en los roles o los ambientes</li>
-<li>ejemplo de atributos en una receta (openssh/attributes/default.rb):</li>
-</ul>
-
-
-<p>```rb openssh/attributes/default.rb
-default[:openssh][:port]                = [ "22" ]
-default[:openssh][:listen_address]      = [ "0.0.0.0" ]</p>
-
-<p>default[:openssh][:permit_root_login]   = "no"
-default[:openssh][:x11_forwarding]      = "no"</p>
-
-<p>default[:openssh][:ignore_rhosts]      = "yes"
-default[:openssh][:use_dns]      = "no"
-default[:openssh][:banner]      = "/etc/ssh/banner"
-<code>
-- ejemplo de atributos en un ambiente
-</code>rb roles/local.rb
-name "local"
-description "local testing environment"
-override_attributes ({</p>
-
-<pre><code>"ntp" =&gt; {
-    "ntp_server" =&gt; "time.apple.com"
-}
-</code></pre>
-
-<p>})
-```</p>
-
-<h3>Plantillas</h3>
-
-<ul>
-<li>Archivos de configuración</li>
-<li>Scripts de inicio</li>
-<li>uso de atributos en una plantilla (openssh/templates/centos/sshd_config.erb):</li>
-</ul>
-
-
-<p><code>rb openssh/templates/centos/sshd_config.erb
-PermitRootLogin &lt;%= node[:openssh][:permit_root_login] %&gt;
-IgnoreRhosts &lt;%= node[:openssh][:ignore_rhosts] %&gt;
-X11Forwarding &lt;%= node[:openssh][:x11_forwarding] %&gt;
-Banner  &lt;%= node[:openssh][:banner] %&gt;
-</code></p>
-
-<ul>
-<li><p>uso de una plantilla en una receta (openssh/recipes/default.rb):
-```rb openssh/recipes/default.rb
-template "/etc/ssh/sshd_config" do
-  source  "sshd_config.erb"
-  owner   "root"
-  group   "root"
-  mode    "0600"</p>
-
-<p>  notifies :restart, "service[sshd]"
-end
-```</p></li>
-</ul>
-
 ]]></content>
   </entry>
   

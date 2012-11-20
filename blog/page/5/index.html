@@ -9,7 +9,9 @@
   <meta name="author" content="osvaldo">
 
   
-  <meta name="description" content="CI - Continuous Integration. Este post describe la instalación de un servidor de integración continua. El mismo estará integrado por jenkins, maven y &hellip;">
+  <meta name="description" content="Este artículo se puede visualizar en formato de presentación aquí. Definir problema crecimiento de la granja de servidores
+configuración manual
+a &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +78,493 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/17/introduccion-rapida-a-chef/">Introducción Rápida a Chef</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-17T13:19:00-03:00" pubdate data-updated="true">Dec 17<span>th</span>, 2011</time>
+        
+         | <a href="/blog/2011/12/17/introduccion-rapida-a-chef/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Este artículo se puede visualizar en formato de presentación <a href="/talks/chef/quick-intro.html">aquí</a>.</p>
+
+<h3>Definir problema</h3>
+
+<ul>
+<li>crecimiento de la granja de servidores</li>
+<li>configuración manual</li>
+<li>a mayor numero de servidores, mayor posibilidad de error cuando se utiliza la configuracion manual</li>
+<li>baja productividad = pérdida de tiempo</li>
+<li>El mantenimiento es reactivo en vez de ser proactivo</li>
+<li>Cambios de emergencia pueden comprometer un sistema</li>
+</ul>
+
+
+<h3>Objetivo a lograr</h3>
+
+<ul>
+<li>permitir crecimiento horizontal</li>
+<li>estar preparados para escalar sin mayores complicaciones</li>
+<li>evitar los puntos únicos de falla</li>
+<li>trabajo manual</li>
+<li>conocimiento compartimentado</li>
+<li>manejo sencillo de configuraciones complicadas</li>
+</ul>
+
+
+<h3>Beneficio de la solución</h3>
+
+<ul>
+<li>organización del trabajo</li>
+<li>obliga a una separación de los entornos de trabajo</li>
+<li>fuerza a evitar las excepciones</li>
+<li>incremento de la productividad</li>
+<li>documentación</li>
+</ul>
+
+
+<h3>Herramientas</h3>
+
+<ul>
+<li>opscode chef</li>
+<li>chef-client/chef-server</li>
+<li>hosted chef (propuesta comercial de opscode)</li>
+<li>chef-solo</li>
+<li>puppet</li>
+<li>cfengine</li>
+<li>otros &#8230;.</li>
+</ul>
+
+
+<h3>¿Cual es mejor?</h3>
+
+<ul>
+<li>puppet o chef</li>
+<li>vi o emacs</li>
+<li>ruby o python</li>
+<li>linux o windows</li>
+</ul>
+
+
+<p>Con Puppet, un Cron Type sería algo asi:</p>
+
+<figure class='code'><figcaption><span>Puppet Cron Type</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">cron</span> <span class="p">{</span> <span class="n">command</span><span class="p">:</span>
+</span><span class='line'>  <span class="n">command</span> <span class="o">=&gt;</span> <span class="s2">&quot;/usr/local/sbin/command&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="n">hour</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span>
+</span><span class='line'>  <span class="n">minute</span> <span class="o">=&gt;</span> <span class="mi">0</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Con Chef, declarar un Recurso equivalente seria:</p>
+
+<figure class='code'><figcaption><span>chef resource</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">cron</span> <span class="s2">&quot;describe your job&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">hour</span> <span class="s2">&quot;2&quot;</span>
+</span><span class='line'>  <span class="n">minute</span> <span class="s2">&quot;0&quot;</span>
+</span><span class='line'>  <span class="n">command</span> <span class="s2">&quot;/usr/local/sbin/command&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>modos de trabajo</h3>
+
+<ul>
+<li>chef-solo</li>
+<li>chef-server</li>
+<li>hosted chef</li>
+</ul>
+
+
+<h3>instalación rapida en 3 pasos</h3>
+
+<ul>
+<li>instalar ruby</li>
+<li>depende del sistema operativo</li>
+<li>instalar chef: sudo gem install chef</li>
+<li>no hay tercer paso ;)</li>
+</ul>
+
+
+<h3>¿Qué es una receta?</h3>
+
+<ul>
+<li>con solo dos archivos ya armamos una receta</li>
+<li>en realidad con uno basta (se puede excluir la metadata)</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>foo/recipes/default.rb
+</span><span class='line'>foo/metadata.rb
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>ejemplo de una receta para PHP</h3>
+
+<figure class='code'><figcaption><span>default.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="no">Chef</span><span class="o">::</span><span class="no">Log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running php recipe)</span>
+</span><span class='line'>
+</span><span class='line'><span class="s2">package &quot;</span><span class="n">php5</span><span class="o">-</span><span class="n">cgi</span><span class="s2">&quot;</span>
+</span><span class='line'><span class="s2">package &quot;</span><span class="n">php5</span><span class="o">-</span><span class="n">cli</span><span class="s2">&quot;</span>
+</span><span class='line'><span class="s2">package &quot;</span><span class="n">php5</span><span class="o">-</span><span class="n">mysql</span><span class="s2">&quot;</span>
+</span><span class='line'><span class="s2">package &quot;</span><span class="n">php5</span><span class="o">-</span><span class="n">curl</span><span class="s2">&quot;</span>
+</span><span class='line'><span class="s2">package &quot;</span><span class="n">php5</span><span class="o">-</span><span class="n">dev</span><span class="s2">&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s2">include_recipe &quot;</span><span class="n">php</span><span class="o">::</span><span class="n">pear</span><span class="s2">&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>ejemplo de una receta para PHP</h3>
+
+<figure class='code'><figcaption><span>pear.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="no">Chef</span><span class="o">::</span><span class="no">Log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running pear recipe&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">package</span> <span class="s2">&quot;php-pear&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">execute</span> <span class="s2">&quot;Update PEAR and all packages&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">command</span> <span class="s2">&quot;pear upgrade-all&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">execute</span> <span class="s2">&quot;Install HTTP_Session2 &amp; Net_CheckIP2&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">command</span> <span class="s2">&quot;pear install HTTP_Session2-beta Net_CheckIP-1.0.0RC3&quot;</span>
+</span><span class='line'>  <span class="n">not_if</span> <span class="s2">&quot;test -f /usr/share/php/pear/HTTP/Session2.php&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>ejemplo de una receta para PHP</h3>
+
+<figure class='code'><figcaption><span>metadata.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">maintainer</span>        <span class="s2">&quot;Till Klampeckel&quot;</span>
+</span><span class='line'><span class="n">maintainer_email</span>  <span class="s2">&quot;till@php.net&quot;</span>
+</span><span class='line'><span class="n">license</span>           <span class="s2">&quot;BSD License&quot;</span>
+</span><span class='line'><span class="n">description</span>       <span class="s2">&quot;Install PHP &amp; required dependencies.&quot;</span>
+</span><span class='line'><span class="n">version</span>           <span class="s2">&quot;0.1&quot;</span>
+</span><span class='line'><span class="n">recipe</span>            <span class="s2">&quot;php::default&quot;</span><span class="p">,</span> <span class="s2">&quot;Install and configure PHP&quot;</span>
+</span><span class='line'><span class="n">recipe</span>            <span class="s2">&quot;php::pear&quot;</span><span class="p">,</span> <span class="s2">&quot;Install PEAR and packages&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">supports</span> <span class="s1">&#39;ubuntu&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>ejemplo de una receta para PHP</h3>
+
+<p>Estructura del directorio</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>/tmp/chef/cookbooks/php/
+</span><span class='line'>/tmp/chef/cookbooks/php/metadata.rb
+</span><span class='line'>/tmp/chef/cookbooks/php/recipes/default.rb
+</span><span class='line'>/tmp/chef/cookbooks/php/recipes/pear.rb
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>ejemplo de una receta para PHP</h3>
+
+<p>Utilizando el modo de trabajo Chef-solo</p>
+
+<ul>
+<li>Necesitamos dos archivo de configuración</li>
+<li>/etc/chef/solo.rb</li>
+<li>node.json</li>
+<li>Un repositorio de cookbooks</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>/etc/chef/solo.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">file_cache_path</span> <span class="s2">&quot;/tmp/chef&quot;</span>
+</span><span class='line'><span class="n">cookbook_path</span> <span class="s2">&quot;/tmp/chef/cookbooks&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>ejemplo de una receta para PHP</h3>
+
+<p>node.json</p>
+
+<ul>
+<li>JSON qué? la mujer de quién?</li>
+<li>La lista de ejecución (run_list) define las recetas que van a ser utilizadas y el orden que son ejecutadas.</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>node.json</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;run_list&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;recipe[php]&quot;</span> <span class="p">]</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Ser flexibles</h3>
+
+<ul>
+<li>Mantener las recetas genéricas</li>
+<li>Configuración individual</li>
+<li>Utilizar variables en node.json</li>
+</ul>
+
+
+<h3>ejemplo de node.json</h3>
+
+<figure class='code'><figcaption><span>node.json</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;php&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;memory&quot;</span><span class="o">:</span><span class="s2">&quot;18G&quot;</span><span class="p">,</span> <span class="s2">&quot;tmp&quot;</span><span class="o">:</span><span class="s2">&quot;/tmp/php/data&quot;</span> <span class="p">},</span>
+</span><span class='line'>  <span class="s2">&quot;run_list&quot;</span><span class="o">:</span> <span class="p">...</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>uso de variables en foo.rb:</p>
+
+<figure class='code'><figcaption><span>foo.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">memory</span> <span class="o">=</span> <span class="n">node</span><span class="o">[</span><span class="ss">:php</span><span class="o">][</span><span class="ss">:memory</span><span class="o">]</span>
+</span><span class='line'><span class="n">tempdir</span> <span class="o">=</span> <span class="n">node</span><span class="o">[</span><span class="ss">:php</span><span class="o">][</span><span class="ss">:tmp</span><span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">directory</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">tempdir</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">owner</span> <span class="s2">&quot;www-data&quot;</span>
+</span><span class='line'>  <span class="n">group</span> <span class="s2">&quot;www-data&quot;</span>
+</span><span class='line'>  <span class="n">recursive</span> <span class="ss">:true</span>
+</span><span class='line'>  <span class="n">action</span> <span class="ss">:delete</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Ejecución</h3>
+
+<p>Con el archivo node.json local en el servidor:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>chef-solo -j /tmp/node.json <span class="o">[</span>-c /etc/chef/solo.rb<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>El archivo node.json y las recetas se pueden descargar de un servidor remoto [master, Amazon S3,..]:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>chef-solo -j http://example.org/node.json -r http://example.org/recipes.tar.gz
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Uso avanzado</h2>
+
+<h3>Archivos</h3>
+
+<ul>
+<li>distribución de archivos de configuración</li>
+<li>archivos estáticos - solo necesitan ser copiados tal cual</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>openssh/files/default/banner</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="no">Ud</span><span class="o">.</span> <span class="n">est</span><span class="err">á</span> <span class="n">ingresando</span> <span class="n">a</span> <span class="n">una</span> <span class="n">red</span> <span class="n">inform</span><span class="err">á</span><span class="n">tica</span> <span class="n">de</span> <span class="no">Acceso</span> <span class="no">Restringido</span> <span class="n">y</span> <span class="n">que</span> <span class="n">contiene</span> <span class="n">informaci</span><span class="err">ó</span><span class="n">n</span>
+</span><span class='line'><span class="n">legalmente</span> <span class="n">protegida</span><span class="p">,</span> <span class="n">confidencial</span> <span class="n">y</span><span class="o">/</span><span class="n">o</span> <span class="n">de</span> <span class="n">secreto</span> <span class="n">profesional</span><span class="p">,</span> <span class="n">cuyo</span> <span class="n">uso</span> <span class="n">indebido</span>
+</span><span class='line'><span class="n">puede</span> <span class="n">generar</span> <span class="n">al</span> <span class="n">usuario</span> <span class="n">responsabilidad</span> <span class="n">civil</span> <span class="n">o</span> <span class="n">configurar</span> <span class="n">los</span>
+</span><span class='line'><span class="n">delitos</span> <span class="n">previstos</span> <span class="n">en</span> <span class="n">los</span> <span class="n">arts</span><span class="o">.</span> <span class="mi">153</span> <span class="n">a</span> <span class="mi">157</span> <span class="n">del</span> <span class="n">C</span><span class="err">ó</span><span class="n">digo</span> <span class="no">Penal</span><span class="o">.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>openssh/recipes/default.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="c1"># asume openssh/files/default/banner</span>
+</span><span class='line'><span class="n">template</span> <span class="s2">&quot;banner&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">source</span>  <span class="s2">&quot;banner&quot;</span>
+</span><span class='line'>  <span class="n">owner</span>   <span class="s2">&quot;root&quot;</span>
+</span><span class='line'>  <span class="n">group</span>   <span class="s2">&quot;root&quot;</span>
+</span><span class='line'>  <span class="n">mode</span>    <span class="s2">&quot;0644&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Atributos</h3>
+
+<ul>
+<li>los atributos de un node son generados por ohai</li>
+<li>pueden ser modificados ó adicionados en las recetas de los cookbooks, en los roles o los ambientes</li>
+<li>ejemplo de atributos en una receta (openssh/attributes/default.rb):</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>openssh/attributes/default.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">default</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:port</span><span class="o">]</span>                <span class="o">=</span> <span class="o">[</span> <span class="s2">&quot;22&quot;</span> <span class="o">]</span>
+</span><span class='line'><span class="n">default</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:listen_address</span><span class="o">]</span>      <span class="o">=</span> <span class="o">[</span> <span class="s2">&quot;0.0.0.0&quot;</span> <span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">default</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:permit_root_login</span><span class="o">]</span>   <span class="o">=</span> <span class="s2">&quot;no&quot;</span>
+</span><span class='line'><span class="n">default</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:x11_forwarding</span><span class="o">]</span>      <span class="o">=</span> <span class="s2">&quot;no&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">default</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:ignore_rhosts</span><span class="o">]</span>      <span class="o">=</span> <span class="s2">&quot;yes&quot;</span>
+</span><span class='line'><span class="n">default</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:use_dns</span><span class="o">]</span>      <span class="o">=</span> <span class="s2">&quot;no&quot;</span>
+</span><span class='line'><span class="n">default</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:banner</span><span class="o">]</span>      <span class="o">=</span> <span class="s2">&quot;/etc/ssh/banner&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>ejemplo de atributos en un ambiente</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>roles/local.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="nb">name</span> <span class="s2">&quot;local&quot;</span>
+</span><span class='line'><span class="n">description</span> <span class="s2">&quot;local testing environment&quot;</span>
+</span><span class='line'><span class="n">override_attributes</span> <span class="p">({</span>
+</span><span class='line'>    <span class="s2">&quot;ntp&quot;</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>        <span class="s2">&quot;ntp_server&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;time.apple.com&quot;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Plantillas</h3>
+
+<ul>
+<li>Archivos de configuración</li>
+<li>Scripts de inicio</li>
+<li>uso de atributos en una plantilla (openssh/templates/centos/sshd_config.erb):</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>openssh/templates/centos/sshd_config.erb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="no">PermitRootLogin</span> <span class="o">&lt;</span><span class="sx">%= node[:openssh][:permit_root_login] %&gt;</span>
+</span><span class='line'><span class="sx">IgnoreRhosts &lt;%=</span> <span class="n">node</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:ignore_rhosts</span><span class="o">]</span> <span class="sx">%&gt;</span>
+</span><span class='line'><span class="sx">X11Forwarding &lt;%= node[:openssh][:x11_forwarding] %&gt;</span>
+</span><span class='line'><span class="no">Banner</span>  <span class="o">&lt;%=</span> <span class="n">node</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:banner</span><span class="o">]</span> <span class="o">%&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>uso de una plantilla en una receta (openssh/recipes/default.rb):</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>openssh/recipes/default.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">template</span> <span class="s2">&quot;/etc/ssh/sshd_config&quot;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">source</span>  <span class="s2">&quot;sshd_config.erb&quot;</span>
+</span><span class='line'>    <span class="n">owner</span>   <span class="s2">&quot;root&quot;</span>
+</span><span class='line'>    <span class="n">group</span>   <span class="s2">&quot;root&quot;</span>
+</span><span class='line'>    <span class="n">mode</span>    <span class="s2">&quot;0600&quot;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">notifies</span> <span class="ss">:restart</span><span class="p">,</span> <span class="s2">&quot;service[sshd]&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -648,6 +1137,10 @@ $CATALINA_HOME/webapps/ROOT/index.html</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/11/20/instalando-servidores-con-un-commit/">instalando servidores con un commit</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/10/03/instalando-ldap-server/">instalando ldap server</a>
       </li>
     
@@ -661,10 +1154,6 @@ $CATALINA_HOME/webapps/ROOT/index.html</p>
     
       <li class="post">
         <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">definiendo un smarthost en mac os x</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">usando https detras de un proxy reverso</a>
       </li>
     
   </ul>

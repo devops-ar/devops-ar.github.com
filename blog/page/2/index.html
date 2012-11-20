@@ -9,7 +9,12 @@
   <meta name="author" content="osvaldo">
 
   
-  <meta name="description" content="Algunos jobs crean builds grandes y con el tiempo, empiezan a ocupar espacio hasta llenar el disco duro. Para solucionar este problema, se pueden &hellip;">
+  <meta name="description" content="tl;dr Agregar en el archivo .conf del apache para el sitio sin ssl: 1
+2
+3
+RewriteEngine On
+RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+RewriteRule &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +81,62 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">Usando Https Detras De Un Proxy Reverso</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-08T11:17:00-03:00" pubdate data-updated="true">Aug 8<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>tl;dr</h2>
+
+<p>Agregar en el archivo .conf del apache para el sitio sin ssl:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='apacheconf'><span class='line'><span class="nb">RewriteEngine</span> <span class="k">On</span>
+</span><span class='line'><span class="nb">RewriteCond</span> %{HTTP:X-Forwarded-Proto} !=https
+</span><span class='line'><span class="nb">RewriteRule</span> (.*) https://%{SERVER_NAME}/$1 [redirect=permanent,last]
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Con eso, deberia detectar que es http y hacer el redirect para el https. Ya el nginx le esta asignando esa variable (actuando como proxy reverso)</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -392,75 +453,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/04/10/configurando-vncserver-en-centos/">Configurando Vncserver en Centos</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-04-10T18:09:00-03:00" pubdate data-updated="true">Apr 10<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/04/10/configurando-vncserver-en-centos/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Primero nos aseguramos de que los paquetes estan instalados.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@nirvana ~<span class="o">]</span><span class="c"># rpm -qa | grep vnc</span>
-</span><span class='line'>vnc-4.1.2-9.el5
-</span><span class='line'>vnc-server-4.1.2-9.el5
-</span><span class='line'><span class="o">[</span>root@nirvana ~<span class="o">]</span><span class="c"># </span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Para un CentOS se puede instalar utilizan yum, para un RHEL &#8230; buscar las rpm en los CD de instalación.</p>
-
-<p>La primera vez que intentamos iniciar el servicio puede fallar.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@nirvana .vnc<span class="o">]</span><span class="c"># service vncserver start</span>
-</span><span class='line'>Starting VNC server: no displays configured                <span class="o">[</span>  OK  <span class="o">]</span>
-</span><span class='line'><span class="o">[</span>root@nirvana .vnc<span class="o">]</span><span class="c">#</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>El mensaje de error es explícito: el servicio no ha sido configurado. Hay tener en cuenta que el vnc se utiliza para acceder a una sesión gráfica en un servidor remoto. Esto quiere decir que se accede a una sesión directamente, no a un gestor de sesiones. El vnc server va a escuchar en un puerto distinto para cada sesión que se defina. De manera predeterminada el vnc server escucha en el puerto 5900 y cada sesión escucha por un puerto consecutivo a partir de ese número. Por lo tanto, para conectar con el cliente VNC, serán el 5900 + &#8220;número de pantalla o display number&#8221;, 5901 para el 1, 5902 para el 2 y asi sucesivamente.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/04/10/configurando-vncserver-en-centos/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -478,6 +470,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/11/20/instalando-servidores-con-un-commit/">instalando servidores con un commit</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/10/03/instalando-ldap-server/">instalando ldap server</a>
       </li>
     
@@ -491,10 +487,6 @@
     
       <li class="post">
         <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">definiendo un smarthost en mac os x</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">usando https detras de un proxy reverso</a>
       </li>
     
   </ul>

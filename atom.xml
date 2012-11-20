@@ -4,7 +4,7 @@
   <title><![CDATA[devops-ar]]></title>
   <link href="http://devops-ar.github.com/atom.xml" rel="self"/>
   <link href="http://devops-ar.github.com/"/>
-  <updated>2012-10-03T09:29:42-03:00</updated>
+  <updated>2012-11-20T11:14:06-03:00</updated>
   <id>http://devops-ar.github.com/</id>
   <author>
     <name><![CDATA[osvaldo]]></name>
@@ -12,6 +12,199 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[instalando servidores con un commit]]></title>
+    <link href="http://devops-ar.github.com/blog/2012/11/20/instalando-servidores-con-un-commit/"/>
+    <updated>2012-11-20T07:50:00-03:00</updated>
+    <id>http://devops-ar.github.com/blog/2012/11/20/instalando-servidores-con-un-commit</id>
+    <content type="html"><![CDATA[<h1>Introducción (aka TL;DR)</h1>
+
+<p>Empece a usar chef para deployar los servers (vm) de desarrollo. Partiendo de la forma estandar de uso de chef, llegue al workflow que presento a continuacion.<br/>
+Toda la informacion de un server se almacena en un archivo de texto. Configurar un server se reduce a editar el archivo correspondiente y comitear los cambios realizados. <br/>
+El workflow se encarga del resto: ejecutar los comandos necesarios, notificar por IRC del estado de la operacion y dejar una traza disponible de los comandos ejecutados para su revision posterior (y/o auditoria/debug/etc).</p>
+
+<h2>componentes de chef</h2>
+
+<p>chef tiene tres componentes basicos:</p>
+
+<ul>
+<li>chef server</li>
+<li>chef workstation</li>
+<li>chef client</li>
+</ul>
+
+
+<p>El chef client (node) toma la configuracion del chef server y la aplica.<br/>
+La chef workstation es la que instala el chef en los clientes (nodes) y en nuestro caso, invoca la ejecucion del chef client.<br/>
+El chef server es donde esta toda la configuracion que se va a aplicar (los cookbooks con las recipes y las data bags). tambien se almacena la informacion de los nodes que son administrador por chef.</p>
+
+<h2>infrastructure as code</h2>
+
+<p>La configuracion que se aplica (cookbooks, databags) se puede guardar en un repositorio de codigo, se decidio utilizar git.  El chef server tiene una interface web, pero no se utiliza, toda la configuracion se hace en los archivos de repositorio y se importa al chef server (mediante el comando knife). De esta manera, todos los cambios estan versionados. Para servidor git se utiliza gitolite (como interface web se recomienda gitlab).</p>
+
+<h1>Workflow</h1>
+
+<p>Se armo un workflow siguiendo la filosofia unix, pequeños componentes que cumplen una tarea en especifico y que pueden ser concatenados para implementar una tarea compleja.<br/>
+El sysadmin clona el repo en la estacion de trabajo que vaya a utilizar. Solo se requiere git instalado, su llave ssh publica (para crear el usuario en gitolite) y acceso por ssh al server git.<br/>
+Trabaja con los archivos . Hace un commit para guardar los cambios realizados. Por ultimo, hace un push para actualizar el repositorio central.</p>
+
+<p>El repositorio central esta en un gitolite. El gitolite corre bajo un usuario (git) sin privilegios.  <br/>
+Se creo un hook <code>post-receive</code> que es el caballo de batalla de este workflow. Cada git push que se realiza contra el repositorio, ejecuta el script de ese hook. <br/>
+El script chequea que fue lo que se actualizo y en base a eso toma la accion que corresponde.<br/>
+El usuario git tiene configurado el comando knife para poder cargar cookbooks y databags en el chef server.<br/>
+Si se actualizo un cookbook, un databag (ver nota siguiente), un role o un environment, se sube (knife upload) al chef server.</p>
+
+<p>Para administrar los servidores se creo un databag: nodes, donde se crea un archivo json (<code>template.json</code>)  por cada servidor que se deployea.</p>
+
+<div><script src='https://gist.github.com/4075735.js?file='></script>
+<noscript><pre><code>#!/bin/sh
+
+#TODO
+# add error checking to knife operations
+
+IRC_URL=&quot;http://irc.example.com/irc.php&quot;
+RUNDECK_URL=&quot;https://rundeck.example.com/rundeck/&quot;
+template_msg=&quot;modified template:&quot;
+node_msg=&quot;modified node:&quot;
+envr_msg=&quot;modified environment:&quot;
+role_msg=&quot;modified role:&quot;
+cookbook_msg=&quot;modified cookbook:&quot;
+boot_msg=&quot;boot-node started in rundeck - progress: &quot;
+run_msg=&quot;run-client started in rundeck - progres: &quot;
+from=&quot;gitolite-chef-server&quot;
+
+
+# Safety check
+if [ -z &quot;$GIT_DIR&quot; ]; then
+    echo &quot;Don't run this script from the command line.&quot; &gt;&amp;2
+    exit 1
+fi
+
+tmpdir=/var/tmp/$$.$RANDOM
+mkdir $tmpdir
+
+read oldrev newrev refname
+BRANCH=${refname#refs/heads/} 
+files=`git diff-tree --stat --summary --find-copies-harder $oldrev..$newrev`
+for i in $files
+do
+  case &quot;$i&quot; in
+    data_bags/nodes/*)
+      k=`echo $i | cut -f&quot;3&quot; -d&quot;/&quot;`
+      j=`basename $k .json`
+      if [ $j = &quot;template&quot; ]; then
+                    curl  -X POST -d 'json={&quot;msg&quot;:&quot;'${template_msg}' '${j}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}'  ${IRC_URL}
+        exit 0
+      fi
+      git show HEAD:$i &gt; $tmpdir/$j.json
+      knife data bag from file nodes $tmpdir/$j.json
+      curl  -X POST -d 'json={&quot;msg&quot;:&quot;'${node_msg}' '${j}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}'  ${IRC_URL}
+      search=`knife node list | grep $j`
+      STATUS=$?
+      #STATUS=1
+      if [ $STATUS -ne 0 ]; then
+        # boostrap node
+        IP=`sed -n '/eth0/{n; s/^.*target&quot;:&quot;\(.*\)&quot;.*/\1/p}' $tmpdir/$j.json`
+        FQDN=`sed -n 's/^.*fqdn&quot;.*&quot;\(.*\)&quot;.*/\1/p' $tmpdir/$j.json`
+        ENVIRONMENT=`sed -n 's/^.*environment&quot;.*&quot;\(.*\)&quot;.*/\1/p' $tmpdir/$j.json`
+        #echo &quot;the ip: $IP and the env: $ENVIRONMENT&quot;
+        out=`ssh chef@rundeck.example.com run -j &quot;boot-node&quot; -p chef-workstation -- -ip ${IP} -fqdn ${FQDN} -env ${ENVIRONMENT}`
+        # the url changed from http://rundeck.example.com:4440/
+        # to https://rundeck.example.com/rundeck/
+        #url=`echo $out | sed 's/.*&lt;\(.*\)&gt;$/\1/'`
+        url=`echo $out | sed 's/.*4440\/\(.*\)&gt;$/\1/'`
+        url=$RUNDECK_URL$url
+        curl  -X POST -d 'json={&quot;msg&quot;:&quot;'${boot_msg}' '${url}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}'  ${IRC_URL}
+        # run-client
+        out=`ssh chef@rundeck.example.com run -j &quot;run-chef-client&quot; -p chef-workstation -- -fqdn ${FQDN}`
+        url=`echo $out | sed 's/.*4440\/\(.*\)&gt;$/\1/'`
+        url=$RUNDECK_URL$url
+        curl  -X POST -d 'json={&quot;msg&quot;:&quot;'${run_msg}' '${url}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}'  ${IRC_URL}
+      else
+        # run-client
+        fqdn=`echo ${search} | xargs knife node show | head -n 1 | awk '{print $3}'`
+        out=`ssh chef@rundeck.example.com run -j &quot;run-chef-client&quot; -p chef-workstation -- -fqdn $fqdn`
+        url=`echo $out | sed 's/.*4440\/\(.*\)&gt;$/\1/'`
+        url=$RUNDECK_URL$url
+        curl  -X POST -d 'json={&quot;msg&quot;:&quot;'${run_msg}' '${url}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}'  ${IRC_URL}
+      fi
+      ;;
+    roles/*)
+      k=`echo $i | cut -f&quot;2&quot; -d&quot;/&quot;`
+      #knife data bag from file nodes $tmpdir/$j.json
+      #curl  -X POST -d 'json={&quot;msg&quot;:&quot;se modifico el node: '${j}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}'  http://rundeck.example.com/irc.php
+      #echo &quot;from roles!&quot;
+      j=`basename $k .rb`
+      git show HEAD:$i &gt; $tmpdir/$k
+      knife role from file $tmpdir/$k
+      curl  -X POST -d 'json={&quot;msg&quot;:&quot;'${role_msg}' '${j}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}'  ${IRC_URL}
+      ;;
+    environments/*)
+      k=`echo $i | cut -f&quot;2&quot; -d&quot;/&quot;`
+      j=`basename $k .rb`
+      git show HEAD:$i &gt; $tmpdir/$k
+      knife environment from file $tmpdir/$k
+      curl  -X POST -d 'json={&quot;msg&quot;:&quot;'${envr_msg}' '${j}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}'  ${IRC_URL}
+      ;;
+    cookbooks/*)
+      k=`echo $i | cut -f&quot;2&quot; -d&quot;/&quot;`
+      #echo &quot;knife cookbook upload $k from $tmpdir&quot;
+      GIT_WORK_TREE=$tmpdir git checkout -f
+      cd $tmpdir
+      knife cookbook upload $k
+      curl  -X POST -d 'json={&quot;msg&quot;:&quot;'${cookbook_msg}' '${k}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}'  ${IRC_URL}
+      ;;
+    */files/*)
+      k=`echo $i | cut -f&quot;2&quot; -d&quot;/&quot;`
+      curl  -X POST -d 'json={&quot;msg&quot;:&quot;'${cookbook_msg}' '${k}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}' ${IRC_URL}
+      ;;
+    */templates/*)
+      k=`echo $i | cut -f&quot;2&quot; -d&quot;/&quot;`
+      curl  -X POST -d 'json={&quot;msg&quot;:&quot;'${cookbook_msg}' '${k}'&quot;,&quot;from&quot;:&quot;'${from}'&quot;}'  ${IRC_URL}
+      ;;
+    *)
+      # Anything else (is there anything else?)
+      #echo &quot;anything else ... $i&quot;
+      #exit 1
+      ;;
+  esac
+done
+rm -fr $tmpdir
+exit 0</code></pre></noscript></div>
+
+
+<p>Si el hook detecta que se hizo el push de un node (ya sea porque se creo o porque se actualizo, hablamos del archivo json), se conecta al chef server y revisa si existe ese node.<br/>
+Si no existe, le hace un bootstrap al node primero, le asigna el environment y ejecuta el comando chef-client. Si ya existia, directamente invoca el chef-client en el node para aplicar cualquiera fuera la nueva configuracion que se realizo.<br/>
+Se crearon recipes que utilizan informacion de este archivo json para configurar el servidor.<br/>
+En el archivo json del node se definen items como los usuarios que van a tener acceso por ssh al server o el listado de software que va a tener instalado. <br/>
+Si se realizo la modificacion de un cookbook, el hook lo sube al chef-server. Idem para un role, environment u otro data bag que no sea nodes.  <br/>
+El hook no tiene ningun acceso a los servidores (nodes). Cuando se requiere ejecutar una accion, lanza un job en una instancia de rundeck. Esta instancia seria el equivalente a la chef workstation.</p>
+
+<h1>rundeck</h1>
+
+<p>En un server con acceso a todas las vm por ssh (jumphost) se creo una cuenta de usuario (chef) sin privilegios. Se configuro el comando knife y la llave ssh privada para acceder a las vm. <br/>
+Bajo esta cuenta se invoca una instancia de rundeck. En el rundeck se creo un proyecto con dos jobs: uno para el bootstraping de un node (instalar el cliente de chef) y otro para la ejecucion del chef-client. Se configuro el usuario git para que pudiera lanzar cualquiera de estos jobs por ssh con los argumentos necesarios.<br/>
+Cuando el hook necesita ejecutar un comando en un node, crea el job correspondiente en el rundeck, notifica la url del job (el rundeck se la devuelve cuando crea el job) y termina su ejecucion.<br/>
+El rundeck almacena las trazas de todo comando que ejecuta. Esto permite hacer un seguimiento en caso de ser necesario.</p>
+
+<h1>Seguridad</h1>
+
+<p>Toda modificación se hace via git, cada commit se guarda con las credenciales de la persona que lo realizó.<br/>
+El dev/sysadmin solo requiere tener git instalado y acceso por ssh al repositorio (y tener una cuenta de usuarios con permisos para comitear).<br/>
+El server de git no necesita ningun acceso a ningun server, solo la posibilidad de usar el knife para subir informaciones al chef server. Todo cambio queda registrado con el commit de quien lo hizo. El repo funciona bajo un usuario sin privilegios.<br/>
+El server de rundeck tambien se ejecuta bajo un usuario sin privilegios. Solo recibe jobs desde el hook del commit.</p>
+
+<h1>Auditoria</h1>
+
+<p>El git mantiene un registro de todos los commits realizados.<br/>
+El rundeck mantiene una traza de la ejecucion de todos los comandos realizados.</p>
+
+<h1>IRC</h1>
+
+<p>Para el irc se utiliza irccat como bot que mediante una pagina en php recibe el post y lo envia al irc server.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[instalando ldap server]]></title>
@@ -3981,464 +4174,6 @@ Es utilizada por los administradores para interactuar con la API del Servidor de
 </pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>osvaldo@coldplay ~<span class="o">]</span><span class="nv">$ </span>knife <span class="nb">exec</span> -E <span class="s2">&quot;search(:node, &#39;languages_java_version:1.*&#39;  ).each {|host|  puts host[:fqdn] + &#39; java version: &#39; + host[:languages][:java][:version] }&quot;</span>
 </span><span class='line'>toja-lm java version: 1.6.0_18
 </span></code></pre></td></tr></table></div></figure>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Introducción rápida a Chef]]></title>
-    <link href="http://devops-ar.github.com/blog/2011/12/17/introduccion-rapida-a-chef/"/>
-    <updated>2011-12-17T13:19:00-03:00</updated>
-    <id>http://devops-ar.github.com/blog/2011/12/17/introduccion-rapida-a-chef</id>
-    <content type="html"><![CDATA[<p>Este artículo se puede visualizar en formato de presentación <a href="http://devops-ar.github.com/talks/chef/quick-intro.html">aquí</a>.</p>
-
-<h3>Definir problema</h3>
-
-<ul>
-<li>crecimiento de la granja de servidores</li>
-<li>configuración manual</li>
-<li>a mayor numero de servidores, mayor posibilidad de error cuando se utiliza la configuracion manual</li>
-<li>baja productividad = pérdida de tiempo</li>
-<li>El mantenimiento es reactivo en vez de ser proactivo</li>
-<li>Cambios de emergencia pueden comprometer un sistema</li>
-</ul>
-
-
-<h3>Objetivo a lograr</h3>
-
-<ul>
-<li>permitir crecimiento horizontal</li>
-<li>estar preparados para escalar sin mayores complicaciones</li>
-<li>evitar los puntos únicos de falla</li>
-<li>trabajo manual</li>
-<li>conocimiento compartimentado</li>
-<li>manejo sencillo de configuraciones complicadas</li>
-</ul>
-
-
-<h3>Beneficio de la solución</h3>
-
-<ul>
-<li>organización del trabajo</li>
-<li>obliga a una separación de los entornos de trabajo</li>
-<li>fuerza a evitar las excepciones</li>
-<li>incremento de la productividad</li>
-<li>documentación</li>
-</ul>
-
-
-<h3>Herramientas</h3>
-
-<ul>
-<li>opscode chef</li>
-<li>chef-client/chef-server</li>
-<li>hosted chef (propuesta comercial de opscode)</li>
-<li>chef-solo</li>
-<li>puppet</li>
-<li>cfengine</li>
-<li>otros &#8230;.</li>
-</ul>
-
-
-<h3>¿Cual es mejor?</h3>
-
-<ul>
-<li>puppet o chef</li>
-<li>vi o emacs</li>
-<li>ruby o python</li>
-<li>linux o windows</li>
-</ul>
-
-
-<p>Con Puppet, un Cron Type sería algo asi:</p>
-
-<figure class='code'><figcaption><span>Puppet Cron Type</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">cron</span> <span class="p">{</span> <span class="n">command</span><span class="p">:</span>
-</span><span class='line'>  <span class="n">command</span> <span class="o">=&gt;</span> <span class="s2">&quot;/usr/local/sbin/command&quot;</span><span class="p">,</span>
-</span><span class='line'>  <span class="n">hour</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span>
-</span><span class='line'>  <span class="n">minute</span> <span class="o">=&gt;</span> <span class="mi">0</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Con Chef, declarar un Recurso equivalente seria:</p>
-
-<figure class='code'><figcaption><span>chef resource</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">cron</span> <span class="s2">&quot;describe your job&quot;</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">hour</span> <span class="s2">&quot;2&quot;</span>
-</span><span class='line'>  <span class="n">minute</span> <span class="s2">&quot;0&quot;</span>
-</span><span class='line'>  <span class="n">command</span> <span class="s2">&quot;/usr/local/sbin/command&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>modos de trabajo</h3>
-
-<ul>
-<li>chef-solo</li>
-<li>chef-server</li>
-<li>hosted chef</li>
-</ul>
-
-
-<h3>instalación rapida en 3 pasos</h3>
-
-<ul>
-<li>instalar ruby</li>
-<li>depende del sistema operativo</li>
-<li>instalar chef: sudo gem install chef</li>
-<li>no hay tercer paso ;)</li>
-</ul>
-
-
-<h3>¿Qué es una receta?</h3>
-
-<ul>
-<li>con solo dos archivos ya armamos una receta</li>
-<li>en realidad con uno basta (se puede excluir la metadata)</li>
-</ul>
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>foo/recipes/default.rb
-</span><span class='line'>foo/metadata.rb
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>ejemplo de una receta para PHP</h3>
-
-<figure class='code'><figcaption><span>default.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="no">Chef</span><span class="o">::</span><span class="no">Log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running php recipe)</span>
-</span><span class='line'>
-</span><span class='line'><span class="s2">package &quot;</span><span class="n">php5</span><span class="o">-</span><span class="n">cgi</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="s2">package &quot;</span><span class="n">php5</span><span class="o">-</span><span class="n">cli</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="s2">package &quot;</span><span class="n">php5</span><span class="o">-</span><span class="n">mysql</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="s2">package &quot;</span><span class="n">php5</span><span class="o">-</span><span class="n">curl</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="s2">package &quot;</span><span class="n">php5</span><span class="o">-</span><span class="n">dev</span><span class="s2">&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="s2">include_recipe &quot;</span><span class="n">php</span><span class="o">::</span><span class="n">pear</span><span class="s2">&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>ejemplo de una receta para PHP</h3>
-
-<figure class='code'><figcaption><span>pear.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="no">Chef</span><span class="o">::</span><span class="no">Log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running pear recipe&quot;</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">package</span> <span class="s2">&quot;php-pear&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">execute</span> <span class="s2">&quot;Update PEAR and all packages&quot;</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">command</span> <span class="s2">&quot;pear upgrade-all&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">execute</span> <span class="s2">&quot;Install HTTP_Session2 &amp; Net_CheckIP2&quot;</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">command</span> <span class="s2">&quot;pear install HTTP_Session2-beta Net_CheckIP-1.0.0RC3&quot;</span>
-</span><span class='line'>  <span class="n">not_if</span> <span class="s2">&quot;test -f /usr/share/php/pear/HTTP/Session2.php&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>ejemplo de una receta para PHP</h3>
-
-<figure class='code'><figcaption><span>metadata.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">maintainer</span>        <span class="s2">&quot;Till Klampeckel&quot;</span>
-</span><span class='line'><span class="n">maintainer_email</span>  <span class="s2">&quot;till@php.net&quot;</span>
-</span><span class='line'><span class="n">license</span>           <span class="s2">&quot;BSD License&quot;</span>
-</span><span class='line'><span class="n">description</span>       <span class="s2">&quot;Install PHP &amp; required dependencies.&quot;</span>
-</span><span class='line'><span class="n">version</span>           <span class="s2">&quot;0.1&quot;</span>
-</span><span class='line'><span class="n">recipe</span>            <span class="s2">&quot;php::default&quot;</span><span class="p">,</span> <span class="s2">&quot;Install and configure PHP&quot;</span>
-</span><span class='line'><span class="n">recipe</span>            <span class="s2">&quot;php::pear&quot;</span><span class="p">,</span> <span class="s2">&quot;Install PEAR and packages&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">supports</span> <span class="s1">&#39;ubuntu&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>ejemplo de una receta para PHP</h3>
-
-<p>Estructura del directorio</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>/tmp/chef/cookbooks/php/
-</span><span class='line'>/tmp/chef/cookbooks/php/metadata.rb
-</span><span class='line'>/tmp/chef/cookbooks/php/recipes/default.rb
-</span><span class='line'>/tmp/chef/cookbooks/php/recipes/pear.rb
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>ejemplo de una receta para PHP</h3>
-
-<p>Utilizando el modo de trabajo Chef-solo</p>
-
-<ul>
-<li>Necesitamos dos archivo de configuración</li>
-<li>/etc/chef/solo.rb</li>
-<li>node.json</li>
-<li>Un repositorio de cookbooks</li>
-</ul>
-
-
-<figure class='code'><figcaption><span>/etc/chef/solo.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">file_cache_path</span> <span class="s2">&quot;/tmp/chef&quot;</span>
-</span><span class='line'><span class="n">cookbook_path</span> <span class="s2">&quot;/tmp/chef/cookbooks&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>ejemplo de una receta para PHP</h3>
-
-<p>node.json</p>
-
-<ul>
-<li>JSON qué? la mujer de quién?</li>
-<li>La lista de ejecución (run_list) define las recetas que van a ser utilizadas y el orden que son ejecutadas.</li>
-</ul>
-
-
-<figure class='code'><figcaption><span>node.json</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">{</span>
-</span><span class='line'>  <span class="s2">&quot;run_list&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;recipe[php]&quot;</span> <span class="p">]</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Ser flexibles</h3>
-
-<ul>
-<li>Mantener las recetas genéricas</li>
-<li>Configuración individual</li>
-<li>Utilizar variables en node.json</li>
-</ul>
-
-
-<h3>ejemplo de node.json</h3>
-
-<figure class='code'><figcaption><span>node.json</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">{</span>
-</span><span class='line'>  <span class="s2">&quot;php&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;memory&quot;</span><span class="o">:</span><span class="s2">&quot;18G&quot;</span><span class="p">,</span> <span class="s2">&quot;tmp&quot;</span><span class="o">:</span><span class="s2">&quot;/tmp/php/data&quot;</span> <span class="p">},</span>
-</span><span class='line'>  <span class="s2">&quot;run_list&quot;</span><span class="o">:</span> <span class="p">...</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>uso de variables en foo.rb:</p>
-
-<figure class='code'><figcaption><span>foo.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">memory</span> <span class="o">=</span> <span class="n">node</span><span class="o">[</span><span class="ss">:php</span><span class="o">][</span><span class="ss">:memory</span><span class="o">]</span>
-</span><span class='line'><span class="n">tempdir</span> <span class="o">=</span> <span class="n">node</span><span class="o">[</span><span class="ss">:php</span><span class="o">][</span><span class="ss">:tmp</span><span class="o">]</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">directory</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">tempdir</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">owner</span> <span class="s2">&quot;www-data&quot;</span>
-</span><span class='line'>  <span class="n">group</span> <span class="s2">&quot;www-data&quot;</span>
-</span><span class='line'>  <span class="n">recursive</span> <span class="ss">:true</span>
-</span><span class='line'>  <span class="n">action</span> <span class="ss">:delete</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Ejecución</h3>
-
-<p>Con el archivo node.json local en el servidor:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>chef-solo -j /tmp/node.json <span class="o">[</span>-c /etc/chef/solo.rb<span class="o">]</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>El archivo node.json y las recetas se pueden descargar de un servidor remoto [master, Amazon S3,..]:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>chef-solo -j http://example.org/node.json -r http://example.org/recipes.tar.gz
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Uso avanzado</h2>
-
-<h3>Archivos</h3>
-
-<ul>
-<li>distribución de archivos de configuración</li>
-<li>archivos estáticos - solo necesitan ser copiados tal cual</li>
-</ul>
-
-
-<figure class='code'><figcaption><span>openssh/files/default/banner</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="no">Ud</span><span class="o">.</span> <span class="n">est</span><span class="err">á</span> <span class="n">ingresando</span> <span class="n">a</span> <span class="n">una</span> <span class="n">red</span> <span class="n">inform</span><span class="err">á</span><span class="n">tica</span> <span class="n">de</span> <span class="no">Acceso</span> <span class="no">Restringido</span> <span class="n">y</span> <span class="n">que</span> <span class="n">contiene</span> <span class="n">informaci</span><span class="err">ó</span><span class="n">n</span>
-</span><span class='line'><span class="n">legalmente</span> <span class="n">protegida</span><span class="p">,</span> <span class="n">confidencial</span> <span class="n">y</span><span class="o">/</span><span class="n">o</span> <span class="n">de</span> <span class="n">secreto</span> <span class="n">profesional</span><span class="p">,</span> <span class="n">cuyo</span> <span class="n">uso</span> <span class="n">indebido</span>
-</span><span class='line'><span class="n">puede</span> <span class="n">generar</span> <span class="n">al</span> <span class="n">usuario</span> <span class="n">responsabilidad</span> <span class="n">civil</span> <span class="n">o</span> <span class="n">configurar</span> <span class="n">los</span>
-</span><span class='line'><span class="n">delitos</span> <span class="n">previstos</span> <span class="n">en</span> <span class="n">los</span> <span class="n">arts</span><span class="o">.</span> <span class="mi">153</span> <span class="n">a</span> <span class="mi">157</span> <span class="n">del</span> <span class="n">C</span><span class="err">ó</span><span class="n">digo</span> <span class="no">Penal</span><span class="o">.</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>openssh/recipes/default.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="c1"># asume openssh/files/default/banner</span>
-</span><span class='line'><span class="n">template</span> <span class="s2">&quot;banner&quot;</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">source</span>  <span class="s2">&quot;banner&quot;</span>
-</span><span class='line'>  <span class="n">owner</span>   <span class="s2">&quot;root&quot;</span>
-</span><span class='line'>  <span class="n">group</span>   <span class="s2">&quot;root&quot;</span>
-</span><span class='line'>  <span class="n">mode</span>    <span class="s2">&quot;0644&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Atributos</h3>
-
-<ul>
-<li>los atributos de un node son generados por ohai</li>
-<li>pueden ser modificados ó adicionados en las recetas de los cookbooks, en los roles o los ambientes</li>
-<li>ejemplo de atributos en una receta (openssh/attributes/default.rb):</li>
-</ul>
-
-
-<figure class='code'><figcaption><span>openssh/attributes/default.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">default</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:port</span><span class="o">]</span>                <span class="o">=</span> <span class="o">[</span> <span class="s2">&quot;22&quot;</span> <span class="o">]</span>
-</span><span class='line'><span class="n">default</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:listen_address</span><span class="o">]</span>      <span class="o">=</span> <span class="o">[</span> <span class="s2">&quot;0.0.0.0&quot;</span> <span class="o">]</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">default</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:permit_root_login</span><span class="o">]</span>   <span class="o">=</span> <span class="s2">&quot;no&quot;</span>
-</span><span class='line'><span class="n">default</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:x11_forwarding</span><span class="o">]</span>      <span class="o">=</span> <span class="s2">&quot;no&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">default</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:ignore_rhosts</span><span class="o">]</span>      <span class="o">=</span> <span class="s2">&quot;yes&quot;</span>
-</span><span class='line'><span class="n">default</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:use_dns</span><span class="o">]</span>      <span class="o">=</span> <span class="s2">&quot;no&quot;</span>
-</span><span class='line'><span class="n">default</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:banner</span><span class="o">]</span>      <span class="o">=</span> <span class="s2">&quot;/etc/ssh/banner&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>ejemplo de atributos en un ambiente</li>
-</ul>
-
-
-<figure class='code'><figcaption><span>roles/local.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="nb">name</span> <span class="s2">&quot;local&quot;</span>
-</span><span class='line'><span class="n">description</span> <span class="s2">&quot;local testing environment&quot;</span>
-</span><span class='line'><span class="n">override_attributes</span> <span class="p">({</span>
-</span><span class='line'>    <span class="s2">&quot;ntp&quot;</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span><span class='line'>        <span class="s2">&quot;ntp_server&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;time.apple.com&quot;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">})</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Plantillas</h3>
-
-<ul>
-<li>Archivos de configuración</li>
-<li>Scripts de inicio</li>
-<li>uso de atributos en una plantilla (openssh/templates/centos/sshd_config.erb):</li>
-</ul>
-
-
-<figure class='code'><figcaption><span>openssh/templates/centos/sshd_config.erb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="no">PermitRootLogin</span> <span class="o">&lt;</span><span class="sx">%= node[:openssh][:permit_root_login] %&gt;</span>
-</span><span class='line'><span class="sx">IgnoreRhosts &lt;%=</span> <span class="n">node</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:ignore_rhosts</span><span class="o">]</span> <span class="sx">%&gt;</span>
-</span><span class='line'><span class="sx">X11Forwarding &lt;%= node[:openssh][:x11_forwarding] %&gt;</span>
-</span><span class='line'><span class="no">Banner</span>  <span class="o">&lt;%=</span> <span class="n">node</span><span class="o">[</span><span class="ss">:openssh</span><span class="o">][</span><span class="ss">:banner</span><span class="o">]</span> <span class="o">%&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li>uso de una plantilla en una receta (openssh/recipes/default.rb):</li>
-</ul>
-
-
-<figure class='code'><figcaption><span>openssh/recipes/default.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">template</span> <span class="s2">&quot;/etc/ssh/sshd_config&quot;</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">source</span>  <span class="s2">&quot;sshd_config.erb&quot;</span>
-</span><span class='line'>    <span class="n">owner</span>   <span class="s2">&quot;root&quot;</span>
-</span><span class='line'>    <span class="n">group</span>   <span class="s2">&quot;root&quot;</span>
-</span><span class='line'>    <span class="n">mode</span>    <span class="s2">&quot;0600&quot;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">notifies</span> <span class="ss">:restart</span><span class="p">,</span> <span class="s2">&quot;service[sshd]&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
 
 ]]></content>
   </entry>

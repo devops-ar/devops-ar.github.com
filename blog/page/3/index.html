@@ -9,7 +9,14 @@
   <meta name="author" content="osvaldo">
 
   
-  <meta name="description" content="El proxy de perforce consta de dos procesos. Un script que se conecta al servidor remoto (se requieren credenciales para el mismo que el usuario &hellip;">
+  <meta name="description" content="Primero nos aseguramos de que los paquetes estan instalados. 1
+2
+3
+4
+[root@nirvana ~]# rpm -qa | grep vnc
+vnc-4.1.2-9.el5
+vnc-server-4.1.2-9.el5
+[ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +83,75 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/04/10/configurando-vncserver-en-centos/">Configurando Vncserver en Centos</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-10T18:09:00-03:00" pubdate data-updated="true">Apr 10<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/04/10/configurando-vncserver-en-centos/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Primero nos aseguramos de que los paquetes estan instalados.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@nirvana ~<span class="o">]</span><span class="c"># rpm -qa | grep vnc</span>
+</span><span class='line'>vnc-4.1.2-9.el5
+</span><span class='line'>vnc-server-4.1.2-9.el5
+</span><span class='line'><span class="o">[</span>root@nirvana ~<span class="o">]</span><span class="c"># </span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Para un CentOS se puede instalar utilizan yum, para un RHEL &#8230; buscar las rpm en los CD de instalación.</p>
+
+<p>La primera vez que intentamos iniciar el servicio puede fallar.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>root@nirvana .vnc<span class="o">]</span><span class="c"># service vncserver start</span>
+</span><span class='line'>Starting VNC server: no displays configured                <span class="o">[</span>  OK  <span class="o">]</span>
+</span><span class='line'><span class="o">[</span>root@nirvana .vnc<span class="o">]</span><span class="c">#</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>El mensaje de error es explícito: el servicio no ha sido configurado. Hay tener en cuenta que el vnc se utiliza para acceder a una sesión gráfica en un servidor remoto. Esto quiere decir que se accede a una sesión directamente, no a un gestor de sesiones. El vnc server va a escuchar en un puerto distinto para cada sesión que se defina. De manera predeterminada el vnc server escucha en el puerto 5900 y cada sesión escucha por un puerto consecutivo a partir de ese número. Por lo tanto, para conectar con el cliente VNC, serán el 5900 + &#8220;número de pantalla o display number&#8221;, 5901 para el 1, 5902 para el 2 y asi sucesivamente.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/04/10/configurando-vncserver-en-centos/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -298,229 +374,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/02/03/empezando-con-chef/">Empezando Con Chef</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-02-03T02:20:00-03:00" pubdate data-updated="true">Feb 3<span>rd</span>, 2012</time>
-        
-         | <a href="/blog/2012/02/03/empezando-con-chef/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h1>Componentes de una instalación de Chef</h1>
-
-<p>Una instalación de Chef va a contar típicamente con tres componentes.</p>
-
-<ul>
-<li><strong>Chef Server</strong> Es el host donde esta la base de datos de los nodes registrados, los certificados de las credenciales de los mismos y los cookbooks.</li>
-<li><strong>Chef Client</strong> Es el node gestionado a través del Chef Server. Una vez hecho el bootstraping, cada vez que se ejecute el cliente de chef (comando chef-client) se conecta al Chef Server, descarga y aplica la configuración establecida por las recetas, roles y environments que tenga asignado.</li>
-<li><strong>Workstation</strong> Puede o no ser un node de chef, pero si va tener las credenciales de un usuario registrado con el Chef Server. Desde este equipo se ejecutan comandos de knife y se trabajan con los cookbooks.</li>
-</ul>
-
-
-<h1>Bootstraping</h1>
-
-<p>La instalación de chef en un host (node) para que pueda ser gestionado por un chef server se llama bootstraping. Se realiza con el comando <a href="http://wiki.opscode.com/display/chef/Knife">knife</a> y el subcomando <a href="http://wiki.opscode.com/display/chef/Knife+Bootstrap">bootstrap</a>.</p>
-
-<p>Por ejemplo:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>knife bootstrap 10.24.2.51 -x osvaldo --sudo  -N unixtools.tx.corp.acme.com -r <span class="s1">&#39;role[demo]&#39;</span> -d rhel5-demo
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Con ese comando, se esta ejecutando el comando knife, el subcomando bootstrap, la dirección IP del server que se le va a hacer el bootstrap y los parámetros, que entonces, serán del subcomando.</p>
-
-<pre><code>--sudo:
-    El bootstrap se ejecuta via sudo.
--x, --ssh-user USERNAME:
-    El username (nombre de usuario) con el que se realiza la conexión ssh.
--N, --node-name NAME:
-    El nombre con el que el host va a ser registrado (como un node) en el server Chef. Usamos el fqdn (el node name tiene que ser único).
--r, --run-list RUN_LIST:
-    Un listado separado por comas de los roles o recetas que se van a aplicar en el momento del bootstrapping.
--d, --distro DISTRO:
-    El template que se va a utilizar para el bootstrap.
-</code></pre>
-
-<p>El bootstraping se debe realizar desde la workstation. Los templates del bootstrap son scripts en ruby pero con codigo en bash y se colocan en alguna de las locaciones predeterminadas.</p>
-
-<figure class='code'><figcaption><span>tree ~/chef-repo/.chef</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>|-- bootstrap
-</span><span class='line'>|   <span class="sb">`</span>-- glb-rhel5.erb
-</span><span class='line'>|-- knife.rb
-</span><span class='line'>|-- osvaldo.pem
-</span><span class='line'><span class="sb">`</span>-- validation.pem
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Una locación común seria ~/chef-repo/.chef. En esta carpeta tenemos:</p>
-
-<ul>
-<li><strong>validation.pem</strong>: Es el certificado que utilizan los nodes para validarse ante el Chef Server</li>
-<li><strong>osvaldo.pem</strong>: Certificado del cliente. Lo utiliza el operador para trabajar desde ese host como workstation.</li>
-<li><strong>knife.rb</strong>: Archivo de configuración del comando knife.</li>
-<li><strong>bootstrap</strong>: Directorio donde se almacenan los templates para el bootstrap.</li>
-<li><strong>glb-rhel5.rb</strong>: Template para la instalación de un servidor RedHat (CentOS) de ACME.</li>
-</ul>
-
-
-<figure class='code'><figcaption><span>bootstrap/glb-rhel5.erb </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">bash</span> <span class="o">-</span><span class="n">c</span> <span class="s1">&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">echo &lt;%= @config[:chef_node_name] %&gt; &gt; /tmp/chef_node_name</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">PROPERHOSTNAME=`cat /tmp/chef_node_name | cut -d. -f1`</span>
-</span><span class='line'><span class="s1">PROPERDNSDOMAINNAME=`cat /tmp/chef_node_name | sed s/^$PROPERHOSTNAME.//` </span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">IPV4ADDR=`/sbin/ip addr | grep eth0 | grep &quot;inet &quot; | cut -d &quot; &quot; -f 6 | cut -d \/ -f 1`</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">cp /etc/hosts /etc/hosts.chef-bck</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">NETCONF=&quot;/etc/sysconfig/network&quot;</span>
-</span><span class='line'><span class="s1">grep &quot;^HOSTNAME=${PROPERHOSTNAME}$&quot; ${NETCONF} || ( sed -i s/^HOSTNAME.*$// ${NETCONF} &amp;&amp; echo &quot;HOSTNAME=${PROPERHOSTNAME}&quot; &gt;&gt; ${NETCONF})</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">(</span>
-</span><span class='line'><span class="s1">cat &lt;&lt;EOF</span>
-</span><span class='line'><span class="s1">127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4</span>
-</span><span class='line'><span class="s1">::1         localhost localhost.localdomain localhost6 localhost6.localdomain6</span>
-</span><span class='line'><span class="s1">${IPV4ADDR} ${PROPERHOSTNAME}.${PROPERDNSDOMAINNAME} ${PROPERHOSTNAME}</span>
-</span><span class='line'><span class="s1">EOF</span>
-</span><span class='line'><span class="s1">) &gt; /etc/hosts</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">hostname $PROPERHOSTNAME</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">if [ ! -d /usr/local/rvm ]; then</span>
-</span><span class='line'><span class="s1">    wget http://192.168.20.50/rvm-chef-0.10.4-r0.noarch.rpm -P /tmp</span>
-</span><span class='line'><span class="s1">    rpm -ivh /tmp/rvm-chef-0.10.4-r0.noarch.rpm</span>
-</span><span class='line'><span class="s1">fi</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">(</span>
-</span><span class='line'><span class="s1">cat &lt;&lt;&#39;</span><span class="no">EOP</span><span class="s1">&#39;</span>
-</span><span class='line'><span class="s1">[[ -s &quot;/usr/local/rvm/scripts/rvm&quot; ]] &amp;&amp; . &quot;/usr/local/rvm/scripts/rvm&quot; </span>
-</span><span class='line'><span class="s1">EOP</span>
-</span><span class='line'><span class="s1">) &gt;&gt; .bashrc</span>
-</span><span class='line'><span class="s1">[[ -s &quot;/usr/local/rvm/scripts/rvm&quot; ]] &amp;&amp; . &quot;/usr/local/rvm/scripts/rvm&quot; </span>
-</span><span class='line'><span class="s1">rvm use --default ruby-1.9.2</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">mkdir -p /etc/chef</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">(</span>
-</span><span class='line'><span class="s1">cat &lt;&lt;&#39;</span><span class="no">EOP</span><span class="s1">&#39;</span>
-</span><span class='line'><span class="s1">&lt;%= validation_key %&gt;</span>
-</span><span class='line'><span class="s1">EOP</span>
-</span><span class='line'><span class="s1">) &gt; /tmp/validation.pem</span>
-</span><span class='line'><span class="s1">awk NF /tmp/validation.pem &gt; /etc/chef/validation.pem</span>
-</span><span class='line'><span class="s1">rm /tmp/validation.pem</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">(</span>
-</span><span class='line'><span class="s1">cat &lt;&lt;&#39;</span><span class="no">EOP</span><span class="s1">&#39;</span>
-</span><span class='line'><span class="s1">&lt;%= config_content %&gt;</span>
-</span><span class='line'><span class="s1">EOP</span>
-</span><span class='line'><span class="s1">) &gt; /etc/chef/client.rb</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">(</span>
-</span><span class='line'><span class="s1">cat &lt;&lt;&#39;</span><span class="no">EOP</span><span class="s1">&#39;</span>
-</span><span class='line'><span class="s1">&lt;%= { &quot;run_list&quot; =&gt; @run_list }.to_json %&gt;</span>
-</span><span class='line'><span class="s1">EOP</span>
-</span><span class='line'><span class="s1">) &gt; /etc/chef/first-boot.json</span>
-</span><span class='line'>
-</span><span class='line'><span class="s1">chef-client -j /etc/chef/first-boot.json&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -538,6 +391,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/11/20/instalando-servidores-con-un-commit/">instalando servidores con un commit</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/10/03/instalando-ldap-server/">instalando ldap server</a>
       </li>
     
@@ -551,10 +408,6 @@
     
       <li class="post">
         <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">definiendo un smarthost en mac os x</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/08/usando-https-detras-de-un-reverse-proxy/">usando https detras de un proxy reverso</a>
       </li>
     
   </ul>
