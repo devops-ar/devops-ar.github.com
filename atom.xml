@@ -4,7 +4,7 @@
   <title><![CDATA[devops-ar]]></title>
   <link href="http://devops-ar.github.com/atom.xml" rel="self"/>
   <link href="http://devops-ar.github.com/"/>
-  <updated>2012-11-20T11:17:04-03:00</updated>
+  <updated>2013-02-21T08:30:10-03:00</updated>
   <id>http://devops-ar.github.com/</id>
   <author>
     <name><![CDATA[osvaldo]]></name>
@@ -12,6 +12,74 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[reiniciar un dell via idrac]]></title>
+    <link href="http://devops-ar.github.com/blog/2013/02/21/reiniciar-un-dell-via-idrac/"/>
+    <updated>2013-02-21T08:25:00-03:00</updated>
+    <id>http://devops-ar.github.com/blog/2013/02/21/reiniciar-un-dell-via-idrac</id>
+    <content type="html"><![CDATA[<p>Los servidores Dell tienen una interface adicional para la administracion del equipo: idrac.  Esta interface se configura adicionalmente al equipo y consiste de una placa de red con un software standalone, independiente del sistema operativo del equipo, y que permite acceso al server como si se estuviera fisicamente delante del servidor (consola). Tiene dos accesos, via web (https) y via consola (ssh).</p>
+
+<p>El siguiente script permite ejecutar un reset del servidor sin necesidad de acceder por la web. Se puede incorporar en un chequeo automatizado (si falla el chequeo, se lanza el reset). Utiliza expect para manejar el proceso de login.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># if [ x&quot;$1&quot; = &quot;x&quot; ]; then</span>
+</span><span class='line'><span class="c">#     echo &quot;Usage `basename $0` &lt;DRAC unique ID&gt;&quot;</span>
+</span><span class='line'><span class="c">#     exit -1</span>
+</span><span class='line'><span class="c"># fi</span>
+</span><span class='line'><span class="c">#DRAC_ID=$1</span>
+</span><span class='line'><span class="nv">HOSTNAME</span><span class="o">=</span>10.10.100.13
+</span><span class='line'><span class="nv">USER</span><span class="o">=</span>admin
+</span><span class='line'><span class="nv">ALERT</span><span class="o">=</span>root@example.com
+</span><span class='line'><span class="nv">SMTP_SERVER</span><span class="o">=</span>mail.example.com
+</span><span class='line'><span class="nv">PASSWORD</span><span class="o">=</span>secret
+</span><span class='line'>
+</span><span class='line'>expect -c <span class="s2">&quot;</span>
+</span><span class='line'><span class="s2">set timeout 20</span>
+</span><span class='line'><span class="s2">spawn ssh $USER@$HOSTNAME</span>
+</span><span class='line'><span class="s2">expect *password:</span>
+</span><span class='line'><span class="s2">send \&quot;$PASSWORD\r\&quot;</span>
+</span><span class='line'><span class="s2">set timeout 5</span>
+</span><span class='line'><span class="s2">expect \&quot;\[root\]# \&quot;</span>
+</span><span class='line'><span class="s2">expect \&quot;/admin1-&gt;\&quot;</span>
+</span><span class='line'><span class="s2">send \&quot;reset  /admin1/system1\r\&quot;</span>
+</span><span class='line'><span class="s2">expect \&quot;/admin1-&gt;\&quot;</span>
+</span><span class='line'><span class="s2">send \&quot;version\r\&quot;</span>
+</span><span class='line'><span class="s2">send \&quot;exit\r\&quot;</span>
+</span><span class='line'><span class="s2">&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Mas información sobre los comandos de idrac se puede encontrar en el  <a href="http://support.dell.com/support/edocs/software/smdrac3/idrac/idrac22modular/en/ug/html/chap14.htm">manual de Dell</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[instalando servidores con un commit]]></title>
@@ -4021,162 +4089,6 @@ to avoid in the first place.</p>
 <li><a href="http://ramblings.narrabilis.com/wp/creating-a-yum-repository-repo-and-creating-a-yum-group-to-install-kickstart/">http://ramblings.narrabilis.com/wp/creating-a-yum-repository-repo-and-creating-a-yum-group-to-install-kickstart/</a></li>
 <li><a href="http://www.tim-riemenschneider.de/linux/rpmbook/node310.html">http://www.tim-riemenschneider.de/linux/rpmbook/node310.html</a></li>
 </ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Herramientas de Chef]]></title>
-    <link href="http://devops-ar.github.com/blog/2011/12/17/chef-tools/"/>
-    <updated>2011-12-17T14:07:00-03:00</updated>
-    <id>http://devops-ar.github.com/blog/2011/12/17/chef-tools</id>
-    <content type="html"><![CDATA[<p>Este artículo se puede visualizar en formato de presentación <a href="http://devops-ar.github.com/talks/chef/chef-tools.html">aquí</a>.</p>
-
-<h2><a href="http://wiki.opscode.com/display/chef/Ohai">ohai</a></h2>
-
-<p>Ohai detecta información acerca del sistema operativo. Puede ser utilizado como un comando independiente pero su función primaria consiste en proveer información sobre el Nodo a Chef.
-Cuando se ejecuta, recolecta información detallada y extensible acerca del equipo sobre el esta corriendo, como por ejemplo, configuración de Chef, el hostname, el FQDN, la configuración de red, así como datos sobre la memoria, la CPU, la plataforma y el kernel.</p>
-
-<p>Cuando se ejecuta independiente, Ohai imprime un bloque de datos en formato JSON con toda la información que puede obtener del sistema. Cuando se utiliza a través de Chef, ese bloque de datos JSON es enviado al servidor de Chef como atributos &#8220;automáticos&#8221; del Nodo para actualizar la información del mismo que pudiera existir previamente.</p>
-
-<h2><a href="http://wiki.opscode.com/display/chef/Knife">knife</a></h2>
-
-<p>Knife es una poderosa herramienta de linea de comandos (CLI) que forma parte de Chef.
-Es utilizada por los administradores para interactuar con la API del Servidor de Chef y con el Repositorio local de Chef. Permite manipular los Nodos, Cookbooks, Roles, Databags, Ambientes, etc. Además, puede ser utilizada para la propia instalación de Chef en nuevos sistemas.</p>
-
-<h2>Ohai</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>osvaldo@vostro:~<span class="nv">$ </span>ohai
-</span><span class='line'><span class="o">{</span>
-</span><span class='line'>  <span class="s2">&quot;languages&quot;</span>: <span class="o">{</span>
-</span><span class='line'>    <span class="s2">&quot;perl&quot;</span>: <span class="o">{</span>
-</span><span class='line'>      <span class="s2">&quot;version&quot;</span>: <span class="s2">&quot;5.10.1&quot;</span>,
-</span><span class='line'>      <span class="s2">&quot;archname&quot;</span>: <span class="s2">&quot;i486-linux-gnu-thread-multi&quot;</span>
-</span><span class='line'>    <span class="o">}</span>,
-</span><span class='line'>    <span class="s2">&quot;python&quot;</span>: <span class="o">{</span>
-</span><span class='line'>      <span class="s2">&quot;version&quot;</span>: <span class="s2">&quot;2.6.6&quot;</span>,
-</span><span class='line'>      <span class="s2">&quot;builddate&quot;</span>: <span class="s2">&quot;Dec 27 2010, 00:02:40&quot;</span>
-</span><span class='line'>    <span class="o">}</span>,
-</span><span class='line'>...
-</span><span class='line'>  <span class="s2">&quot;kernel&quot;</span>: <span class="o">{</span>
-</span><span class='line'>    <span class="s2">&quot;name&quot;</span>: <span class="s2">&quot;Linux&quot;</span>,
-</span><span class='line'>    <span class="s2">&quot;release&quot;</span>: <span class="s2">&quot;2.6.32-5-686&quot;</span>,
-</span><span class='line'>    <span class="s2">&quot;version&quot;</span>: <span class="s2">&quot;#1 SMP Thu Nov 3 04:23:54 UTC 2011&quot;</span>,
-</span><span class='line'>    <span class="s2">&quot;machine&quot;</span>: <span class="s2">&quot;i686&quot;</span>,
-</span><span class='line'>...
-</span><span class='line'>  <span class="s2">&quot;lsb&quot;</span>: <span class="o">{</span>
-</span><span class='line'>    <span class="s2">&quot;id&quot;</span>: <span class="s2">&quot;Debian&quot;</span>,
-</span><span class='line'>    <span class="s2">&quot;description&quot;</span>: <span class="s2">&quot;Debian GNU/Linux 6.0.3 (squeeze)&quot;</span>,
-</span><span class='line'>    <span class="s2">&quot;release&quot;</span>: <span class="s2">&quot;6.0.3&quot;</span>,
-</span><span class='line'>    <span class="s2">&quot;codename&quot;</span>: <span class="s2">&quot;squeeze&quot;</span>
-</span><span class='line'>  <span class="o">}</span>,
-</span><span class='line'>  <span class="s2">&quot;platform&quot;</span>: <span class="s2">&quot;debian&quot;</span>,
-</span><span class='line'>  <span class="s2">&quot;platform_version&quot;</span>: <span class="s2">&quot;6.0.3&quot;</span>,
-</span><span class='line'>...
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Knife :: the killer app</h2>
-
-<p>Que pasa si queremos obtener una mirada del estado de los servidores que pertenecen a un rol en particular?</p>
-
-<p><strong>Sort by 5min load average</strong></p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>osvaldo@coldplay ~<span class="o">]</span><span class="nv">$ </span>knife ssh -x otoja <span class="s1">&#39;roles:demo&#39;</span>  <span class="s1">&#39;cat /proc/loadavg | awk &quot;{print $2}&quot;&#39;</span> | sort -n -k 2
-</span><span class='line'>nirvana.example.com 0.00 0.00 0.00 1/149 16941
-</span><span class='line'>stp.example.com 0.00 0.00 0.00 4/182 25165
-</span><span class='line'>soundgarden.example.com  0.40 0.10 0.03 1/179 485
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>Sort by uptime</strong></p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>osvaldo@coldplay ~<span class="o">]</span><span class="nv">$ </span>knife ssh -x otoja <span class="s1">&#39;roles:demo&#39;</span> <span class="s1">&#39;uptime&#39;</span> | sort -n -k 4
-</span><span class='line'>nirvana.example.com  21:25:39 up 8 days,  6:30,  2 users,  load average: 0.00, 0.00, 0.00
-</span><span class='line'>soundgarden.example.com   21:24:04 up 8 days,  9:00,  1 user,  load average: 0.20, 0.08, 0.02
-</span><span class='line'>stp.example.com  21:25:39 up 33 days, 10:47,  2 users,  load average: 0.00, 0.00, 0.00
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>puedo hacer un tail a un archivo al mismo tiempo en todos los servidores con solo un comando?</strong></p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>knife ssh -x otoja <span class="s1">&#39;roles:demo&#39;</span> <span class="s1">&#39;sudo tail -f /var/log/messages&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>y ahora a mirar la pantalla &#8230;</p>
-
-<p><strong>que servidores estan utilizando python 2.*?</strong></p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>osvaldo@coldplay ~<span class="o">]</span><span class="nv">$ </span>knife <span class="nb">exec</span> -E <span class="s2">&quot;search(:node, &#39;languages_python_version:2.*&#39;  ).each {|host|  puts host[:fqdn] + &#39; python version: &#39; + host[:languages][:python][:version] }&quot;</span>
-</span><span class='line'>soundgarden.example.com python version: 2.4.3
-</span><span class='line'>nirvana.example.com python version: 2.4.3
-</span><span class='line'>stp.example.com python version: 2.4.3
-</span><span class='line'>vostro python version: 2.6.6
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>cual es el estado de un servicio X (ntp en el ejemplo) en un grupo determinado de servidores (con el role demo)?</strong></p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>osvaldo@coldplay ~<span class="o">]</span><span class="nv">$ </span>knife ssh -x otoja -m <span class="s2">&quot;`knife exec -E &quot;</span>search<span class="o">(</span>:node, <span class="s1">&#39;roles:demo&#39;</span><span class="o">)</span>.each <span class="o">{</span>|host| puts host<span class="o">[</span>:fqdn<span class="o">]</span> <span class="o">}</span><span class="s2">&quot; | xargs`&quot;</span> <span class="s1">&#39;/etc/init.d/ntpd status&#39;</span>
-</span><span class='line'>stp.example.com ntpd is stopped
-</span><span class='line'>soundgarden.example.com  ntpd is stopped
-</span><span class='line'>nirvana.example.com ntpd is stopped
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>que servidores tienen instalado java version 1.*?</strong></p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="o">[</span>osvaldo@coldplay ~<span class="o">]</span><span class="nv">$ </span>knife <span class="nb">exec</span> -E <span class="s2">&quot;search(:node, &#39;languages_java_version:1.*&#39;  ).each {|host|  puts host[:fqdn] + &#39; java version: &#39; + host[:languages][:java][:version] }&quot;</span>
-</span><span class='line'>toja-lm java version: 1.6.0_18
-</span></code></pre></td></tr></table></div></figure>
 
 ]]></content>
   </entry>

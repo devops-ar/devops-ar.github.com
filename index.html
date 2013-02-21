@@ -9,7 +9,7 @@
   <meta name="author" content="osvaldo">
 
   
-  <meta name="description" content="Introducción (aka TL;DR) Empece a usar chef para deployar los servers (vm) de desarrollo. Partiendo de la forma estandar de uso de chef, llegue al &hellip;">
+  <meta name="description" content="Los servidores Dell tienen una interface adicional para la administracion del equipo: idrac. Esta interface se configura adicionalmente al equipo y &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +76,103 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/02/21/reiniciar-un-dell-via-idrac/">Reiniciar Un Dell via Idrac</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-21T08:25:00-03:00" pubdate data-updated="true">Feb 21<span>st</span>, 2013</time>
+        
+         | <a href="/blog/2013/02/21/reiniciar-un-dell-via-idrac/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Los servidores Dell tienen una interface adicional para la administracion del equipo: idrac.  Esta interface se configura adicionalmente al equipo y consiste de una placa de red con un software standalone, independiente del sistema operativo del equipo, y que permite acceso al server como si se estuviera fisicamente delante del servidor (consola). Tiene dos accesos, via web (https) y via consola (ssh).</p>
+
+<p>El siguiente script permite ejecutar un reset del servidor sin necesidad de acceder por la web. Se puede incorporar en un chequeo automatizado (si falla el chequeo, se lanza el reset). Utiliza expect para manejar el proceso de login.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># if [ x&quot;$1&quot; = &quot;x&quot; ]; then</span>
+</span><span class='line'><span class="c">#     echo &quot;Usage `basename $0` &lt;DRAC unique ID&gt;&quot;</span>
+</span><span class='line'><span class="c">#     exit -1</span>
+</span><span class='line'><span class="c"># fi</span>
+</span><span class='line'><span class="c">#DRAC_ID=$1</span>
+</span><span class='line'><span class="nv">HOSTNAME</span><span class="o">=</span>10.10.100.13
+</span><span class='line'><span class="nv">USER</span><span class="o">=</span>admin
+</span><span class='line'><span class="nv">ALERT</span><span class="o">=</span>root@example.com
+</span><span class='line'><span class="nv">SMTP_SERVER</span><span class="o">=</span>mail.example.com
+</span><span class='line'><span class="nv">PASSWORD</span><span class="o">=</span>secret
+</span><span class='line'>
+</span><span class='line'>expect -c <span class="s2">&quot;</span>
+</span><span class='line'><span class="s2">set timeout 20</span>
+</span><span class='line'><span class="s2">spawn ssh $USER@$HOSTNAME</span>
+</span><span class='line'><span class="s2">expect *password:</span>
+</span><span class='line'><span class="s2">send \&quot;$PASSWORD\r\&quot;</span>
+</span><span class='line'><span class="s2">set timeout 5</span>
+</span><span class='line'><span class="s2">expect \&quot;\[root\]# \&quot;</span>
+</span><span class='line'><span class="s2">expect \&quot;/admin1-&gt;\&quot;</span>
+</span><span class='line'><span class="s2">send \&quot;reset  /admin1/system1\r\&quot;</span>
+</span><span class='line'><span class="s2">expect \&quot;/admin1-&gt;\&quot;</span>
+</span><span class='line'><span class="s2">send \&quot;version\r\&quot;</span>
+</span><span class='line'><span class="s2">send \&quot;exit\r\&quot;</span>
+</span><span class='line'><span class="s2">&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Mas información sobre los comandos de idrac se puede encontrar en el  <a href="http://support.dell.com/support/edocs/software/smdrac3/idrac/idrac22modular/en/ug/html/chap14.htm">manual de Dell</a>.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -301,68 +398,6 @@ El workflow se encarga del resto: ejecutar los comandos necesarios, notificar po
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">Definiendo Un Smarthost en Mac Os X</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-08-27T11:36:00-03:00" pubdate data-updated="true">Aug 27<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Es común tener un smarthost o relay de correo en las intranet. Si tenemos un equipo con Mac OS X  y necesitamos configurarle que todos los correos que envia salgan a través de un servidor en particular, estos serian los pasos. La pasarela de mensajeria seria para este caso: mailgateway.example.com. El puerto 25 en el smarthost deberia estar accesible desde el host que estamos configurando.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>postconf -e <span class="nv">relayhost</span><span class="o">=</span>mailgateway.example.com
-</span><span class='line'>launchctl stop org.postfix.master
-</span><span class='line'>launchctl unload /System/Library/LaunchDaemons/org.postfix.master.plist
-</span><span class='line'>launchctl load /System/Library/LaunchDaemons/org.postfix.master.plist
-</span><span class='line'>launchctl start org.postfix.master
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Si se quiere comprobar utilizar los siguientes comandos.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">echo</span> <span class="s2">&quot;test&quot;</span> | mail -s <span class="s2">&quot;test&quot;</span> osvaldo@example.com
-</span><span class='line'>tail -f /var/log/mail.log
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Me guie por (este link)[http://thomer.com/howtos/postfix_smarthost_mailavenger.html] donde se explica además como configurar la autenticación si el smarthost lo requiere..</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -378,6 +413,10 @@ El workflow se encarga del resto: ejecutar los comandos necesarios, notificar po
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/02/21/reiniciar-un-dell-via-idrac/">reiniciar un dell via idrac</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/11/20/instalando-servidores-con-un-commit/">instalando servidores con un commit</a>
       </li>
     
@@ -391,10 +430,6 @@ El workflow se encarga del resto: ejecutar los comandos necesarios, notificar po
     
       <li class="post">
         <a href="/blog/2012/09/18/usando-svn-push-con-jenkins/">usando svn push con jenkins</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">definiendo un smarthost en mac os x</a>
       </li>
     
   </ul>
@@ -427,7 +462,7 @@ El workflow se encarga del resto: ejecutar los comandos necesarios, notificar po
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2012 - osvaldo -
+  Copyright &copy; 2013 - osvaldo -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

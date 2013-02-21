@@ -5,16 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>guia rapida de git para equipos - devops-ar</title>
+  <title>reiniciar un dell via idrac - devops-ar</title>
   <meta name="author" content="osvaldo">
 
   
-  <meta name="description" content="¿Quien soy? Si se ejecuta git config -l deberia obtenerse algo asi. 1
-2
-3
-$ git config -l
-user.name=Osvaldo
-user.email=osvaldo@example.com Si no &hellip;">
+  <meta name="description" content="Los servidores Dell tienen una interface adicional para la administracion del equipo: idrac. Esta interface se configura adicionalmente al equipo y &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -23,7 +18,7 @@ user.email=osvaldo@example.com Si no &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://devops-ar.github.com/blog/2012/02/03/guia-rapida-de-git-para-equipos/">
+  <link rel="canonical" href="http://devops-ar.github.com/blog/2013/02/21/reiniciar-un-dell-via-idrac/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -84,7 +79,7 @@ user.email=osvaldo@example.com Si no &hellip;">
   
   <header>
     
-      <h1 class="entry-title">Guia Rapida De Git Para Equipos</h1>
+      <h1 class="entry-title">Reiniciar Un Dell via Idrac</h1>
     
     
       <p class="meta">
@@ -100,7 +95,7 @@ user.email=osvaldo@example.com Si no &hellip;">
   
 
 
-<time datetime="2012-02-03T01:54:00-03:00" pubdate data-updated="true">Feb 3<span>rd</span>, 2012</time>
+<time datetime="2013-02-21T08:25:00-03:00" pubdate data-updated="true">Feb 21<span>st</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -109,70 +104,66 @@ user.email=osvaldo@example.com Si no &hellip;">
   </header>
 
 
-<div class="entry-content"><h2>¿Quien soy?</h2>
+<div class="entry-content"><p>Los servidores Dell tienen una interface adicional para la administracion del equipo: idrac.  Esta interface se configura adicionalmente al equipo y consiste de una placa de red con un software standalone, independiente del sistema operativo del equipo, y que permite acceso al server como si se estuviera fisicamente delante del servidor (consola). Tiene dos accesos, via web (https) y via consola (ssh).</p>
 
-<p>Si se ejecuta <code>git config -l</code> deberia obtenerse algo asi.</p>
+<p>El siguiente script permite ejecutar un reset del servidor sin necesidad de acceder por la web. Se puede incorporar en un chequeo automatizado (si falla el chequeo, se lanza el reset). Utiliza expect para manejar el proceso de login.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>git config -l
-</span><span class='line'>user.name<span class="o">=</span>Osvaldo
-</span><span class='line'>user.email<span class="o">=</span>osvaldo@example.com
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#!/bin/sh</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># if [ x&quot;$1&quot; = &quot;x&quot; ]; then</span>
+</span><span class='line'><span class="c">#     echo &quot;Usage `basename $0` &lt;DRAC unique ID&gt;&quot;</span>
+</span><span class='line'><span class="c">#     exit -1</span>
+</span><span class='line'><span class="c"># fi</span>
+</span><span class='line'><span class="c">#DRAC_ID=$1</span>
+</span><span class='line'><span class="nv">HOSTNAME</span><span class="o">=</span>10.10.100.13
+</span><span class='line'><span class="nv">USER</span><span class="o">=</span>admin
+</span><span class='line'><span class="nv">ALERT</span><span class="o">=</span>root@example.com
+</span><span class='line'><span class="nv">SMTP_SERVER</span><span class="o">=</span>mail.example.com
+</span><span class='line'><span class="nv">PASSWORD</span><span class="o">=</span>secret
+</span><span class='line'>
+</span><span class='line'>expect -c <span class="s2">&quot;</span>
+</span><span class='line'><span class="s2">set timeout 20</span>
+</span><span class='line'><span class="s2">spawn ssh $USER@$HOSTNAME</span>
+</span><span class='line'><span class="s2">expect *password:</span>
+</span><span class='line'><span class="s2">send \&quot;$PASSWORD\r\&quot;</span>
+</span><span class='line'><span class="s2">set timeout 5</span>
+</span><span class='line'><span class="s2">expect \&quot;\[root\]# \&quot;</span>
+</span><span class='line'><span class="s2">expect \&quot;/admin1-&gt;\&quot;</span>
+</span><span class='line'><span class="s2">send \&quot;reset  /admin1/system1\r\&quot;</span>
+</span><span class='line'><span class="s2">expect \&quot;/admin1-&gt;\&quot;</span>
+</span><span class='line'><span class="s2">send \&quot;version\r\&quot;</span>
+</span><span class='line'><span class="s2">send \&quot;exit\r\&quot;</span>
+</span><span class='line'><span class="s2">&quot;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Si no hemos configurado aun git, empecemos por ahi.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>git config --global user.email <span class="s2">&quot;osvaldo@example.com&quot;</span>
-</span><span class='line'>git config --global user.name <span class="s2">&quot;Osvaldo&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Crear un repo</h2>
-
-<p>Se puede crear un repositorio nuevo</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>git init
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>o se puede clonar un ya existente</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'>git clone ssh://192.168.20.52/home/osvaldo/chef-repo .
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Branches</h2>
-
-<p>Una branch puede ser creado por un próposito definido (arreglar un bug, <a href="http://nvie.com/posts/a-successful-git-branching-model/">introducir una nueva funcionalidad</a>. También puede ser por usuario. De esta manera, cada uno tiene su branch, donde puede realizar las modificaciones sin afectar el trabajo que estén haciendo otros. Una vez el código esta listo para producción, se hace el merge a la branch master (<a href="http://kentnguyen.com/development/visualized-git-practices-for-team/">haciendo primero un <code>git pull -rebase</code></a>).</p>
-
-<h2>Flujo de trabajo</h2>
-
-<p>El flujo de trabajo con las branches seria</p>
-
-<ul>
-<li>configurar git</li>
-<li>clonar el repo <code>git fetch</code></li>
-<li>crear/moverme a la branch personal <code>git checkout -b otsuarez</code></li>
-<li>editar <code>git -m -a ".. cambios .."</code> (nota. en la branch personal: &#8220;otsuarez&#8221;).</li>
-<li>cambiar a la branch principal y copiar los cambios para ahi <code>git checkout master</code> y despues <code>git merge otsuarez</code></li>
-<li>actualizar el repo central. <code>git push origin master</code></li>
-<li>opcionalmente podemos borrar la rama creada <code>git branch -D otsuarez</code></li>
-</ul>
-
-
-<h3>Referencias</h3>
-
-<ul>
-<li><a href="http://www.spheredev.org/wiki/Git_for_the_lazy">http://www.spheredev.org/wiki/Git_for_the_lazy</a></li>
-<li><a href="http://help.github.com/git-cheat-sheets/">http://help.github.com/git-cheat-sheets/</a></li>
-</ul>
-
+<p>Mas información sobre los comandos de idrac se puede encontrar en el  <a href="http://support.dell.com/support/edocs/software/smdrac3/idrac/idrac22modular/en/ug/html/chap14.htm">manual de Dell</a>.</p>
 </div>
 
 
@@ -195,21 +186,15 @@ user.email=osvaldo@example.com Si no &hellip;">
   
 
 
-<time datetime="2012-02-03T01:54:00-03:00" pubdate data-updated="true">Feb 3<span>rd</span>, 2012</time>
+<time datetime="2013-02-21T08:25:00-03:00" pubdate data-updated="true">Feb 21<span>st</span>, 2013</time>
       
-
-<span class="categories">
-  
-    <a class='category' href='/blog/categories/git/'>git</a>
-  
-</span>
 
 
     </p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://devops-ar.github.com/blog/2012/02/03/guia-rapida-de-git-para-equipos/" data-via="devops_ar" data-counturl="http://devops-ar.github.com/blog/2012/02/03/guia-rapida-de-git-para-equipos/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://devops-ar.github.com/blog/2013/02/21/reiniciar-un-dell-via-idrac/" data-via="devops_ar" data-counturl="http://devops-ar.github.com/blog/2013/02/21/reiniciar-un-dell-via-idrac/" >Tweet</a>
   
   
   
@@ -218,10 +203,8 @@ user.email=osvaldo@example.com Si no &hellip;">
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2012/01/02/manejando-trazas/" title="Previous Post: instalando graylog2">&laquo; instalando graylog2</a>
+        <a class="basic-alignment left" href="/blog/2012/11/20/instalando-servidores-con-un-commit/" title="Previous Post: instalando servidores con un commit">&laquo; instalando servidores con un commit</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2012/02/03/empezando-con-chef/" title="Next Post: empezando con chef">empezando con chef &raquo;</a>
       
     </p>
   </footer>
@@ -304,8 +287,8 @@ user.email=osvaldo@example.com Si no &hellip;">
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://devops-ar.github.com/blog/2012/02/03/guia-rapida-de-git-para-equipos/';
-        var disqus_url = 'http://devops-ar.github.com/blog/2012/02/03/guia-rapida-de-git-para-equipos/';
+        var disqus_identifier = 'http://devops-ar.github.com/blog/2013/02/21/reiniciar-un-dell-via-idrac/';
+        var disqus_url = 'http://devops-ar.github.com/blog/2013/02/21/reiniciar-un-dell-via-idrac/';
         var disqus_script = 'embed.js';
       
     (function () {

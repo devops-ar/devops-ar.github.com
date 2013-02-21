@@ -9,12 +9,7 @@
   <meta name="author" content="osvaldo">
 
   
-  <meta name="description" content="tl;dr Agregar en el archivo .conf del apache para el sitio sin ssl: 1
-2
-3
-RewriteEngine On
-RewriteCond %{HTTP:X-Forwarded-Proto} !=https
-RewriteRule &hellip;">
+  <meta name="description" content="Es común tener un smarthost o relay de correo en las intranet. Si tenemos un equipo con Mac OS X y necesitamos configurarle que todos los correos que &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -81,6 +76,68 @@ RewriteRule &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">Definiendo Un Smarthost en Mac Os X</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-27T11:36:00-03:00" pubdate data-updated="true">Aug 27<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Es común tener un smarthost o relay de correo en las intranet. Si tenemos un equipo con Mac OS X  y necesitamos configurarle que todos los correos que envia salgan a través de un servidor en particular, estos serian los pasos. La pasarela de mensajeria seria para este caso: mailgateway.example.com. El puerto 25 en el smarthost deberia estar accesible desde el host que estamos configurando.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>postconf -e <span class="nv">relayhost</span><span class="o">=</span>mailgateway.example.com
+</span><span class='line'>launchctl stop org.postfix.master
+</span><span class='line'>launchctl unload /System/Library/LaunchDaemons/org.postfix.master.plist
+</span><span class='line'>launchctl load /System/Library/LaunchDaemons/org.postfix.master.plist
+</span><span class='line'>launchctl start org.postfix.master
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Si se quiere comprobar utilizar los siguientes comandos.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">echo</span> <span class="s2">&quot;test&quot;</span> | mail -s <span class="s2">&quot;test&quot;</span> osvaldo@example.com
+</span><span class='line'>tail -f /var/log/mail.log
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Me guie por (este link)[http://thomer.com/howtos/postfix_smarthost_mailavenger.html] donde se explica además como configurar la autenticación si el smarthost lo requiere..</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -341,118 +398,6 @@ RewriteRule &hellip;">
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/19/sendmail-cookbook/">Sendmail Cookbook</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-19T14:02:00-03:00" pubdate data-updated="true">May 19<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/05/19/sendmail-cookbook/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Postfix se ha convertido en el MTA por excelencia para la mayoría de las distribuciones Linux. Sin embargo, algunas, como CentOS (hasta la 5 al menos) instalan sendmail de manera predeterminada. A menos que estemos instalando un servidor de mensajeria, utilizar sendmail sería la mejor opción. Es sencillo de configurar, ya esta instalado y para el uso que le vamos a dar, cumple su cometido.</p>
-
-<p>Para cubrir la parte de configuración y ahorrarnos ese paso, se armo un cookbook que solo contiene tres archivos.</p>
-
-<p>Lo primero que hacemos es crear un archivo de atributos donde se define el smarthost que se este utilizando. Como todo atributo, puede ser modificado luego a nivel de role o de ambiente (environment), incluso, a nivel de node mediante el uso de un data bag.</p>
-
-<figure class='code'><figcaption><span>cookbooks/sendmail/attributes/default.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">default</span><span class="o">[</span><span class="s2">&quot;sendmail&quot;</span><span class="o">][</span><span class="s2">&quot;smarthost&quot;</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&quot;mail-gateway.acme.com&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Sendmail maneja sus archivos de configuración a través de macros m4. Nunca se editan los archivos .cf tal como se aclaran en los mismos:</p>
-
-<figure class='code'><figcaption><span>sendmail.cf line 25</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c">#####   DO NOT EDIT THIS FILE!  Only edit the source .mc file.</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>El archivo de template de sendmail.mc es una copia del archivo original, solo se adiciona la linea de definición del smarthost utilizando el atributo antes definido.</p>
-
-<figure class='code'><figcaption><span>cookbooks/sendmail/templates/default/sendmail.mc.erb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">define</span><span class="p">(</span><span class="sb">`SMART_HOST&#39;, `</span><span class="o">&lt;%=</span> <span class="n">node</span><span class="o">[</span><span class="s1">&#39;sendmail&#39;</span><span class="o">][</span><span class="s1">&#39;smarthost&#39;</span><span class="o">]</span> <span class="o">%&gt;</span><span class="err">&#39;</span><span class="p">)</span><span class="n">dnl</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>El tercer archivo es la receta como tal.</p>
-
-<figure class='code'><figcaption><span>cookbooks/sendmail/recipes/default.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="n">package</span> <span class="s2">&quot;m4&quot;</span>
-</span><span class='line'><span class="n">package</span> <span class="s2">&quot;sendmail&quot;</span>
-</span><span class='line'><span class="n">package</span> <span class="s2">&quot;sendmail-cf&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">service</span> <span class="s1">&#39;sendmail&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">template</span> <span class="s2">&quot;/etc/mail/sendmail.mc&quot;</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">source</span> <span class="s2">&quot;sendmail.mc.erb&quot;</span>
-</span><span class='line'>  <span class="n">mode</span> <span class="mo">0644</span>
-</span><span class='line'>  <span class="n">owner</span> <span class="s2">&quot;root&quot;</span>
-</span><span class='line'>  <span class="n">group</span> <span class="s2">&quot;root&quot;</span>
-</span><span class='line'>  <span class="n">notifies</span> <span class="ss">:run</span><span class="p">,</span> <span class="s2">&quot;execute[create_sendmailcf_file]&quot;</span><span class="p">,</span> <span class="ss">:immediately</span>
-</span><span class='line'>  <span class="n">notifies</span> <span class="ss">:restart</span><span class="p">,</span> <span class="s2">&quot;service[sendmail]&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">execute</span> <span class="s2">&quot;create_sendmailcf_file&quot;</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">command</span> <span class="s2">&quot;/usr/bin/m4 /etc/mail/sendmail.mc &gt; /etc/mail/sendmail.cf&quot;</span>
-</span><span class='line'>  <span class="n">action</span> <span class="ss">:nothing</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Las tres primeras lineas se aseguran de que los paquetes requeridos se encuentren instalados en el sistema.</p>
-
-<p>La declaración del servicio <code>sendmail</code> se encarga de configurarlo para que inicie de manera automática y poder enviarle notificaciones desde otras partes de la receta.</p>
-
-<p>Se crea el archivo de configuración del sendmail: sendmail.mc a partir del template. En el caso de que ya existiera no se hace mas nada. Para los casos en que se crea o fue modificado, se ejecuta de manera inmediata el comando de creación del archivo sendmail.cf y se declara que el servicio de sendmail sea reiniciado, para tomar los cambios aplicados, una vez que el chef haya terminado de aplicar todas las recetas.</p>
-
-<p>El comando <code>create_sendmailcf_file</code> no hace nada de manera predeterminada. Solo se ejecuta en caso de modificación del template del archivo de configuración del sendmail.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -470,6 +415,10 @@ RewriteRule &hellip;">
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/02/21/reiniciar-un-dell-via-idrac/">reiniciar un dell via idrac</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/11/20/instalando-servidores-con-un-commit/">instalando servidores con un commit</a>
       </li>
     
@@ -483,10 +432,6 @@ RewriteRule &hellip;">
     
       <li class="post">
         <a href="/blog/2012/09/18/usando-svn-push-con-jenkins/">usando svn push con jenkins</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/27/definiendo-un-smarthost-en-mac-os-x/">definiendo un smarthost en mac os x</a>
       </li>
     
   </ul>
@@ -519,7 +464,7 @@ RewriteRule &hellip;">
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2012 - osvaldo -
+  Copyright &copy; 2013 - osvaldo -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
